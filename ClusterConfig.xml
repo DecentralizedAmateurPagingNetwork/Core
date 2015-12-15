@@ -1,0 +1,40 @@
+<!--
+  ~ DAPNET CORE PROJECT
+  ~ Copyright (C) 2015
+  ~
+  ~ Daniel Sialkowski
+  ~
+  ~ daniel.sialkowski@rwth-aachen.de
+  ~
+  ~ Institut für Hochfrequenztechnik
+  ~ RWTH AACHEN UNIVERSITY
+  ~ Melatener Str. 25
+  ~ 52074 Aachen
+  -->
+
+<!--Do not change anything but the marked parameters!!!-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:org:jgroups"
+        xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
+    <TCP bind_port="7800"/>
+    <!--Add here known initial hosts: HostA[7800],HostB[7800]...-->
+    <TCPPING initial_hosts="192.168.100.103[7800]"
+             port_range="1"/>
+    <!--Enter here your node key-->
+    <AUTH auth_class="org.dapnet.core.cluster.ClusterAuthentication"
+          auth_value="DS-TPKey"/>
+    <MERGE3/>
+    <FD_SOCK/>
+    <FD/>
+    <VERIFY_SUSPECT/>
+    <pbcast.NAKACK2 use_mcast_xmit="false"/>
+    <UNICAST3/>
+    <pbcast.STABLE/>
+    <MFC/>
+    <FRAG2/>
+    <pbcast.STATE_TRANSFER/>
+    <pbcast.FLUSH timeout="2000"/>
+    <!--Enter here NodeName@ClusterName -->
+    <pbcast.GMS name="DS-TP@DAPNet0.1"
+                print_local_addr="false"/>
+</config>

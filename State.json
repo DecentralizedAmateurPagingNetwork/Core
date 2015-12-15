@@ -1,0 +1,167 @@
+{
+  "callSigns": [
+    {
+      "name": "Testrufzeichen",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 36866,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "admin"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "DS-TP",
+      "address": {
+        "ip_addr": "192.168.100.103",
+        "port": 7800
+      },
+      "status": "ONLINE",
+      "key": "1000:c761cb478a66a630839c2033f9db5609a9e63e7c80f489a5:efd3892a408559f5fb95c3155e242cc8bf25a34e1e67ccb3"
+    }
+  ],
+  "users": [
+    {
+      "name": "admin",
+      "hash": "1000:60a1b5016c34444e212c49b194fafc69275d9aeaaae4c169:ceaea9e9809928d129c9c77f9a735710a509fc5350fdaa37",
+      "mail": "admin@admin.de",
+      "admin": true
+    }
+  ],
+  "calls": [
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:47:57 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:48:04 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:48:10 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:48:18 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:50:30 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Das ist ein Test",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:51:00 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Das ist ein Test",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 2:54:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Das ist ein Test",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "Testgruppe"
+      ],
+      "emergency": false,
+      "timestamp": "Oct 27, 2015 3:18:43 PM",
+      "ownerName": "admin"
+    }
+  ],
+  "news": [],
+  "transmitters": [
+    {
+      "name": "Testsender",
+      "longitude": 10.0,
+      "latitude": 0.0,
+      "power": 10.0,
+      "nodeName": "DS-TP",
+      "address": {
+        "ip_addr": "192.168.0.103",
+        "port": 1337
+      },
+      "timeSlot": "0123456789ABCDEF",
+      "ownerNames": [
+        "admin"
+      ],
+      "deviceType": "RASPPAGER1",
+      "status": "ONLINE"
+    }
+  ],
+  "transmitterGroups": [
+    {
+      "name": "Testgruppe",
+      "description": "Nur zum Testen",
+      "transmitterNames": [
+        "Testsender"
+      ],
+      "ownerNames": [
+        "admin"
+      ]
+    }
+  ],
+  "rubrics": []
+}

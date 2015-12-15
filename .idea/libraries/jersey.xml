@@ -1,0 +1,28 @@
+<component name="libraryTable">
+  <library name="jersey">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jersey/asm-all-repackaged-2.2.0-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/cglib-2.2.0-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/guava-14.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/hk2-api-2.2.0-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/hk2-locator-2.2.0-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/hk2-utils-2.2.0-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/javax.annotation-api-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/javax.inject-2.2.0-b14.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/javax.servlet-api-3.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/javax.ws.rs-api-2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jaxb-api-2.2.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jersey-client.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jersey-common.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jersey-container-jdk-http-2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jersey-container-servlet-core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jersey-container-servlet.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/jersey-server.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/osgi-resource-locator-1.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/persistence-api-1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jersey/org.osgi.core-4.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

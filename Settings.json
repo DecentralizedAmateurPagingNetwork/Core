@@ -1,0 +1,29 @@
+{
+  "transmissionSettings": {
+    "pagingProtocolSettings": {
+      "numberOfSyncLoops": 5,
+      "sendSpeed": 1
+    },
+    "raspager1Settings": {
+      "maxNumberOfReconnects": 5,
+      "reconnectWaitTime": -1,
+      "connectionTimeout": 5000,
+      "maxMessageCount": 4,
+      "transmissionDelay": 500
+    }
+  },
+  "modelSettings": {
+    "stateFile": "State.json"
+  },
+  "restSettings": {
+    "baseUrl": "http://localhost:8080/"
+  },
+  "clusterSettings": {
+    "responseTimeout": 10000,
+    "clusterConfigurationFile": "ClusterConfig.xml"
+  },
+  "schedulerSettings": {
+    "timeTransmissionPeriod": 1200000,
+    "rubricTransmissionTimer": 21600000
+  }
+}
