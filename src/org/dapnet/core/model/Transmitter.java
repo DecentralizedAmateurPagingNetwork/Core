@@ -19,8 +19,7 @@ import org.dapnet.core.model.validator.TimeSlot;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.jgroups.stack.IpAddress;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -30,10 +29,23 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
     protected String name;
 
-    //Not used in moment
-    protected double longitude;
-    protected double latitude;
-    protected double power;
+    @NotNull(message = "nicht vorhanden")
+    @Digits(integer=3, fraction=8)
+    @Min(-180)
+    @Max(+180)
+    protected String longitude;
+
+    @NotNull(message = "nicht vorhanden")
+    @Digits(integer=3, fraction=8)
+    @Min(-90)
+    @Max(+90)
+    protected String latitude;
+
+    @NotNull(message = "nicht vorhanden")
+    @Digits(integer=3, fraction=3)
+    @Min(0)
+    @Max(200)
+    protected String power;
 
     @NotNull(message = "nicht vorhanden")
     protected String nodeName;
@@ -67,8 +79,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     public Transmitter() {
     }
 
-    public Transmitter(String name, double longitude, double latitude,
-                       double power, IpAddress address, DeviceType deviceType, String timeSlot, ArrayList<String> ownerNames) {
+    public Transmitter(String name, String longitude, String latitude,
+                       String power, IpAddress address, DeviceType deviceType, String timeSlot, ArrayList<String> ownerNames) {
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -87,27 +99,27 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
         this.name = name;
     }
 
-    public double getLongitude() {
+    public String getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
 
-    public double getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
 
-    public double getPower() {
+    public String getPower() {
         return power;
     }
 
-    public void setPower(double power) {
+    public void setPower(String power) {
         this.power = power;
     }
 

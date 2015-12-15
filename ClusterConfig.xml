@@ -22,7 +22,7 @@
              port_range="1"/>
     <!--Enter here your node key-->
     <AUTH auth_class="org.dapnet.core.cluster.ClusterAuthentication"
-          auth_value="DS-TPKey"/>
+          auth_value="DS-TP"/>
     <MERGE3/>
     <FD_SOCK/>
     <FD/>

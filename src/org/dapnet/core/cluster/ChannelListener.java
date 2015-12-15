@@ -59,8 +59,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
             if (clusterManager.getState().getUsers().size() == 0) {
                 createFirstUser();
             }
-        }
-        else {
+        } else {
             //Update NodeStatus in existing Cluster to online
             if (!clusterManager.updateNodeStatus(Node.Status.ONLINE)) {
                 logger.error("Could not update NodeStatus");
@@ -83,10 +82,17 @@ public class ChannelListener implements org.jgroups.ChannelListener {
         Scanner scanner = new Scanner(System.in);
         String key = scanner.nextLine();
 
+        System.out.println("Longitude:");
+        String longitude = scanner.nextLine();
+
+        System.out.println("Latitude:");
+        String latitude = scanner.nextLine();
+
         IpAddress address = (IpAddress) clusterManager.getChannel().
                 down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
 
-        Node node = new Node(clusterManager.getChannel().getName(), address, Node.Status.ONLINE, key);
+        Node node = new Node(clusterManager.getChannel().getName(), address, longitude, latitude, Node.Status.ONLINE,
+                key);
         try {
             node.setKey(HashUtil.createHash(node.getKey()));
         } catch (Exception e) {
@@ -95,12 +101,9 @@ public class ChannelListener implements org.jgroups.ChannelListener {
             DAPNetCore.stopDAPNetCore();
         }
 
-        if(clusterManager.handleStateOperation(null, "putNode", new Object[]{node}, new Class[]{Node.class}))
-        {
+        if (clusterManager.handleStateOperation(null, "putNode", new Object[]{node}, new Class[]{Node.class})) {
             logger.info("First node successfully created");
-        }
-        else
-        {
+        } else {
             logger.fatal("First node could not been created");
             DAPNetCore.stopDAPNetCore();
         }
@@ -114,12 +117,9 @@ public class ChannelListener implements org.jgroups.ChannelListener {
         node.setAddress(address);
         node.setStatus(Node.Status.ONLINE);
 
-        if(clusterManager.handleStateOperation(null, "putNode", new Object[]{node}, new Class[]{Node.class}))
-        {
+        if (clusterManager.handleStateOperation(null, "putNode", new Object[]{node}, new Class[]{Node.class})) {
             logger.info("First node successfully updated");
-        }
-        else
-        {
+        } else {
             logger.fatal("First node could not been created");
             DAPNetCore.stopDAPNetCore();
         }
@@ -144,12 +144,9 @@ public class ChannelListener implements org.jgroups.ChannelListener {
             DAPNetCore.stopDAPNetCore();
         }
 
-        if(clusterManager.handleStateOperation(null, "putUser", new Object[]{user}, new Class[]{User.class}))
-        {
+        if (clusterManager.handleStateOperation(null, "putUser", new Object[]{user}, new Class[]{User.class})) {
             logger.info("First user successfully updated");
-        }
-        else
-        {
+        } else {
             logger.fatal("First user could not been created");
             DAPNetCore.stopDAPNetCore();
         }

@@ -17,8 +17,7 @@ package org.dapnet.core.model;
 import org.dapnet.core.model.list.Searchable;
 import org.jgroups.stack.IpAddress;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 
 public class Node implements Serializable, Searchable {
@@ -26,6 +25,18 @@ public class Node implements Serializable, Searchable {
     @NotNull(message = "nicht vorhanden")
     @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
     private String name;
+
+    @NotNull(message = "nicht vorhanden")
+    @Digits(integer=3, fraction=8)
+    @Min(-180)
+    @Max(+180)
+    protected String longitude;
+
+    @NotNull(message = "nicht vorhanden")
+    @Digits(integer=3, fraction=8)
+    @Min(-90)
+    @Max(+90)
+    protected String latitude;
 
     @NotNull(message = "nicht vorhanden")
     private IpAddress address;
@@ -41,8 +52,10 @@ public class Node implements Serializable, Searchable {
     }
 
     // Used in case of creating new cluster
-    public Node(String name, IpAddress address, Status status, String key) {
+    public Node(String name, IpAddress address, String longitude, String latitude, Status status, String key) {
         this.name = name;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.address = address;
         this.status = status;
         this.key = key;
@@ -62,6 +75,22 @@ public class Node implements Serializable, Searchable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
     }
 
     public IpAddress getAddress() {
