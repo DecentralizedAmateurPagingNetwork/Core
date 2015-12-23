@@ -15,9 +15,13 @@
 package org.dapnet.core.model;
 
 import org.dapnet.core.model.list.Searchable;
+import org.dapnet.core.model.validator.DescriptionPayload;
+import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -81,8 +85,7 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
         state = statePar;
     }
 
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "bla", alias = "bla")
     public ArrayList<User> getOwners() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -93,11 +96,11 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
             if (state.getUsers().contains(owner))
                 users.add(state.getUsers().findByName(owner));
         }
-        if (ownerNames.size() == users.size())
-            return users;
-        else
+        if(users.size()!=ownerNames.size())
             return null;
+        return users;
     }
+
 
     @Override
     public String toString() {

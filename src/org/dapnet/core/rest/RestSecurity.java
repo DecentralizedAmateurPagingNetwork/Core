@@ -63,7 +63,7 @@ public class RestSecurity {
         //ValidatePassword
         boolean authenticated = false;
         try {
-            authenticated = HashUtil.validatePassword(user.getName(), user.getHash());
+            authenticated = HashUtil.validatePassword(loginData.getPassword(), user.getHash());
         } catch (Exception e) {
             logger.error("Error while validating password");
             e.printStackTrace();

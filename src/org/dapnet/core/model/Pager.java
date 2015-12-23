@@ -24,8 +24,8 @@ public class Pager implements Serializable {
     //No ID
 
     @NotNull(message = "nicht vorhanden")
-    @Min(value = 0, message = "muss zwischen 0 und 2097151 liegen")
-    @Max(value = 2097151, message = "muss zwischen 0 und 2097151 liegen")
+    @Min(value = 0)//, message = "muss zwischen 0 und 2097151 liegen")
+    @Max(value = 2097151)//, message = "muss zwischen 0 und 2097151 liegen")
     int number;
 
     @NotNull(message = "nicht vorhanden")

@@ -12,6 +12,58 @@
       "ownerNames": [
         "admin"
       ]
+    },
+    {
+      "name": "TestSign4",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 37866,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "admin"
+      ]
+    },
+    {
+      "name": "TestSign5",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 37866,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "admin"
+      ]
+    },
+    {
+      "name": "TestSign6",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 37866,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "user"
+      ]
+    },
+    {
+      "name": "TestSign7",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 37866,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "user"
+      ]
     }
   ],
   "nodes": [
@@ -36,9 +88,15 @@
     },
     {
       "name": "admin2",
-      "hash": "1000:5ab5a0a0e76531563680e1b089b2d9c3ec37799815efc79a:d71460950861da06e98892c1488b076303eb6045b7777d5c",
+      "hash": "1000:1658a644e251b650f92933f2e2a89a1750a4bfb055e82a7d:92ee7baf5c5cb216cfbc00d98724c72d64c5d41f0e13fdad",
       "mail": "admin2@test.de",
-      "admin": true
+      "admin": false
+    },
+    {
+      "name": "user",
+      "hash": "1000:289f8bb1bb92058b1b26f3a1a3a9e66fc3d5d1e720db81b4:13f12acfe082137d291d07cb908b7455f7c1c10b1873c03a",
+      "mail": "admin2@test.de",
+      "admin": false
     }
   ],
   "calls": [],
@@ -59,7 +117,7 @@
         "admin"
       ],
       "deviceType": "RASPPAGER1",
-      "status": "OFFLINE"
+      "status": "ERROR"
     }
   ],
   "transmitterGroups": [],

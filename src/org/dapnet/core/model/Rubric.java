@@ -114,6 +114,8 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
             return null;
     }
 
+
+
     @NotNull(message = "müssen existieren")
     @Size(min = 1, message = "müssen existieren")
     public ArrayList<User> getOwners() throws Exception {

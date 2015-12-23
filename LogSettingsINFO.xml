@@ -47,15 +47,15 @@
         <logger name="org.jgroups.protocols" level="error"/>
 
         <!--Rest-->
-        <logger name="org.dapnet.core.rest.AbstractResource" level="info"/>
-        <logger name="org.dapnet.core.rest.CallResource" level="info"/>
-        <logger name="org.dapnet.core.rest.CallSignResource" level="info"/>
-        <logger name="org.dapnet.core.rest.NewsResource" level="info"/>
-        <logger name="org.dapnet.core.rest.NodeResource" level="info"/>
-        <logger name="org.dapnet.core.rest.RubricResource" level="info"/>
-        <logger name="org.dapnet.core.rest.TransmitterGroupResource" level="info"/>
-        <logger name="org.dapnet.core.rest.TransmitterResource" level="info"/>
-        <logger name="org.dapnet.core.rest.UserResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.AbstractResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.CallResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.CallSignResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.NewsResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.NodeResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.RubricResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.TransmitterGroupResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.TransmitterResource" level="info"/>
+        <logger name="org.dapnet.core.rest.resources.UserResource" level="info"/>
 
         <logger name="org.dapnet.core.rest.RestManager" level="info"/>
         <logger name="org.dapnet.core.rest.RestSecurity" level="error"/>

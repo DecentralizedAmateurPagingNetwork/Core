@@ -21,6 +21,7 @@ import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.transmission.TransmissionManager;
 
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -93,6 +94,8 @@ public class DAPNetCore {
         setJavaLogLevelToWarn();
         //Set Path to LogSettings
         Configurator.initialize("main", "LogSettings.xml");
+        //Set language to English
+        Locale.getDefault().setDefault(Locale.ENGLISH);
 
         dapNetCore = new DAPNetCore();
         dapNetCore.start();
