@@ -12,7 +12,7 @@
  * 52074 Aachen
  */
 
-package org.dapnet.core.rest.exceptionHandling;
+package org.dapnet.core.rest.ExceptionHandlingTemp;
 
-public class test {
+public class NoQuorumException extends Exception {
 }

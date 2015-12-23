@@ -12,7 +12,7 @@
  * 52074 Aachen
  */
 
-package org.dapnet.core.rest.ExceptionHandling;
+package org.dapnet.core.rest.ExceptionHandlingTemp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

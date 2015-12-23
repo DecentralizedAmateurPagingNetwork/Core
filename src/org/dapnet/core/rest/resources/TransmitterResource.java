@@ -16,7 +16,7 @@ package org.dapnet.core.rest.resources;
 
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
+import org.dapnet.core.rest.ExceptionHandlingTemp.EmptyBodyException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

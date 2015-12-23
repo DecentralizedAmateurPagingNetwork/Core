@@ -15,15 +15,12 @@
 package org.dapnet.core.rest.resources;
 
 import org.dapnet.core.model.Activation;
-import org.dapnet.core.model.Call;
 import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
+import org.dapnet.core.rest.ExceptionHandlingTemp.EmptyBodyException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Path("/activation")
 @Produces("application/json")
