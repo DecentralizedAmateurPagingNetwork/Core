@@ -14,6 +14,8 @@
 
 package org.dapnet.core.model;
 
+import org.dapnet.core.model.validator.ValidName;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -23,28 +25,27 @@ import java.util.List;
 
 public class Call implements Serializable {
     //No ID
-
     @NotNull
-    @Size(min = 1, max = 80, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @Size(min = 1, max = 80)
     private String text;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen callSignNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one callSignName")
     private List<String> callSignNames;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen transmitterGroupNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one transmitterGroupName")
     private List<String> transmitterGroupNames;
 
     //No Validation necessary
     private boolean emergency;
 
     //Internally set
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private Date timestamp;
 
     //Internally set
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private String ownerName;
 
 
@@ -87,8 +88,8 @@ public class Call implements Serializable {
         state = statePar;
     }
 
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "must contain names of existing callSigns",
+            fieldName = "callSignNames", constraintName = "ValidCallSignNames")
     public ArrayList<CallSign> getCallSigns() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -105,8 +106,8 @@ public class Call implements Serializable {
             return null;
     }
 
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "must contain names of existing transmitterGroups",
+            fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
     public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -123,7 +124,8 @@ public class Call implements Serializable {
             return null;
     }
 
-    @NotNull(message = "muss existieren")
+    @ValidName(message = "must be a name of an existing user",
+            fieldName = "ownerName", constraintName = "ValidOwnerName")
     public User getOwner() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");

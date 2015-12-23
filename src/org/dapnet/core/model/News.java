@@ -14,6 +14,8 @@
 
 package org.dapnet.core.model;
 
+import org.dapnet.core.model.validator.ValidName;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -23,25 +25,25 @@ import java.util.Date;
 
 public class News implements Serializable {
     //No ID
-
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, max = 80, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 1, max = 80)
     private String text;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private String rubricName;
 
-    @NotNull(message = "nicht vorhanden")
-    @Min(value = 1, message = "muss zwischen 1 und 10 liegen")
-    @Max(value = 10, message = "muss zwischen 1 und 10 liegen")
+    @NotNull
+    @Min(value = 1)
+    @Max(value = 10)
     private int number;
 
     //Internally set
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private Date timestamp;
 
     //Internally set
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one ownerName")
     private String ownerName;
 
     public String getText() {
@@ -95,7 +97,8 @@ public class News implements Serializable {
         state = statePar;
     }
 
-    @NotNull(message = "muss existieren")
+    @ValidName(message = "must contain the name of an existing rubric",
+            fieldName = "rubricName", constraintName = "ValidRubricName")
     public Rubric getRubric() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -105,7 +108,8 @@ public class News implements Serializable {
             return state.getRubrics().findByName(rubricName);
     }
 
-    @NotNull(message = "muss existieren")
+    @ValidName(message = "must contain the name of an existing user",
+            fieldName = "ownerNames", constraintName = "ValidOwnerNames")
     public User getOwner() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");

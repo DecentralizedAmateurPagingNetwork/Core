@@ -25,15 +25,15 @@ import java.util.ArrayList;
 
 public class User implements Serializable, Searchable, RestAuthorizable {
     //ID
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 3, max = 20)
     private String name;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 102, max = 102, message = "ist ungültig")
+    @NotNull
+    @Size(min = 102, max = 102)
     private String hash;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @EMail
     private String mail;
 

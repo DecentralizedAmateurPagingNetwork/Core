@@ -23,13 +23,13 @@ import java.io.Serializable;
 public class Pager implements Serializable {
     //No ID
 
-    @NotNull(message = "nicht vorhanden")
-    @Min(value = 0)//, message = "muss zwischen 0 und 2097151 liegen")
-    @Max(value = 2097151)//, message = "muss zwischen 0 und 2097151 liegen")
+    @NotNull
+    @Min(value = 0)
+    @Max(value = 2097151)
     int number;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 3, max = 20)
     String name;
 
     public int getNumber() {

@@ -29,20 +29,21 @@ import java.util.ArrayList;
 
 public class CallSign implements Serializable, RestAuthorizable, Searchable {
     //ID
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 3, max = 20)
     private String name;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 0, max = 60, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 0, max = 60)
     private String description;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Valid
+    @Size(min = 1, message = "must contain at least one pager")
     private ArrayList<Pager> pagers;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen ownerNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one ownerName")
     private ArrayList<String> ownerNames;
 
 
@@ -85,7 +86,8 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
         state = statePar;
     }
 
-    @ValidName(message = "bla", alias = "bla")
+    @ValidName(message = "must contain names of existing users",
+            fieldName = "ownerNames", constraintName = "ValidOwnerNames")
     public ArrayList<User> getOwners() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -100,7 +102,6 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
             return null;
         return users;
     }
-
 
     @Override
     public String toString() {

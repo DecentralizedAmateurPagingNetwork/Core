@@ -15,6 +15,7 @@
 package org.dapnet.core.model;
 
 import org.dapnet.core.model.list.Searchable;
+import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
 import javax.validation.constraints.Max;
@@ -27,25 +28,25 @@ import java.util.List;
 
 public class Rubric implements Serializable, RestAuthorizable, Searchable {
     //ID
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 3, max = 20)
     private String name;
 
-    @NotNull(message = "nicht vorhanden")
-    @Min(value = 1, message = "muss zwischen 1 und 95 liegen")
-    @Max(value = 95, message = "muss zwischen 1 und 95 liegen")
+    @NotNull
+    @Min(value = 1)
+    @Max(value = 95)
     private int number;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen transmitterGroupNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one transmitterGroupName")
     private List<String> transmitterGroupNames;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, max = 11, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 1, max = 11)
     private String label;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen ownerNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one ownerName")
     private ArrayList<String> ownerNames;
 
 
@@ -96,8 +97,8 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
         state = statePar;
     }
 
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "must contain names of existing transmitterGroups",
+            fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
     public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -114,10 +115,8 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
             return null;
     }
 
-
-
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "must contain names of existing users",
+            fieldName = "ownerNames", constraintName = "ValidOwnerNames")
     public ArrayList<User> getOwners() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");

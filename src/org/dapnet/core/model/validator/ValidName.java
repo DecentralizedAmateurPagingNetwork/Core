@@ -28,11 +28,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Documented
 public @interface ValidName {
-    String message() default "ist ungültig";
+    String message() default "must contain name of existing objects";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    String alias() default "ValidName";
+    String constraintName() default "ValidName";
+
+    String fieldName() default "names";
 }

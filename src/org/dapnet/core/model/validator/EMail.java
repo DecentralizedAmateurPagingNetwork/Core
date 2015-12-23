@@ -28,7 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Documented
 public @interface EMail {
-    String message() default "ist ungültig";
+    String message() default "must be valid mail address";
 
     Class<?>[] groups() default {};
 

@@ -16,6 +16,7 @@ package org.dapnet.core.model;
 
 import org.dapnet.core.model.list.Searchable;
 import org.dapnet.core.model.validator.TimeSlot;
+import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.jgroups.stack.IpAddress;
 
@@ -25,43 +26,43 @@ import java.util.ArrayList;
 
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     //ID
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 3, max = 20)
     protected String name;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Digits(integer=3, fraction=8)
     @Min(-180)
     @Max(+180)
     protected String longitude;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Digits(integer=3, fraction=8)
     @Min(-90)
     @Max(+90)
     protected String latitude;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Digits(integer=3, fraction=3)
     @Min(0)
     @Max(200)
     protected String power;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     protected String nodeName;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     protected IpAddress address;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @TimeSlot()
     protected String timeSlot;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen ownerNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one ownerName")
     protected ArrayList<String> ownerNames;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     protected DeviceType deviceType;
 
     public enum DeviceType {
@@ -69,7 +70,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     }
 
     //Internally set
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     protected Status status;
 
     public enum Status {
@@ -178,8 +179,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
         state = statePar;
     }
 
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "must contain names of existing users",
+            fieldName = "ownerNames", constraintName = "ValidOwnerNames")
     public ArrayList<User> getOwners() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
@@ -196,7 +197,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
             return null;
     }
 
-    @NotNull(message = "muss existieren")
+    @ValidName(message = "must contain the name of an existing node",
+            fieldName = "nodeName", constraintName = "ValidNodeName")
     public Node getNode() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");

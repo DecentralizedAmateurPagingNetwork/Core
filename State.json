@@ -102,7 +102,7 @@
       "longitude": "0",
       "latitude": "0",
       "address": {
-        "ip_addr": "192.168.100.103",
+        "ip_addr": "127.0.0.1",
         "port": 7800
       },
       "status": "ONLINE",
@@ -261,7 +261,7 @@
         "user"
       ],
       "deviceType": "RASPPAGER1",
-      "status": "ONLINE"
+      "status": "ERROR"
     }
   ],
   "transmitterGroups": [

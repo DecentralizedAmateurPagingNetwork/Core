@@ -22,29 +22,29 @@ import java.io.Serializable;
 
 public class Node implements Serializable, Searchable {
     //ID
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 3, max = 20, message = "muss zwischen {min} und {max} Zeichen lang sein")
+    @NotNull
+    @Size(min = 3, max = 20)
     private String name;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Digits(integer=3, fraction=8)
     @Min(-180)
     @Max(+180)
     protected String longitude;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Digits(integer=3, fraction=8)
     @Min(-90)
     @Max(+90)
     protected String latitude;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private IpAddress address;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private Status status;
 
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private String key;
 
     public enum Status {

@@ -16,10 +16,7 @@ package org.dapnet.core.rest.exceptionHandling;
 
 import javax.validation.ConstraintViolation;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor {
     protected List<Violation> violations;
@@ -59,52 +56,41 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
 
         public Violation(ConstraintViolation<?> violation)
         {
-            //if(violation.getConstraintDescriptor().getPayload() != null){
-                //String name = violation.getConstraintDescriptor().getPayload().toArray()[0].getSimpleName();
-                //this.constraint = ((DescriptionPayload) violation.getConstraintDescriptor().getPayload()).getConstraintName();
-                //this.field = ((DescriptionPayload) violation.getConstraintDescriptor().getPayload()).getFieldName();
+            //Set Code for all ConstraintViolations
 
-            /*if(violation.getInvalidValue()==null && ) //Method validation
-            {
-                switch(violation.getPropertyPath().toString()) //Method name without "get" at the beginning
+            if(violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName().equals("ValidName"))
+            {//Constraint Violation due to invalid names
+                Map<String,Object> attributes = violation.getConstraintDescriptor().getAttributes();
+                this.constraint = (String) attributes.get("constraintName");
+                this.field = (String) attributes.get("fieldName");
+
+                switch(this.constraint)
                 {
-                    case "owner":
+                    case "ValidOwnerName":
                         this.code = 6201;
-                        this.constraint = "ValidOwnerName";
-                        this.field = "ownerName";
                         break;
-                    case "owners":
-                        this.code = 6201;
-                        this.constraint = "ValidOwnerNames";
-                        this.field = "ownerNames";
+                    case "ValidOwnerNames":
+                        this.code = 6202;
                         break;
-                    case "transmitterGroups":
-                        this.code = 6201;
-                        this.constraint = "ValidTransmitterGroupNames";
-                        this.field = "transmitterGroupNames";
+                    case "ValidTransmitterGroupNames":
+                        this.code = 6203;
                         break;
-                    case "callSigns":
-                        this.code = 6201;
-                        this.constraint = "ValidCallSignNames";
-                        this.field = "CallSignNames";
+                    case "ValidCallSignNames":
+                        this.code = 6204;
                         break;
-                    case "rubric":
-                        this.code = 6201;
-                        this.constraint = "ValidRubricName";
-                        this.field = "rubricName";
+                    case "ValidRubricName":
+                        this.code = 6205;
                         break;
-                    case "node":
-                        this.code = 6201;
-                        this.constraint = "ValidNodeName";
-                        this.field = "nodeName";
+                    case "ValidNodeName":
+                        this.code = 6206;
                         break;
-                    case "transmitters":
-                        this.code = 6201;
-                        this.constraint = "ValidTransmitterName";
-                        this.field = "transmitterNames";
+                    case "ValidTransmitterNames":
+                        this.code = 6207;
                         break;
-                } */
-            //} else { //Field validation
+                    default: // default code if constraint invalid
+                        this.code = 6200;
+                }
+            } else { //regular constraint violation
                 this.constraint = violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
                 this.field = violation.getPropertyPath().toString();
                 this.value = (violation.getInvalidValue() == null) ? null : violation.getInvalidValue().toString();
@@ -133,7 +119,7 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
                     default:
                         this.code = 6000;
                 }
-           // }
+           }
             this.message = violation.getMessage();
         }
 

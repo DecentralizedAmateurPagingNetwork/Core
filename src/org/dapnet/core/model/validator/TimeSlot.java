@@ -28,7 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Documented
 public @interface TimeSlot {
-    String message() default "ist ungültig";
+    String message() default "must be a valid timeSlotDescription";
 
     Class<?>[] groups() default {};
 

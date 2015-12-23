@@ -14,6 +14,8 @@
 
 package org.dapnet.core.model;
 
+import org.dapnet.core.model.validator.ValidName;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -25,17 +27,17 @@ import java.util.List;
 
 public class Activation implements Serializable {
     //No ID
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     @Min(value = 0)
     @Max(value = 2097151)
     private int number;
 
-    @NotNull(message = "nicht vorhanden")
-    @Size(min = 1, message = "müssen mindestens einen transmitterGroupNamen enthalten")
+    @NotNull
+    @Size(min = 1, message = "must contain at least one transmitterGroupName")
     private List<String> transmitterGroupNames;
 
     //Internally set
-    @NotNull(message = "nicht vorhanden")
+    @NotNull
     private Date timestamp;
 
     public int getNumber() {
@@ -69,8 +71,8 @@ public class Activation implements Serializable {
         state = statePar;
     }
 
-    @NotNull(message = "müssen existieren")
-    @Size(min = 1, message = "müssen existieren")
+    @ValidName(message = "must contain names of existing transmitterGroups",
+            fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
     public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
         if (state == null)
             throw new Exception("StateNotSetException");
