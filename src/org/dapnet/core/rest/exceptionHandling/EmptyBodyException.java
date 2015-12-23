@@ -12,7 +12,7 @@
  * 52074 Aachen
  */
 
-package org.dapnet.core.rest.ExceptionHandlingTemp;
+package org.dapnet.core.rest.exceptionHandling;
 
 public class EmptyBodyException extends Exception {
 }

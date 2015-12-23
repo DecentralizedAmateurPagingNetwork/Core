@@ -17,7 +17,7 @@ package org.dapnet.core.rest.resources;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.ExceptionHandlingTemp.EmptyBodyException;
+import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;

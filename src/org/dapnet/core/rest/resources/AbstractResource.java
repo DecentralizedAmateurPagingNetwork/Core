@@ -21,8 +21,8 @@ import org.dapnet.core.rest.RestAuthorizable;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.UserExclusionStrategy;
-import org.dapnet.core.rest.ExceptionHandlingTemp.EmptyBodyException;
-import org.dapnet.core.rest.ExceptionHandlingTemp.NoQuorumException;
+import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
+import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
