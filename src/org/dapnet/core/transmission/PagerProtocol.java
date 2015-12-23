@@ -14,6 +14,7 @@
 
 package org.dapnet.core.transmission;
 
+import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
@@ -25,5 +26,6 @@ public interface PagerProtocol {
     Message createMessageFromTime(Date date);
     Message createMessageFromRubric(Rubric rubric);
     Message createMessageFromNews(News news);
+    Message createMessageFromActivation(Activation avtivation);
     List<Message> createMessagesFromCall(Call call);
 }

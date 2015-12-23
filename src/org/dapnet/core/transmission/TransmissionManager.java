@@ -16,6 +16,8 @@ package org.dapnet.core.transmission;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
+import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
@@ -104,6 +106,24 @@ public class    TransmissionManager {
         }catch (Exception e)
         {
             logger.error("Failed to send Call");
+            e.printStackTrace();
+        }
+    }
+
+    public void handleActivation(Activation activation)
+    {
+        try {
+            Message message = pagerProtocol.createMessageFromActivation(activation);
+            List<TransmitterDevice> transmitterDevices =
+                    transmitterDeviceManager.getTransmitterDevices(activation.getTransmitterGroups());
+
+            for(TransmitterDevice transmitterDevice : transmitterDevices)
+                transmitterDevice.sendMessage(message);
+
+            logger.info("Activation sent using " + transmitterDevices.size() + " Transmitter");
+        }catch (Exception e)
+        {
+            logger.error("Failed to send Activation");
             e.printStackTrace();
         }
     }

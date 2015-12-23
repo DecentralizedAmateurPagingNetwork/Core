@@ -74,6 +74,32 @@ public class RpcListener {
         }
     }
 
+    //### Activation ###################################################################################################
+    public synchronized RpcResponse postActivation(Activation activation) {
+        RpcResponse response = null;
+        try {
+            //Check Arguments
+            if (activation == null) {
+                return response = RpcResponse.BAD_REQUEST;
+            }
+
+            //Validation
+            if (validator.validate(activation).size() != 0) {
+                return response = RpcResponse.VALIDATION_ERROR;
+            }
+
+            //Transmit Activation
+            clusterManager.getTransmissionManager().handleActivation(activation);
+
+            return response = RpcResponse.OK;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return response = RpcResponse.INTERNAL_ERROR;
+        } finally {
+            logResponse("PostActivation", activation, response);
+        }
+    }
+
     //### CallSign #####################################################################################################
     public synchronized RpcResponse putCallSign(CallSign callSign) {
         RpcResponse response = null;

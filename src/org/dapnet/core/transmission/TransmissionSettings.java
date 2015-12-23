@@ -31,6 +31,7 @@ public class TransmissionSettings implements Serializable {
     public class PagingProtocolSettings implements Serializable{
         private int numberOfSyncLoops = 5;
         private int sendSpeed = 1;// 0: 512, 1: 1200, 2:2400
+        private String activationCode = "0 7 50,0 7 34,0 7 53,0 7 51,0 7 51,0 7 52,0 7 52,0 7 52";
 
         public int getNumberOfSyncLoops() {
             return numberOfSyncLoops;
@@ -38,6 +39,10 @@ public class TransmissionSettings implements Serializable {
 
         public int getSendSpeed() {
             return sendSpeed;
+        }
+
+        public String getActivationCode() {
+            return activationCode;
         }
     }
 

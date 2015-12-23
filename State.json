@@ -64,6 +64,36 @@
       "ownerNames": [
         "user"
       ]
+    },
+    {
+      "name": "sign",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 36866,
+          "name": "KorbisPager"
+        },
+        {
+          "number": 48159,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "user"
+      ]
+    },
+    {
+      "name": "sign2",
+      "description": "TestRufzeichen3",
+      "pagers": [
+        {
+          "number": 48159,
+          "name": "KorbisPager"
+        }
+      ],
+      "ownerNames": [
+        "user"
+      ]
     }
   ],
   "nodes": [
@@ -99,7 +129,104 @@
       "admin": false
     }
   ],
-  "calls": [],
+  "calls": [
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "sign"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 4:34:15 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "sign2"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 4:35:16 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "sign2"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 4:35:25 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "sign2"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 4:35:26 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "sign2"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 4:35:27 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo5",
+      "callSignNames": [
+        "sign"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 4:35:38 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo5",
+      "callSignNames": [
+        "sign"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 5:01:52 PM",
+      "ownerName": "user"
+    },
+    {
+      "text": "Hallo5",
+      "callSignNames": [
+        "sign"
+      ],
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "emergency": false,
+      "timestamp": "Dec 23, 2015 5:02:12 PM",
+      "ownerName": "user"
+    }
+  ],
   "news": [],
   "transmitters": [
     {
@@ -118,8 +245,48 @@
       ],
       "deviceType": "RASPPAGER1",
       "status": "ERROR"
+    },
+    {
+      "name": "raspi",
+      "longitude": "10",
+      "latitude": "0",
+      "power": "10",
+      "nodeName": "DS-TP",
+      "address": {
+        "ip_addr": "192.168.100.133",
+        "port": 1337
+      },
+      "timeSlot": "0123456789ABCDEF",
+      "ownerNames": [
+        "user"
+      ],
+      "deviceType": "RASPPAGER1",
+      "status": "ONLINE"
     }
   ],
-  "transmitterGroups": [],
-  "rubrics": []
+  "transmitterGroups": [
+    {
+      "name": "group",
+      "description": "Nur zum Testen",
+      "transmitterNames": [
+        "raspi"
+      ],
+      "ownerNames": [
+        "user"
+      ]
+    }
+  ],
+  "rubrics": [
+    {
+      "name": "Rubriken Test2",
+      "number": 6,
+      "transmitterGroupNames": [
+        "group"
+      ],
+      "label": "Test 2",
+      "ownerNames": [
+        "user"
+      ]
+    }
+  ]
 }

@@ -14,14 +14,19 @@
 
 package org.dapnet.core.transmission;
 
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class SkyperProtocol implements PagerProtocol{
+    private static final TransmissionSettings.PagingProtocolSettings settings =
+            Settings.getTransmissionSettings().getPagingProtocolSettings();
+
     public List<Message> createMessagesFromCall(Call call)
     {
         //Collect all addresses
@@ -106,6 +111,37 @@ public class SkyperProtocol implements PagerProtocol{
                 4520,
                 Message.MessagePriority.NEWS,
                 Message.MessageType.ALPHANUM);
+
+        return message;
+    }
+
+    @Override
+    public Message createMessageFromActivation(Activation activation) {
+        List<String> activationCode = Arrays.asList(settings.getActivationCode().split(","));
+        String activationString = "";
+
+        for(int i=0; i<activationCode.size(); i++)
+        {
+            List<String> activationSubCode = Arrays.asList(activationCode.get(i).split(" "));
+
+            if(activationSubCode.size()!=3)
+                return null;
+
+            int shift = Integer.parseInt(activationSubCode.get(0));
+            int mask = Integer.parseInt(activationSubCode.get(1));
+            int offset = Integer.parseInt(activationSubCode.get(2));
+
+            int cInt = ((activation.getNumber() >> shift ) & mask) + offset;
+            char c = (char) cInt;
+            activationString = activationString + String.valueOf(c);
+        }
+
+        //Create Message
+        Message message = new Message(
+                activationString,
+                activation.getNumber(),
+                Message.MessagePriority.ACTIVATION,
+                Message.MessageType.NUMERIC);//or ALPHANUMERIC? Both are shown in display!!?!
 
         return message;
     }

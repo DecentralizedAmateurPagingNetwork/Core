@@ -78,6 +78,7 @@ public class State implements Serializable {
 
     public void setModelReferences() {
         //Setting reference to state in model for allow returning of reference instead of strings
+        Activation.setState(this);
         Call.setState(this);
         CallSign.setState(this);
         News.setState(this);

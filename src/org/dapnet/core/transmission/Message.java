@@ -24,7 +24,7 @@ public class Message implements Comparable<Message>{
     private MessageType type;
 
     public enum MessagePriority {
-        EMERGENCY,TIME,CALL,NEWS,RUBRIC
+        EMERGENCY,TIME,CALL,NEWS,ACTIVATION,RUBRIC
     }
 
     public enum MessageType {
