@@ -23,13 +23,13 @@ public class ExceptionDescriptor implements Serializable{
     protected static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     protected int code;
+    protected String name;
     protected String message;
-    protected String description;
 
-    public ExceptionDescriptor(int code, String message, String description) {
+    public ExceptionDescriptor(int code, String name, String message) {
         this.code = code;
+        this.name = name;
         this.message = message;
-        this.description = description;
     }
 
     public String toJson()
@@ -39,7 +39,7 @@ public class ExceptionDescriptor implements Serializable{
 
     public String getLogMessage()
     {
-        return message + " (" + code + ")";
+        return name + " (" + code + ")";
     }
 
     public int getCode() {
@@ -50,19 +50,19 @@ public class ExceptionDescriptor implements Serializable{
         this.code = code;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getMessage() {
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }
