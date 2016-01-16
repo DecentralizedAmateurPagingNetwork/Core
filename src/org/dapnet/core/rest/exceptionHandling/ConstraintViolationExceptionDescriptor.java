@@ -31,6 +31,13 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
         }
     }
 
+    //Used for faked ConstraintViolations
+    public ConstraintViolationExceptionDescriptor(int code, String message, String description, Violation violation) {
+        super(code, message, description);
+        this.violations = new ArrayList<>();
+        this.violations.add(violation);
+    }
+
     public List<Violation> getViolations() {
         return violations;
     }
@@ -39,7 +46,7 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
         this.violations = violations;
     }
 
-    public class Violation implements Serializable {
+    public static class Violation implements Serializable {
         private int code;
         private String constraint;
         private String field;
@@ -48,7 +55,6 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
 
         public Violation(int code, String field, String value, String message) {
             this.code = code;
-
             this.field = field;
             this.value = value;
             this.message = message;

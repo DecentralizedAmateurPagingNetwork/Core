@@ -60,6 +60,14 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
                     "Empty Body",
                     "Request body does not contain any data");
         }
+        else if(e instanceof InvalidAddressException) {
+            //Fake ConstraintViolation
+            descriptor = new ConstraintViolationExceptionDescriptor(
+                    4001,
+                    "Constraint Violation",
+                    "Missing fields or invalid values",
+                    new ConstraintViolationExceptionDescriptor.Violation(6103, "address", null, "must be a valid IpAddress"));
+        }
         else if(e instanceof ForbiddenException) {
             descriptor = new ExceptionDescriptor(
                     4030,

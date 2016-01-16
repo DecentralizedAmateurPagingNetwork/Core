@@ -17,10 +17,7 @@ package org.dapnet.core.rest.resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.dapnet.core.model.list.Searchable;
-import org.dapnet.core.rest.RestAuthorizable;
-import org.dapnet.core.rest.RestListener;
-import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.UserExclusionStrategy;
+import org.dapnet.core.rest.*;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 
@@ -45,9 +42,11 @@ public abstract class AbstractResource {
     HttpHeaders httpHeaders;
 
     //Gson Helper
-    protected static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-    protected static final Gson userGson = new GsonBuilder().setPrettyPrinting()
-            .setExclusionStrategies(new UserExclusionStrategy()).create();
+    protected static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().
+            registerTypeAdapterFactory(new GsonTypeAdapter()).create();
+    protected static final Gson userGson = new GsonBuilder().setPrettyPrinting().
+            registerTypeAdapterFactory(new GsonTypeAdapter()).
+            setExclusionStrategies(new UserExclusionStrategy()).create();
 
     protected Gson getExclusionGson(RestSecurity.SecurityStatus status) {
         //Add here other Exclusion Strategies
