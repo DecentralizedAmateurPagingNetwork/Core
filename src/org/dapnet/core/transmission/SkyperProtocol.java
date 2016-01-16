@@ -50,7 +50,7 @@ public class SkyperProtocol implements PagerProtocol{
                     call.getText(),
                     address,
                     call.isEmergency()? Message.MessagePriority.EMERGENCY : Message.MessagePriority.CALL,
-                    Message.MessageType.ALPHANUM));
+                    Message.FunctionalBits.ALPHANUM));
         }
         return messages;
     }
@@ -65,7 +65,7 @@ public class SkyperProtocol implements PagerProtocol{
                 timeString,
                 2504,
                 Message.MessagePriority.TIME,
-                Message.MessageType.NUMERIC);
+                Message.FunctionalBits.NUMERIC);
 
         return message;
     }
@@ -85,7 +85,7 @@ public class SkyperProtocol implements PagerProtocol{
                 rubricString,
                 4512,
                 Message.MessagePriority.RUBRIC,
-                Message.MessageType.ALPHANUM);
+                Message.FunctionalBits.ALPHANUM);
 
         return message;
     }
@@ -110,7 +110,7 @@ public class SkyperProtocol implements PagerProtocol{
                 newsString,
                 4520,
                 Message.MessagePriority.NEWS,
-                Message.MessageType.ALPHANUM);
+                Message.FunctionalBits.ALPHANUM);
 
         return message;
     }
@@ -141,8 +141,7 @@ public class SkyperProtocol implements PagerProtocol{
                 activationString,
                 activation.getNumber(),
                 Message.MessagePriority.ACTIVATION,
-                Message.MessageType.NUMERIC);//or ALPHANUMERIC? Both are shown in display!!?!
-
+                Message.FunctionalBits.ACTIVATION);
         return message;
     }
 }
