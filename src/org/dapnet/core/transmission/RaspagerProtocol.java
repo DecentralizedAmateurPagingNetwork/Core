@@ -139,12 +139,21 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         int sequenceNumber = this.getSequenceNumber();
         // Mostly adapted from Sven Jung
         //See Diplomarbeit Jansen Page 30
+        TransmitterDeviceProtocol.PagingMessageType type = null;
+        switch (message.getFunctionalBits())
+        {
+            case ACTIVATION: type = PagingMessageType.ALPHANUM; break; //todo check whether correct
+            case ALPHANUM: type = PagingMessageType.ALPHANUM; break;
+            case NUMERIC: type = PagingMessageType.NUMERIC; break;
+            case TONE: type = PagingMessageType.ALPHANUM; break; //todo check whether correct
+        }
+
         String msg = String.format("#%02X %s:%X:%X:%s:%s",
                 sequenceNumber,
-                message.getFunctionalBits().getValue(),
+                type.getValue(),
                 settings.getSendSpeed(),
                 message.getAddress(),
-                message.getFunctionalBits(),
+                message.getFunctionalBits().getValue(),
                 message.getText());
         toServer.println(msg);
 
