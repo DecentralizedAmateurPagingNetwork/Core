@@ -9,7 +9,7 @@
       "maxNumberOfReconnects": 5,
       "reconnectWaitTime": 20000,
       "connectionTimeout": 5000,
-      "maxMessageCount": 4,
+      "maxMessageCount": 1,
       "transmissionDelay": 500
     }
   },

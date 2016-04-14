@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="org.quartz-scheduler:quartz:2.2.2" type="repository">
+    <properties maven-id="org.quartz-scheduler:quartz:2.2.2" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/c3p0-0.9.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-api-1.7.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-2.2.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

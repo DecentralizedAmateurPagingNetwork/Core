@@ -93,7 +93,8 @@ public class DAPNetCore {
         //Jersey and Hibernate do not support log4j2, so setting additionally Java Logger to warn level
         setJavaLogLevelToWarn();
         //Set Path to LogSettings
-        Configurator.initialize("main", "LogSettings.xml");
+        Configurator.initialize(null, "LogSettings.xml");
+        System.setProperty("Dlogging.config", "LogSettings.xml");
         //Set language to English
         Locale.getDefault().setDefault(Locale.ENGLISH);
 

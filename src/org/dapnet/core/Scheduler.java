@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.TransmissionManager;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -36,6 +38,18 @@ public class Scheduler {
 
         startTimeTransmissionTimer();
         startRubricTransmissionTimer();
+
+        try {
+            // Grab the Scheduler instance from the Factory
+            org.quartz.Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+            // and start it off
+            scheduler.start();
+
+            //scheduler.shutdown();
+
+        } catch (SchedulerException se) {
+            se.printStackTrace();
+        }
         logger.info("Scheduler successfully started");
     }
 

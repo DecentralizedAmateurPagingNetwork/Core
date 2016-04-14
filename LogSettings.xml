@@ -34,7 +34,7 @@
         <logger name="org.dapnet.core.transmission.TransmissionManager" level="info"/>
         <logger name="org.dapnet.core.transmission.TransmitterDeviceManager" level="info"/>
 
-        <logger name="org.dapnet.core.transmission.TransmitterDevice" level="warn"/>
+        <logger name="org.dapnet.core.transmission.TransmitterDevice" level="info"/>
         <logger name="org.dapnet.core.transmission.Raspager1" level="info"/>
 
         <!--Cluster-->
