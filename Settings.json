@@ -9,7 +9,7 @@
       "maxNumberOfReconnects": 5,
       "reconnectWaitTime": 20000,
       "connectionTimeout": 5000,
-      "maxMessageCount": 1,
+      "maxMessageCount": 4,
       "transmissionDelay": 500
     }
   },
@@ -24,7 +24,7 @@
     "clusterConfigurationFile": "ClusterConfig.xml"
   },
   "schedulerSettings": {
-    "timeTransmissionPeriod": 1200000,
-    "rubricTransmissionTimer": 21600000
+    "timeTransmissionCron": "15 * * * * ?",
+    "rubricNameTransmissionCron": "30 * * * * ?"
   }
 }

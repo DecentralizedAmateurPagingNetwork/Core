@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterSettings;
 import org.dapnet.core.model.ModelSettings;
 import org.dapnet.core.rest.RestSettings;
+import org.dapnet.core.scheduler.SchedulerSettings;
 import org.dapnet.core.transmission.TransmissionSettings;
 
 import java.io.File;

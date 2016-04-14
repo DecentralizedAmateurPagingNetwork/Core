@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.rest.RestManager;
+import org.dapnet.core.scheduler.SchedulerManager;
 import org.dapnet.core.transmission.TransmissionManager;
 
 import java.util.Locale;
@@ -31,7 +32,7 @@ public class DAPNetCore {
     private ClusterManager clusterManager;
     private RestManager restManager;
     private TransmissionManager transmissionManager;
-    private Scheduler scheduler;
+    private SchedulerManager schedulerManager;
 
     private void start() {
         try {
@@ -44,8 +45,8 @@ public class DAPNetCore {
             logger.info("Starting RestManager");
             restManager = new RestManager(clusterManager);
             restManager.startServer();
-            logger.info("Starting Scheduler");
-            scheduler = new Scheduler(transmissionManager, clusterManager);
+            logger.info("Starting SchedulerManager");
+            schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
             System.out.println("DAPNETCore started");
 
             //Wait for Stop
@@ -74,9 +75,9 @@ public class DAPNetCore {
             clusterManager.stop();
         if (restManager != null)
             restManager.stopServer();
-        if (scheduler != null)
-            scheduler.stop();
-        if(clusterManager==null||restManager==null||scheduler==null)
+        if (schedulerManager != null)
+            schedulerManager.stop();
+        if(clusterManager==null||restManager==null|| schedulerManager ==null)
         {
             //Used for stopping DAPNET while startup
             System.exit(-1);

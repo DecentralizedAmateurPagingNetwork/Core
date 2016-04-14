@@ -33,6 +33,9 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/log4j2/log4j-core-2.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/log4j2/log4j-api-2.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson/gson-2.3.1.jar" path-in-jar="/" />
+      <element id="library" level="project" name="org.quartz-scheduler:quartz:2.2.2" />
+      <element id="library" level="project" name="org.quartz-scheduler:quartz-jobs:2.2.2" />
+      <element id="library" level="project" name="org.apache.logging.log4j:log4j-slf4j-impl:2.5" />
     </root>
   </artifact>
 </component>
