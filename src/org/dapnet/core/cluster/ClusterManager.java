@@ -22,6 +22,7 @@ import org.dapnet.core.model.Node;
 import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestListener;
+import org.dapnet.core.scheduler.SchedulerManager;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.dapnet.core.transmission.TransmitterDeviceManager;
 import org.dapnet.core.transmission.TransmitterDeviceManagerListener;
@@ -55,15 +56,19 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 
     private TransmissionManager transmissionManager;
     private TransmitterDeviceManager transmitterDeviceManager;
+    private SchedulerManager schedulerManager;
 
     private boolean quorum = true;
     private boolean stopping = false;
 
-    public ClusterManager(TransmissionManager transmissionManager) throws Exception {
+    public ClusterManager(TransmissionManager transmissionManager, SchedulerManager schedulerManager) throws Exception {
         //Register Transmission
         this.transmissionManager = transmissionManager;
         this.transmitterDeviceManager = transmissionManager.getTransmitterDeviceManager();
         this.transmitterDeviceManager.setListener(this);
+
+        //Register SchedulerManager
+        this.schedulerManager = schedulerManager;
 
         //Initiate State
         initState();
@@ -268,6 +273,10 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 
     public TransmitterDeviceManager getTransmitterDeviceManager() {
         return transmitterDeviceManager;
+    }
+
+    public SchedulerManager getSchedulerManager() {
+        return schedulerManager;
     }
 
     public JChannel getChannel() {

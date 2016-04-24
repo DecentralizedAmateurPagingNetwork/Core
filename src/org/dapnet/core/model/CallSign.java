@@ -15,13 +15,10 @@
 package org.dapnet.core.model;
 
 import org.dapnet.core.model.list.Searchable;
-import org.dapnet.core.model.validator.DescriptionPayload;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
-import org.hibernate.validator.constraints.ScriptAssert;
 
 import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;

@@ -36,6 +36,25 @@
       <element id="library" level="project" name="org.quartz-scheduler:quartz:2.2.2" />
       <element id="library" level="project" name="org.quartz-scheduler:quartz-jobs:2.2.2" />
       <element id="library" level="project" name="org.apache.logging.log4j:log4j-slf4j-impl:2.5" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/activation-1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/c3p0-0.9.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/javaee-api-6.0-5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/log4j-1.2.17.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/log4j-api-2.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/log4j-slf4j-impl-2.5-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/log4j-slf4j-impl-2.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/mail-1.4.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-2.2.2-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-2.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-core-2.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-jobs-2.2.2-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/quartz-jobs-2.2.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-api-1.7.12.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-api-1.7.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-log4j12-1.7.7-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-log4j12-1.7.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-log4j13-1.0.1-sources.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Bachelorarbeit/IntelliJProjects/DAPNetCore/lib/quartz/slf4j-log4j13-1.0.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

@@ -1,0 +1,42 @@
+/*
+ * DAPNET CORE PROJECT
+ * Copyright (C) 2015
+ *
+ * Daniel Sialkowski
+ *
+ * daniel.sialkowski@rwth-aachen.de
+ *
+ * Institut für Hochfrequenztechnik
+ * RWTH AACHEN UNIVERSITY
+ * Melatener Str. 25
+ * 52074 Aachen
+ */
+
+package org.dapnet.core.model.validator;
+
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Target({ TYPE, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { ValidityDateValidator.class })
+@Documented
+public @interface ValidityDate {
+    String message() default "end cannot be before end";
+
+    Class<?>[] groups() default { };
+
+    Class<? extends Payload>[] payload() default { };
+
+    String constraintName() default "ValidStartEnd";
+
+    String fieldName() default "end";
+}

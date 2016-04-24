@@ -143,7 +143,72 @@
     }
   ],
   "calls": [],
-  "news": [],
+  "news": [
+    {
+      "text": "Hallo Hallo",
+      "rubricName": "test",
+      "number": 10,
+      "timestamp": "Apr 15, 2016 7:42:49 PM",
+      "ownerName": "admin",
+      "uuid": "4e550d43-e9f1-4fcd-9a2d-474401e07086",
+      "validity": {
+        "start": "Apr 17, 2016 6:17:00 PM",
+        "end": "Apr 18, 2016 6:19:45 PM"
+      },
+      "scheduling": {
+        "repeatIntervallInMinutes": 1,
+        "cron": "45 * * * * ?"
+      }
+    },
+    {
+      "text": "Hallo Hallo",
+      "rubricName": "test",
+      "number": 10,
+      "timestamp": "Apr 15, 2016 7:45:04 PM",
+      "ownerName": "admin",
+      "uuid": "85af3bdc-a293-4bbb-9087-dcdc02b4df2f",
+      "validity": {
+        "start": "Apr 17, 2016 6:17:00 PM",
+        "end": "Apr 18, 2016 6:19:45 PM"
+      },
+      "scheduling": {
+        "repeatIntervallInMinutes": 0,
+        "cron": "45 * * * * ?"
+      }
+    },
+    {
+      "text": "Hallo Hallo",
+      "rubricName": "test",
+      "number": 10,
+      "timestamp": "Apr 15, 2016 7:56:45 PM",
+      "ownerName": "admin",
+      "uuid": "04ac1a17-1466-44e8-aadf-8f49ad13b0f4",
+      "validity": {
+        "start": "Apr 15, 2016 6:17:00 PM",
+        "end": "Apr 18, 2016 6:19:45 PM"
+      },
+      "scheduling": {
+        "repeatIntervallInMinutes": 1,
+        "cron": "45 * * * * ?"
+      }
+    },
+    {
+      "text": "Hallo Hallo",
+      "rubricName": "test",
+      "number": 10,
+      "timestamp": "Apr 15, 2016 7:57:46 PM",
+      "ownerName": "admin",
+      "uuid": "c9144af1-e4ab-4cff-81df-b10e54c784c7",
+      "validity": {
+        "start": "Apr 15, 2016 6:17:00 PM",
+        "end": "Apr 18, 2016 6:19:45 PM"
+      },
+      "scheduling": {
+        "repeatIntervallInMinutes": 1,
+        "cron": "45 * * * * ?"
+      }
+    }
+  ],
   "transmitters": [
     {
       "name": "AufmTisch2",
@@ -164,5 +229,28 @@
     }
   ],
   "transmitterGroups": [],
-  "rubrics": []
+  "rubrics": [
+    {
+      "name": "Rubriken Test2",
+      "number": 6,
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "label": "Test 2",
+      "ownerNames": [
+        "user"
+      ]
+    },
+    {
+      "name": "test",
+      "number": 7,
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "label": "Test 2",
+      "ownerNames": [
+        "admin"
+      ]
+    }
+  ]
 }

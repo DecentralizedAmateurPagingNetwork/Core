@@ -40,13 +40,16 @@ public class DAPNetCore {
             System.out.println("Starting DAPNETCore...");
             logger.info("Starting TransmissionManager");
             transmissionManager = new TransmissionManager();
+            logger.info("Starting SchedulerManager");
+            schedulerManager = new SchedulerManager();
             logger.info("Starting Cluster");
-            clusterManager = new ClusterManager(transmissionManager);
+            clusterManager = new ClusterManager(transmissionManager, schedulerManager);
             logger.info("Starting RestManager");
             restManager = new RestManager(clusterManager);
             restManager.startServer();
-            logger.info("Starting SchedulerManager");
-            schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
+            logger.info("Registering scheduled Jobs");
+            schedulerManager.registerTimeTransmissionJob(transmissionManager);
+            schedulerManager.registerRubricNameTransmissionJob(transmissionManager, clusterManager);
             System.out.println("DAPNETCore started");
 
             //Wait for Stop

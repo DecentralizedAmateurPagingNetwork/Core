@@ -16,12 +16,14 @@ package org.dapnet.core.model;
 
 import org.dapnet.core.model.validator.ValidName;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 public class News implements Serializable {
     //No ID
@@ -45,6 +47,14 @@ public class News implements Serializable {
     @NotNull
     @Size(min = 1, message = "must contain at least one ownerName")
     private String ownerName;
+
+    private UUID uuid = UUID.randomUUID();
+
+    //Optional - is allowed to be null
+    @Valid
+    private Validity validity;
+    @Valid
+    private Scheduling scheduling;
 
     public String getText() {
         return text;
@@ -84,6 +94,30 @@ public class News implements Serializable {
 
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
+    }
+
+    public Validity getValidity() {
+        return validity;
+    }
+
+    public Scheduling getScheduling() {
+        return scheduling;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setValidity(Validity validity) {
+        this.validity = validity;
+    }
+
+    public void setScheduling(Scheduling scheduling) {
+        this.scheduling = scheduling;
     }
 
     public static State getState() {

@@ -122,6 +122,13 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
                     case "EMail":
                         this.code = 6102;
                         break;
+                    case "ValidityDate":
+                        this.code = 6103;
+                        this.value = null;
+                        break;
+                    case "Cron":
+                        this.code = 6104;
+                        break;
                     default:
                         this.code = 6000;
                 }

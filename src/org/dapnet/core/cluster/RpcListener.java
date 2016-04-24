@@ -196,7 +196,9 @@ public class RpcListener {
             //Add new Object
             clusterManager.getState().getNews().add(news);
             clusterManager.getState().writeToFile();
-            clusterManager.getTransmissionManager().handleNews(news);
+
+            clusterManager.getSchedulerManager().registerNewsTransmissionJob(
+                    clusterManager.getTransmissionManager(), news);
             return response = RpcResponse.OK;
         } catch (Exception e) {
             e.printStackTrace();
