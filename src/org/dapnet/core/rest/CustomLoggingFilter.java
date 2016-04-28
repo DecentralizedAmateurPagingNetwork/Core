@@ -58,7 +58,7 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
             entity.substring(0,9999);
         sb.append(" - Entity: ").append(entity);
 
-        logger.info("Rest " + requestContext.getMethod() + " Request : " + sb.toString());
+        logger.info("REST " + requestContext.getMethod() + " Request : " + sb.toString());
     }
 
     private String getEntityBody(ContainerRequestContext requestContext)
@@ -92,9 +92,9 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
 
         if(responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
                 || responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR)
-            logger.info("Rest " + requestContext.getMethod() + " Response : " + sb.toString());
+            logger.info("REST " + requestContext.getMethod() + " Response : " + sb.toString());
         else
-            logger.error("Rest " + requestContext.getMethod() + " Response : " + sb.toString());
+            logger.error("REST " + requestContext.getMethod() + " Response : " + sb.toString());
     }
 
     // Add Header to allow Web Module running on other server than DAPNET Core
