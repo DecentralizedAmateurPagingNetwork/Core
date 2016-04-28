@@ -64,7 +64,7 @@ public class DAPNetCore {
                 System.out.println("DAPNETCore was interrupted");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.fatal("Exception : ", e);
             System.exit(-1);
         }
     }

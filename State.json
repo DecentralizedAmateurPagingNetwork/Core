@@ -115,7 +115,7 @@
       "longitude": "0",
       "latitude": "0",
       "address": {
-        "ip_addr": "192.168.100.103",
+        "ip_addr": "192.168.0.104",
         "port": 7800
       },
       "status": "ONLINE",
@@ -142,7 +142,704 @@
       "admin": false
     }
   ],
-  "calls": [],
+  "calls": [
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:16 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:19 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:20 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:20 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:20 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:20 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:20 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:20 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:21 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:21 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:21 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:21 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:22 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:22 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:22 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:22 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:22 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:22 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:23 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:24 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:24 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:24 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:24 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:24 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:24 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:25 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:25 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:25 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:25 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:26 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:26 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:26 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:26 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:26 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:26 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:27 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:27 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:27 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:27 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:27 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:27 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:28 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:28 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:28 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:28 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    },
+    {
+      "text": "Hallo",
+      "callSignNames": [
+        "Testrufzeichen"
+      ],
+      "transmitterGroupNames": [
+        "realTransmitters"
+      ],
+      "emergency": false,
+      "timestamp": "Apr 26, 2016 8:12:29 PM",
+      "ownerName": "admin"
+    }
+  ],
   "news": [],
   "transmitters": [
     {

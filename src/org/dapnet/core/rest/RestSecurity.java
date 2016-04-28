@@ -48,7 +48,7 @@ public class RestSecurity {
         //Get LoginData
         LoginData loginData;
         try {
-            loginData = getLoginData(httpHeaders);
+            loginData = new LoginData(httpHeaders);
         } catch (Exception e) {
             //No Authorization Data in Http Header
             logger.info("No Authorization Data in HttpHeader");
@@ -65,8 +65,7 @@ public class RestSecurity {
         try {
             authenticated = HashUtil.validatePassword(loginData.getPassword(), user.getHash());
         } catch (Exception e) {
-            logger.error("Error while validating password");
-            e.printStackTrace();
+            logger.error("Error while validating password", e);
             return SecurityStatus.INTERNAL_ERROR;
         }
         if (!authenticated) {
@@ -137,49 +136,4 @@ public class RestSecurity {
         }
         return SecurityStatus.INTERNAL_ERROR;
     }
-
-    //Create LoginData from httpHeaders
-    public class LoginData {
-        private String username;
-        private String password;
-
-        public LoginData(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-    }
-
-    public LoginData getLoginData(HttpHeaders httpHeaders) throws Exception {
-        String authorizationToken = httpHeaders.getRequestHeader("Authorization").get(0);
-        String encodedUserPassword = authorizationToken.replaceFirst("Basic ", "");
-        String usernameAndPassword = null;
-        byte[] decodedBytes = Base64.getDecoder().decode(
-                encodedUserPassword);
-        usernameAndPassword = new String(decodedBytes, "UTF-8");
-
-        StringTokenizer tokenizer = new StringTokenizer(
-                usernameAndPassword, ":");
-        String username = tokenizer.nextToken();
-        String password = tokenizer.nextToken();
-
-        return new LoginData(username, password);
-    }
-
-
 }

@@ -15,6 +15,7 @@
 package org.dapnet.core.rest.resources;
 
 import org.dapnet.core.model.Call;
+import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -54,7 +55,7 @@ public class CallResource extends AbstractResource {
         Call call = gson.fromJson(callJSON, Call.class);
         if(call != null) {
             call.setTimestamp(new Date());
-            call.setOwnerName(restSecurity.getLoginData(httpHeaders).getUsername());
+            call.setOwnerName(new LoginData(httpHeaders).getUsername());
         }
         else
             throw new EmptyBodyException();

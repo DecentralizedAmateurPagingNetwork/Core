@@ -14,12 +14,15 @@
 
 package org.dapnet.core.scheduler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.quartz.*;
 
 import java.util.Date;
 
 public class TimeTransmissionJob implements Job {
+    private static final Logger logger = LogManager.getLogger(TimeTransmissionJob.class.getName());
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
@@ -31,7 +34,7 @@ public class TimeTransmissionJob implements Job {
             //Possibility to implement TimeZones by adding here a TransmitterGroup
             transmissionManager.handleTime(new Date());
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error("Failed to execute TimeTransmissionJob", e);
         }
     }
 }

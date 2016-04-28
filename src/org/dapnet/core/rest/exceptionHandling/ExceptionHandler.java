@@ -118,8 +118,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
                     5000,
                     "Internal Server Error",
                     "A server-side error occurred while executing the request");
-            logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage());
-            e.printStackTrace();
+            logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage(), e);
         }
         else if(e instanceof NoQuorumException) {
             descriptor = new ExceptionDescriptor(
@@ -132,8 +131,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
                     5030,
                     "Service Unavailable",
                     "A server-side error occurred while executing the request");
-            logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage());
-            e.printStackTrace();
+            logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage(), e);
         }
 
 
@@ -143,8 +141,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
                     5001,
                     "Internal Server Error",
                     "A unknown server-side error occurred while executing the request");
-            logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage());
-            e.printStackTrace();
+            logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage(), e);
         }
 
         return Response.status(descriptor.getCode()/10).entity(descriptor.toJson()).build();

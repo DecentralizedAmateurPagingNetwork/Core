@@ -14,6 +14,9 @@
 
 package org.dapnet.core.transmission;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dapnet.core.DAPNetCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.*;
 
@@ -26,6 +29,7 @@ import java.util.List;
 public class SkyperProtocol implements PagerProtocol{
     private static final TransmissionSettings.PagingProtocolSettings settings =
             Settings.getTransmissionSettings().getPagingProtocolSettings();
+    private static final Logger logger = LogManager.getLogger(SkyperProtocol.class.getName());
 
     public List<Message> createMessagesFromCall(Call call)
     {
@@ -38,7 +42,7 @@ public class SkyperProtocol implements PagerProtocol{
                     addresses.add(pager.getNumber());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to create messages from call", e);
             return null;
         }
 

@@ -47,8 +47,7 @@ public class    TransmissionManager {
             logger.info("Time sent using " + transmitterDeviceManager.getTransmitterDevices().size() + " Transmitter");
         }catch (Exception e)
         {
-            logger.error("Failed to send Time");
-            e.printStackTrace();
+            logger.error("Failed to send Time", e);
         }
     }
 
@@ -65,8 +64,7 @@ public class    TransmissionManager {
             logger.info("News sent using " + transmitterDevices.size() + " Transmitter");
         }catch (Exception e)
         {
-            logger.error("Failed to send News");
-            e.printStackTrace();
+            logger.error("Failed to send News", e);
         }
     }
 
@@ -83,8 +81,7 @@ public class    TransmissionManager {
             logger.info("Rubric sent using " + transmitterDevices.size() + " Transmitter");
         }catch (Exception e)
         {
-            logger.error("Failed to send Rubric");
-            e.printStackTrace();
+            logger.error("Failed to send Rubric", e);
         }
     }
 
@@ -105,8 +102,7 @@ public class    TransmissionManager {
                     transmitterDevices.size() + " Transmitter");
         }catch (Exception e)
         {
-            logger.error("Failed to send Call");
-            e.printStackTrace();
+            logger.error("Failed to send Call", e);
         }
     }
 
@@ -123,8 +119,7 @@ public class    TransmissionManager {
             logger.info("Activation sent using " + transmitterDevices.size() + " Transmitter");
         }catch (Exception e)
         {
-            logger.error("Failed to send Activation");
-            e.printStackTrace();
+            logger.error("Failed to send Activation", e);
         }
     }
 

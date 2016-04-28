@@ -67,7 +67,7 @@ public class RpcListener {
 
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PostCall", call, response);
@@ -93,7 +93,7 @@ public class RpcListener {
 
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PostActivation", activation, response);
@@ -127,7 +127,7 @@ public class RpcListener {
             clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PutCallSign", callSign, response);
@@ -172,7 +172,7 @@ public class RpcListener {
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("DeleteCallSign", callSign, response);
@@ -199,7 +199,7 @@ public class RpcListener {
             clusterManager.getTransmissionManager().handleNews(news);
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PostNews", news, response);
@@ -223,7 +223,7 @@ public class RpcListener {
             clusterManager.checkQuorum();
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("UpdateNodeStatus", nodeName + " to " + status, response);
@@ -257,7 +257,7 @@ public class RpcListener {
             clusterManager.checkQuorum();
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PutNode", node, response);
@@ -295,7 +295,7 @@ public class RpcListener {
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("DeleteNode", node, response);
@@ -333,7 +333,7 @@ public class RpcListener {
 
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PutRubric", rubric, response);
@@ -370,7 +370,7 @@ public class RpcListener {
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("DeleteRubric", rubric, response);
@@ -393,7 +393,7 @@ public class RpcListener {
             clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("UpdateTransmitterStatus", transmitterName + " to " + status, response);
@@ -443,7 +443,7 @@ public class RpcListener {
 
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PutTransmitter", transmitter, response);
@@ -498,7 +498,7 @@ public class RpcListener {
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("DeleteTransmitter", transmitterName, response);
@@ -532,7 +532,7 @@ public class RpcListener {
             clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PutTransmitterGroup", transmitterGroup, response);
@@ -592,7 +592,7 @@ public class RpcListener {
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("DeleteTransmitterGroup", transmitterGroup, response);
@@ -626,7 +626,7 @@ public class RpcListener {
             clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("PutUser", user, response);
@@ -730,7 +730,7 @@ public class RpcListener {
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Exception : ", e);
             return response = RpcResponse.INTERNAL_ERROR;
         } finally {
             logResponse("DeleteUser", user, response);

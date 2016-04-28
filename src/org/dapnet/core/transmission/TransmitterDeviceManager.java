@@ -87,7 +87,6 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             logger.info("Start disconnecting from " + transmitter.getName());
             TransmitterDevice device = connectingTransmitterDevices.findByName(transmitter.getName());
             device.stop();
-
             //Move Device to disconnecting List
             connectingTransmitterDevices.remove(device);
             disconnectingTransmitterDevices.add(device);
@@ -139,7 +138,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 transmitter.addAll(transmitterGroup.getTransmitterNames());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to get TransmitterNames", e);
             return null;
         }
         return transmitter;

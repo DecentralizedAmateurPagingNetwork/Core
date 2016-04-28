@@ -15,6 +15,7 @@
 package org.dapnet.core.rest.resources;
 
 import org.dapnet.core.model.News;
+import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -56,7 +57,7 @@ public class NewsResource extends AbstractResource {
         News news = gson.fromJson(newsJSON, News.class);
         if (news != null){
             news.setTimestamp(new Date());
-            news.setOwnerName(restSecurity.getLoginData(httpHeaders).getUsername());
+            news.setOwnerName(new LoginData(httpHeaders).getUsername());
         } else
             throw new EmptyBodyException();
 

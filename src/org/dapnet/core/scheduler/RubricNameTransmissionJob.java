@@ -14,12 +14,17 @@
 
 package org.dapnet.core.scheduler;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dapnet.core.DAPNetCore;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.quartz.*;
 
 public class RubricNameTransmissionJob implements Job {
+    private static final Logger logger = LogManager.getLogger(RubricNameTransmissionJob.class.getName());
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         SchedulerContext schedulerContext = null;
@@ -31,7 +36,7 @@ public class RubricNameTransmissionJob implements Job {
             for(Rubric rubric : clusterManager.getState().getRubrics())
                 transmissionManager.handleRubric(rubric);
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error("Failed to execute RubricNameTransmissionJob", e);
         }
     }
 }

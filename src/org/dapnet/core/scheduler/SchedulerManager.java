@@ -71,7 +71,7 @@ public class SchedulerManager {
         try {
             scheduler.shutdown();
         } catch (SchedulerException e) {
-            e.printStackTrace();
+            logger.error("Failed to stop Scheduler:", e);
         }
         logger.info("SchedulerManager successfully stopped");
     }

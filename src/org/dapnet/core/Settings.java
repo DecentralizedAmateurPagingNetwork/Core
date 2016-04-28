@@ -92,8 +92,7 @@ public class Settings implements Serializable {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            logger.error("Failed to create Settings File. Using default values");
-            e.printStackTrace();
+            logger.error("Failed to create Settings File. Using default values", e);
         }
         return settings;
     }

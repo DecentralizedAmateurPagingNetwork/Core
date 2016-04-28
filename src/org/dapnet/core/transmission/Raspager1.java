@@ -86,7 +86,7 @@ public class Raspager1 extends TransmitterDevice {
                 return;
             } catch (IOException e) {
                 numberOfReconnects++;
-                logger.info(this + " could not create connection: " + e.getMessage());
+                logger.warn(this + " could not create connection: " + e.getMessage());
             }
 
             if (numberOfReconnects > settings.getMaxNumberOfReconnects())

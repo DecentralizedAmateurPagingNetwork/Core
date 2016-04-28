@@ -16,6 +16,9 @@ package org.dapnet.core.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dapnet.core.DAPNetCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.list.SearchableArrayList;
 
@@ -31,6 +34,8 @@ import java.util.List;
 import static org.jgroups.util.Util.readFile;
 
 public class State implements Serializable {
+    private static final Logger logger = LogManager.getLogger(State.class.getName());
+
     @NotNull(message = "nicht vorhanden")
     @Valid
     private SearchableArrayList<CallSign> callSigns;
@@ -101,7 +106,7 @@ public class State implements Serializable {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.fatal("Failed to write state file: ", e);
         }
     }
 
