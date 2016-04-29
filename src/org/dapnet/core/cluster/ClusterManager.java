@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -16,7 +16,7 @@ package org.dapnet.core.cluster;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
+import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.State;
@@ -97,9 +97,9 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         }catch (Exception e)
         {
             logger.fatal("Could not connect to cluster");
-            System.out.println("Could not connect to cluster. Check your settings and make sure your node is already" +
+            System.out.println("Could not connect to cluster. Check your settings and make sure your node is already " +
                     "registered.");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
 
         //Connect to Transmitter
@@ -131,7 +131,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 
         if(constraintViolations.size() != 0)
         {
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
     }
 
@@ -184,7 +184,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         }
 
         if (onlineNodeCount == 0) {
-            //DAPNetCore is stopping
+            //DAPNETCore is stopping
             return;
         }
 

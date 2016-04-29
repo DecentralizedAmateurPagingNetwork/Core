@@ -1,8 +1,7 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
- * Sven Jung &
  * Daniel Sialkowski
  *
  * daniel.sialkowski@rwth-aachen.de

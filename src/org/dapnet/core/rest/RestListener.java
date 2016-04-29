@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *

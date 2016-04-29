@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -18,7 +18,7 @@ import java.io.Serializable;
 
 public class ClusterSettings implements Serializable {
     private int responseTimeout = 10000;
-    private String clusterConfigurationFile = "ClusterConfig.xml";
+    private String clusterConfigurationFile = "config/ClusterConfig.xml";
 
     public int getResponseTimeout() {
         return responseTimeout;

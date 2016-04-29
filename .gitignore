@@ -1,4 +1,4 @@
-/Settings.json
-/LogSettings.xml
-/ClusterConfig.xml
-/State.json
+/config/Settings.json
+/config/LogSettings.xml
+/config/ClusterConfig.xml
+/data/State.json

@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -24,13 +24,16 @@ import org.dapnet.core.rest.RestSettings;
 import org.dapnet.core.scheduler.SchedulerSettings;
 import org.dapnet.core.transmission.TransmissionSettings;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.beans.XMLEncoder;
+import java.io.*;
 
 import static org.jgroups.util.Util.readFile;
 
+@XmlRootElement
 public class Settings implements Serializable {
     private static final Logger logger = LogManager.getLogger(Settings.class.getName());
     private static Settings settings;
@@ -73,9 +76,9 @@ public class Settings implements Serializable {
     {
         if(settings == null) {
             try {
-                settings = new Gson().fromJson(readFile("Settings.json"), Settings.class);
+                settings = new Gson().fromJson(readFile("config/Settings.json"), Settings.class);
             } catch (Exception e) {
-                logger.warn("Creating new Settings File");
+                logger.warn("Creating new settings file");
                 settings = createDefaultSettings();
             }
         }
@@ -85,14 +88,14 @@ public class Settings implements Serializable {
     private static Settings createDefaultSettings(){
         settings = new Settings();
         try {
-            File file = new File("Settings.json");
+            File file = new File("config/Settings.json");
             FileWriter writer = new FileWriter(file);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             writer.write(gson.toJson(settings));
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            logger.error("Failed to create Settings File. Using default values", e);
+            logger.error("Failed to create settings file. Using default values", e);
         }
         return settings;
     }

@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -18,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.list.SearchableArrayList;
 
@@ -98,6 +97,7 @@ public class State implements Serializable {
 
     public void writeToFile() {
         File file = new File(Settings.getModelSettings().getStateFile());
+        file.getParentFile().mkdirs();
         try {
             FileWriter writer = new FileWriter(file);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();

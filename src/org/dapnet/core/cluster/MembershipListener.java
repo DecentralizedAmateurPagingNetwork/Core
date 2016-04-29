@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
+import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Transmitter;
 import org.jgroups.Address;
@@ -107,7 +107,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                 logger.fatal("Node has quorum although it is the minoritySubgroup " +
                         "(Seems to merge independent clusters). " +
                         "Stopping minority group.");
-                DAPNetCore.stopDAPNetCore();
+                DAPNETCore.stopDAPNETCore();
             } else {
                 logger.info("Node is minoritySubgroup. Receive State from majoritySubgroup");
 
@@ -120,7 +120,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                 } catch (Exception e) {
                     logger.fatal("Could not get State from majority");
                     logger.catching(e);
-                    DAPNetCore.stopDAPNetCore();
+                    DAPNETCore.stopDAPNETCore();
                 }
 
                 //Inform Cluster that Node is ONLINE

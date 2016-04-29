@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -16,7 +16,7 @@ package org.dapnet.core.cluster;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
+import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.model.State;
 import org.jgroups.Message;
 import org.jgroups.util.Util;
@@ -68,7 +68,7 @@ public class MessageListener implements org.jgroups.MessageListener {
         }
         if (constraintViolations.size() != 0) {
             logger.fatal("Discarding received State");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
 
         clusterManager.getState().writeToFile();

@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -28,7 +28,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
-public class DAPNetCore {
+public class DAPNETCore {
     private ClusterManager clusterManager;
     private RestManager restManager;
     private TransmissionManager transmissionManager;
@@ -37,7 +37,7 @@ public class DAPNetCore {
     private void start() {
         try {
             //Start
-            System.out.println("Starting DAPNETCore...");
+            System.out.println("Starting DAPNET_CORE...");
             logger.info("Starting TransmissionManager");
             transmissionManager = new TransmissionManager();
             logger.info("Starting Cluster");
@@ -61,7 +61,7 @@ public class DAPNetCore {
                 }
             } catch (Exception e) {
                 //Program was interrupted, not enough time for stopping!
-                System.out.println("DAPNETCore was interrupted");
+                System.out.println("DAPNET_CORE was interrupted");
             }
         } catch (Exception e) {
             logger.fatal("Exception : ", e);
@@ -70,7 +70,7 @@ public class DAPNetCore {
     }
 
     private void stop() {
-        logger.info("Stopping DAPNETCore...");
+        logger.info("Stopping DAPNET_CORE...");
         if (clusterManager != null)
             clusterManager.stop();
         if (restManager != null)
@@ -85,8 +85,8 @@ public class DAPNetCore {
     }
 
     // Static
-    private static final Logger logger = LogManager.getLogger(DAPNetCore.class.getName());
-    private static DAPNetCore dapNetCore;
+    private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
+    private static DAPNETCore dapnetCore;
 
     public static void main(String[] args) throws Exception {
         //Disable IPv6 for Java VM, creates sometimes LogMessages
@@ -94,13 +94,13 @@ public class DAPNetCore {
         //Jersey and Hibernate do not support log4j2, so setting additionally Java Logger to warn level
         setJavaLogLevelToWarn();
         //Set Path to LogSettings
-        Configurator.initialize(null, "LogSettings.xml");
+        Configurator.initialize(null, "config/LogSettings.xml");
         System.setProperty("Dlogging.config", "LogSettings.xml");
         //Set language to English
         Locale.getDefault().setDefault(Locale.ENGLISH);
 
-        dapNetCore = new DAPNetCore();
-        dapNetCore.start();
+        dapnetCore = new DAPNETCore();
+        dapnetCore.start();
     }
 
     private static void setJavaLogLevelToWarn() {
@@ -123,7 +123,7 @@ public class DAPNetCore {
         consoleHandler.setLevel(Level.WARNING);
     }
 
-    public static void stopDAPNetCore() {
-        dapNetCore.stop();
+    public static void stopDAPNETCore() {
+        dapnetCore.stop();
     }
 }

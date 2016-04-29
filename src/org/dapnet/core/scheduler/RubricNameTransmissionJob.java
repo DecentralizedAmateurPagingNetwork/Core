@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -16,7 +16,6 @@ package org.dapnet.core.scheduler;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.TransmissionManager;

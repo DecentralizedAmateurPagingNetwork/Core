@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="quartz">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/quartz/activation-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/c3p0-0.9.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/javaee-api-6.0-5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/log4j-api-2.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/log4j-slf4j-impl-2.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/mail-1.4.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/quartz-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/quartz-core-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/quartz-jobs-2.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/slf4j-api-1.7.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/quartz/slf4j-api-1.7.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

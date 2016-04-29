@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -16,7 +16,7 @@ package org.dapnet.core.cluster;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
+import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.User;
@@ -41,7 +41,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
         } catch (Exception e) {
             logger.fatal("Could not get State");
             logger.catching(e);
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
 
         //Creating Cluster?
@@ -98,14 +98,14 @@ public class ChannelListener implements org.jgroups.ChannelListener {
         } catch (Exception e) {
             logger.catching(e);
             logger.fatal("First node could not been created");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
 
         if (clusterManager.handleStateOperation(null, "putNode", new Object[]{node}, new Class[]{Node.class})) {
             logger.info("First node successfully created");
         } else {
             logger.fatal("First node could not been created");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
     }
 
@@ -121,7 +121,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
             logger.info("First node successfully updated");
         } else {
             logger.fatal("First node could not been created");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
     }
 
@@ -141,14 +141,14 @@ public class ChannelListener implements org.jgroups.ChannelListener {
         } catch (Exception e) {
             logger.catching(e);
             logger.fatal("First user could not been created");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
 
         if (clusterManager.handleStateOperation(null, "putUser", new Object[]{user}, new Class[]{User.class})) {
             logger.info("First user successfully updated");
         } else {
             logger.fatal("First user could not been created");
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
     }
 

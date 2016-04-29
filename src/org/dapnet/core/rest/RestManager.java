@@ -1,6 +1,6 @@
 /*
  * DAPNET CORE PROJECT
- * Copyright (C) 2015
+ * Copyright (C) 2016
  *
  * Daniel Sialkowski
  *
@@ -18,7 +18,7 @@ package org.dapnet.core.rest;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNetCore;
+import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.rest.resources.AbstractResource;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
@@ -52,7 +52,7 @@ public class RestManager {
         } catch (Exception e) {
             logger.fatal("Starting RestApi failed");
             logger.catching(e);
-            DAPNetCore.stopDAPNetCore();
+            DAPNETCore.stopDAPNETCore();
         }
     }
 
