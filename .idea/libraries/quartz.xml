@@ -11,7 +11,6 @@
       <root url="jar://$PROJECT_DIR$/lib/quartz/quartz-core-2.2.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/quartz/quartz-jobs-2.2.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/quartz/slf4j-api-1.7.12.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/quartz/slf4j-api-1.7.7.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

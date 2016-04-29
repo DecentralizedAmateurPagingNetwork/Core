@@ -97,7 +97,13 @@ public class State implements Serializable {
 
     public void writeToFile() {
         File file = new File(Settings.getModelSettings().getStateFile());
-        file.getParentFile().mkdirs();
+        try{
+            file.getParentFile().mkdirs();
+        }
+        catch (Exception e)
+        {
+
+        }
         try {
             FileWriter writer = new FileWriter(file);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
