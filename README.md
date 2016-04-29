@@ -15,14 +15,14 @@ If you would like to join an existing cluster contact an admin. He will register
 Core instance and inform you about the configuration. If you want to create a new cluster
 feel free to set your own configuration. In each case set the following parameters in the
 `cofig/ClusterConfig.xml`:
-   * Node name (name of your DAPNET Core instance) at
-      `<pbcast.GMS name="NodeName@ClusterName"/>`
-   * Cluster name (name of the DAPNET Cluster) at
-      `<pbcast.GMS name="NodeName@ClusterName"/>`
-   * Node authentication key (needed for authentication if you want to rejoin your
-      cluster later) at `<AUTH auth_value="node name"/>`
-   * Initial hosts (if you want to join an existing cluster at least one node have to be
-     known... ) at `<TCPPING initial_hosts="HostA[7800],HostB[7800]\>`
+* Node name (name of your DAPNET Core instance) at
+  `<pbcast.GMS name="NodeName@ClusterName"/>`
+* Cluster name (name of the DAPNET Cluster) at
+  `<pbcast.GMS name="NodeName@ClusterName"/>`
+* Node authentication key (needed for authentication if you want to rejoin your cluster later)
+  at `<AUTH auth_value="node name"/>`
+* Initial hosts (if you want to join an existing cluster at least one node have to be
+  known... ) at `<TCPPING initial_hosts="HostA[7800],HostB[7800]\>`
 
 #### Log Settings ####
 The DAPNET Core uses Log4j2 for logging, which can be configured in the
@@ -65,9 +65,3 @@ Ralf Wilke | wilke@ihf.rwth-aachen.de
 
 ## License ##
 TODO
-
-
-
-
-
-
