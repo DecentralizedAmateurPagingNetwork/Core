@@ -39,6 +39,7 @@ public class SchedulerManager {
 
         registerTimeTransmissionJob();
         registerRubricNameTransmissionJob();
+        registerStateSavingJob();
 
         logger.info("SchedulerManager successfully started");
     }
@@ -65,6 +66,18 @@ public class SchedulerManager {
                 .withSchedule(cronSchedule(Settings.getSchedulerSettings().getRubricNameTransmissionCron()))
                 .build();
         scheduler.scheduleJob(rubricNameTransmissionJob, rubricNameTransmissionTrigger);
+    }
+
+    private void registerStateSavingJob() throws SchedulerException {
+        JobDetail stateSavingJob = newJob(StateSavingJob.class)
+                .withIdentity("stateSavingJob", "main")
+                .build();
+
+        CronTrigger stateSavingTrigger = newTrigger()
+                .withIdentity("stateSavingTrigger", "main")
+                .withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateSavingCron()))
+                .build();
+        scheduler.scheduleJob(stateSavingJob, stateSavingTrigger);
     }
 
     public void stop() {

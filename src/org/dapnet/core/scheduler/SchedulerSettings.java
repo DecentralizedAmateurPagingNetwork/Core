@@ -17,8 +17,9 @@ package org.dapnet.core.scheduler;
 import java.io.Serializable;
 
 public class SchedulerSettings implements Serializable {
-    private String timeTransmissionCron = "15 0/20 * * * ?";
+    private String timeTransmissionCron = "0 0/20 * * * ?";
     private String rubricNameTransmissionCron = "15 0/20 * * * ?";
+    private String stateSavingCron = "30 0/10 * * * ?";
 
     public String getTimeTransmissionCron() {
         return timeTransmissionCron;
@@ -27,4 +28,6 @@ public class SchedulerSettings implements Serializable {
     public String getRubricNameTransmissionCron() {
         return rubricNameTransmissionCron;
     }
+
+    public String getStateSavingCron() {return stateSavingCron; }
 }

@@ -258,6 +258,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         if (stopping) {
             updateNodeStatus(Node.Status.SUSPENDED);
             channel.close();
+            getState().writeToFile();
         }
     }
 

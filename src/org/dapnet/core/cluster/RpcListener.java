@@ -16,6 +16,7 @@ package org.dapnet.core.cluster;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.*;
 
 import javax.validation.Validation;
@@ -60,7 +61,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getCalls().add(call);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
 
             //Transmit new Call
             clusterManager.getTransmissionManager().handleCall(call);
@@ -124,7 +126,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getCallSigns().add(callSign);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
             logger.error("Exception : ", e);
@@ -168,7 +171,8 @@ public class RpcListener {
                 //Object not found
                 return response = RpcResponse.BAD_REQUEST;
             } else {
-                clusterManager.getState().writeToFile();
+                if(Settings.getModelSettings().isSavingImmediately())
+                    clusterManager.getState().writeToFile();
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
@@ -195,7 +199,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getNews().add(news);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             clusterManager.getTransmissionManager().handleNews(news);
             return response = RpcResponse.OK;
         } catch (Exception e) {
@@ -219,7 +224,8 @@ public class RpcListener {
 
             //Set Status
             node.setStatus(status);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             clusterManager.checkQuorum();
             return response = RpcResponse.OK;
         } catch (Exception e) {
@@ -253,7 +259,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getNodes().add(node);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             clusterManager.checkQuorum();
             return response = RpcResponse.OK;
         } catch (Exception e) {
@@ -290,7 +297,8 @@ public class RpcListener {
                 //Object not found
                 return response = RpcResponse.BAD_REQUEST;
             } else {
-                clusterManager.getState().writeToFile();
+                if(Settings.getModelSettings().isSavingImmediately())
+                    clusterManager.getState().writeToFile();
                 clusterManager.checkQuorum();
                 return response = RpcResponse.OK;
             }
@@ -326,7 +334,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getRubrics().add(rubric);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
 
             //Transmit new Rubric
             clusterManager.getTransmissionManager().handleRubric(rubric);
@@ -366,7 +375,8 @@ public class RpcListener {
                 //Object not found
                 return response = RpcResponse.BAD_REQUEST;
             } else {
-                clusterManager.getState().writeToFile();
+                if(Settings.getModelSettings().isSavingImmediately())
+                    clusterManager.getState().writeToFile();
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
@@ -390,7 +400,8 @@ public class RpcListener {
 
             //Set Status
             transmitter.setStatus(status);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
             logger.error("Exception : ", e);
@@ -433,7 +444,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getTransmitters().add(transmitter);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
 
             //Connect to Transmitter if my Transmitter
             String myNodeName = clusterManager.getChannel().getName();
@@ -487,7 +499,8 @@ public class RpcListener {
             }
             else{
                 clusterManager.getState().getTransmitters().removeByName(transmitterName);
-                clusterManager.getState().writeToFile();
+                if(Settings.getModelSettings().isSavingImmediately())
+                    clusterManager.getState().writeToFile();
 
                 //Disconnect from Transmitter if my Transmitter
                 String myNodeName = clusterManager.getChannel().getName();
@@ -529,7 +542,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getTransmitterGroups().add(transmitterGroup);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
             logger.error("Exception : ", e);
@@ -588,7 +602,8 @@ public class RpcListener {
                 //Object not found
                 return response = RpcResponse.BAD_REQUEST;
             } else {
-                clusterManager.getState().writeToFile();
+                if(Settings.getModelSettings().isSavingImmediately())
+                    clusterManager.getState().writeToFile();
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
@@ -623,7 +638,8 @@ public class RpcListener {
 
             //Add new Object
             clusterManager.getState().getUsers().add(user);
-            clusterManager.getState().writeToFile();
+            if(Settings.getModelSettings().isSavingImmediately())
+                clusterManager.getState().writeToFile();
             return response = RpcResponse.OK;
         } catch (Exception e) {
             logger.error("Exception : ", e);
@@ -726,7 +742,8 @@ public class RpcListener {
                 //Object not found
                 return response = RpcResponse.BAD_REQUEST;
             } else {
-                clusterManager.getState().writeToFile();
+                if(Settings.getModelSettings().isSavingImmediately())
+                    clusterManager.getState().writeToFile();
                 return response = RpcResponse.OK;
             }
         } catch (Exception e) {
