@@ -6,7 +6,7 @@
  *
  * daniel.sialkowski@rwth-aachen.de
  *
- * Institut für Hochfrequenztechnik
+ * Institute of High Frequency Technology
  * RWTH AACHEN UNIVERSITY
  * Melatener Str. 25
  * 52074 Aachen

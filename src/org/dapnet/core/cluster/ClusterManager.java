@@ -6,7 +6,7 @@
  *
  * daniel.sialkowski@rwth-aachen.de
  *
- * Institut für Hochfrequenztechnik
+ * Institute of High Frequency Technology
  * RWTH AACHEN UNIVERSITY
  * Melatener Str. 25
  * 52074 Aachen
@@ -27,9 +27,11 @@ import org.dapnet.core.transmission.TransmitterDeviceManager;
 import org.dapnet.core.transmission.TransmitterDeviceManagerListener;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
+import org.jgroups.auth.AuthToken;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
+import org.jgroups.protocols.AUTH;
 import org.jgroups.util.RspList;
 
 import javax.validation.ConstraintViolation;
@@ -169,6 +171,11 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         int startPosition = namePosition + 5;
         int endPosition = properties.indexOf('@', startPosition);
         return properties.substring(startPosition, endPosition);
+    }
+
+    String getAuthValue() {
+        return  ((ClusterAuthentication) ((AUTH) channel.getProtocolStack().findProtocol("AUTH")).getAuthToken())
+                .getAuthValue();
     }
 
     //### Quorum #######################################################################################################

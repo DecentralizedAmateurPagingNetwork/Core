@@ -6,7 +6,7 @@
  *
  * daniel.sialkowski@rwth-aachen.de
  *
- * Institut für Hochfrequenztechnik
+ * Institute of High Frequency Technology
  * RWTH AACHEN UNIVERSITY
  * Melatener Str. 25
  * 52074 Aachen
@@ -44,10 +44,8 @@ public class RestManager {
     public void startServer() {
         try {
             ResourceConfig rc = new ResourceConfig().packages("org/dapnet/core/rest");
-            URI endpoint = null;
-            endpoint = new URI(Settings.getRestSettings().getBaseUrl());
+            URI endpoint = new URI("http://localhost:"+Settings.getRestSettings().getPort()+"/");
             server = JdkHttpServerFactory.createHttpServer(endpoint, rc);
-
             logger.info("RestApi successfully started");
         } catch (Exception e) {
             logger.fatal("Starting RestApi failed");

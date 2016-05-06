@@ -6,7 +6,7 @@
  *
  * daniel.sialkowski@rwth-aachen.de
  *
- * Institut für Hochfrequenztechnik
+ * Institute of High Frequency Technology
  * RWTH AACHEN UNIVERSITY
  * Melatener Str. 25
  * 52074 Aachen
@@ -88,7 +88,11 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
 
         StringBuilder sb = new StringBuilder();
         sb.append("Header: ").append(responseContext.getHeaders());
-        sb.append(" - Entity: ").append(responseContext.getEntity().toString().replace("\n", "").replace("\r", ""));
+        sb.append(" - Entity: ");
+        if(responseContext!=null && responseContext.getEntity()!=null)
+            sb.append(responseContext.getEntity().toString().replace("\n", "").replace("\r", ""));
+        else
+            sb.append("null");
 
         if(responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
                 || responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR)

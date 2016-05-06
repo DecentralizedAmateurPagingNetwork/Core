@@ -6,7 +6,7 @@
  *
  * daniel.sialkowski@rwth-aachen.de
  *
- * Institut für Hochfrequenztechnik
+ * Institute of High Frequency Technology
  * RWTH AACHEN UNIVERSITY
  * Melatener Str. 25
  * 52074 Aachen
@@ -77,22 +77,14 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 
     //Helper
     private void createFirstNode() {
-        System.out.println("Creating first node:");
-        System.out.println("Key (same as in ClusterConfig.xml):");
+        logger.info("Creating first node");
         Scanner scanner = new Scanner(System.in);
-        String key = scanner.nextLine();
-
-        System.out.println("Longitude:");
-        String longitude = scanner.nextLine();
-
-        System.out.println("Latitude:");
-        String latitude = scanner.nextLine();
 
         IpAddress address = (IpAddress) clusterManager.getChannel().
                 down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
 
-        Node node = new Node(clusterManager.getChannel().getName(), address, longitude, latitude, Node.Status.ONLINE,
-                key);
+        Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE,
+                clusterManager.getAuthValue());
         try {
             node.setKey(HashUtil.createHash(node.getKey()));
         } catch (Exception e) {
@@ -126,16 +118,8 @@ public class ChannelListener implements org.jgroups.ChannelListener {
     }
 
     private void createFirstUser() {
-        System.out.println("Creating first User (Admin):");
-        System.out.println("Username:");
-        Scanner scanner = new Scanner(System.in);
-        String username = scanner.nextLine();
-        System.out.println("Password:");
-        String password = scanner.nextLine();
-        System.out.println("Mail:");
-        String mail = scanner.nextLine();
-
-        User user = new User(username, password, mail, true);
+        logger.info("Creating first user");
+        User user = new User("admin", "admin", "admin@admin.de", true);
         try {
             user.setHash(HashUtil.createHash(user.getHash()));
         } catch (Exception e) {
@@ -153,8 +137,6 @@ public class ChannelListener implements org.jgroups.ChannelListener {
     }
 
     private void printCreateClusterWarning() {
-        System.out.println("Creating new Cluster:");
-        System.out.println("You are not joining an existing cluster.");
-        System.out.println("If this is not your intention, please check your configuration and restart.");
+        logger.warn("Creating new Cluster: Check configuration and restart in case you want to join an existing one");
     }
 }
