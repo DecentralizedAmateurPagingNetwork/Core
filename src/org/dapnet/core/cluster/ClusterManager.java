@@ -184,7 +184,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         int onlineNodeCount = 0;
 
         for (Node node : state.getNodes()) {
-            if (node.getStatus() != Node.Status.SUSPENDED)
+            if (node.getStatus() != Node.Status.SUSPENDED)//Node is in UNKNOWN oder ONLINE state
                 activeNodeCount++;
             if (node.getStatus() == Node.Status.ONLINE)
                 onlineNodeCount++;
@@ -195,7 +195,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
             return;
         }
 
-        if (onlineNodeCount > activeNodeCount / 2) {
+        if (onlineNodeCount > (activeNodeCount / 2)) {
             quorum = true;
             logger.info("Cluster has Quorum");
         } else {
@@ -205,6 +205,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
     }
 
     public boolean isQuorum() {
+        checkQuorum();//Should be unnecessary, but added ensure QuorumCheck
         return quorum;
     }
 

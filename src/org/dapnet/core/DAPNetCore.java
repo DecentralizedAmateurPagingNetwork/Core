@@ -6,7 +6,7 @@
  *
  * daniel.sialkowski@rwth-aachen.de
  *
- * Institut für Hochfrequenztechnik
+ * Institute of High Frequency Technology
  * RWTH AACHEN UNIVERSITY
  * Melatener Str. 25
  * 52074 Aachen
@@ -37,7 +37,7 @@ public class DAPNETCore {
     private void start() {
         try {
             //Start
-            System.out.println("Starting DAPNET_CORE...");
+            logger.info("Starting DAPNET_CORE...");
             logger.info("Starting TransmissionManager");
             transmissionManager = new TransmissionManager();
             logger.info("Starting Cluster");
@@ -47,7 +47,7 @@ public class DAPNETCore {
             restManager.startServer();
             logger.info("Starting SchedulerManager");
             schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
-            System.out.println("DAPNETCore started");
+            logger.info("DAPNETCore started");
 
             //Wait for Stop
             try {
@@ -61,7 +61,7 @@ public class DAPNETCore {
                 }
             } catch (Exception e) {
                 //Program was interrupted, not enough time for stopping!
-                System.out.println("DAPNET_CORE was interrupted");
+                logger.warn("DAPNET_CORE was interrupted");
             }
         } catch (Exception e) {
             logger.fatal("Exception : ", e);
