@@ -30,6 +30,8 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
     private SearchableArrayList<TransmitterDevice> disconnectingTransmitterDevices;
     private TransmitterDeviceManagerListener listener;
     private boolean disconnectingFromAll = false;
+    private boolean reconnecting = false;
+    private List<Transmitter> reconnectTransmitters;
 
     public TransmitterDeviceManager() {
         connectedTransmitterDevices = new SearchableArrayList<>();
@@ -42,10 +44,23 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
         this.listener = listener;
     }
 
+    public void performReconnect(List<Transmitter> transmitters)
+    {
+        reconnecting = true;
+        reconnectTransmitters = transmitters;
+        disconnectFromAllTransmitters();
+    }
+
     public void connectToTransmitters(List<Transmitter> transmitters) {
         disconnectingFromAll = false;
         for (Transmitter transmitter : transmitters)
             connectToTransmitter(transmitter);
+        if(reconnecting){
+            reconnecting = false;
+            reconnectTransmitters = null;
+            logger.info("Finished reconnect operation");
+        }
+
     }
 
     public void connectToTransmitter(Transmitter transmitter) {
@@ -103,7 +118,11 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 && connectedTransmitterDevices.isEmpty()
                 && disconnectingTransmitterDevices.isEmpty()) {
             logger.info("Successfully disconnected from all Transmitters");
-            listener.handleDisconnectedFromAllTransmitters();
+
+            if(reconnecting)
+                connectToTransmitters(reconnectTransmitters);
+            else
+                listener.handleDisconnectedFromAllTransmitters();
         }
 
         while(!connectingTransmitterDevices.isEmpty())
@@ -214,7 +233,11 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 && connectedTransmitterDevices.isEmpty()
                 && disconnectingTransmitterDevices.isEmpty()) {
             logger.info("Successfully disconnected from all Transmitters");
-            listener.handleDisconnectedFromAllTransmitters();
+            if(reconnecting)
+                connectToTransmitters(reconnectTransmitters);
+            else
+                listener.handleDisconnectedFromAllTransmitters();
+
         }
     }
 }

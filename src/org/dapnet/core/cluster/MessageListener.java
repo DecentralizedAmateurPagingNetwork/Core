@@ -45,10 +45,11 @@ public class MessageListener implements org.jgroups.MessageListener {
 
     @Override
     public void getState(OutputStream outputStream) throws Exception {
-        logger.info("Sending State to other Node");
+        logger.info("Start sending State to other Node");
         synchronized(clusterManager.getState()) {
             Util.objectToStream(clusterManager.getState(), new DataOutputStream(outputStream));
         }
+        logger.info("Finished sending State to other Node");
     }
 
     @Override

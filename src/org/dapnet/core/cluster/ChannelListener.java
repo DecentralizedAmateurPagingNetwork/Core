@@ -60,10 +60,11 @@ public class ChannelListener implements org.jgroups.ChannelListener {
                 createFirstUser();
             }
         } else {
+            //Is performed automatically by each node!
             //Update NodeStatus in existing Cluster to online
-            if (!clusterManager.updateNodeStatus(Node.Status.ONLINE)) {
-                logger.error("Could not update NodeStatus");
-            }
+            //if (!clusterManager.updateNodeStatus(Node.Status.ONLINE)) {
+            //    logger.error("Could not update NodeStatus");
+            //}
         }
     }
 
@@ -108,13 +109,8 @@ public class ChannelListener implements org.jgroups.ChannelListener {
         Node node = clusterManager.getState().getNodes().findByName(clusterManager.getChannel().getName());
         node.setAddress(address);
         node.setStatus(Node.Status.ONLINE);
-
-        if (clusterManager.handleStateOperation(null, "putNode", new Object[]{node}, new Class[]{Node.class})) {
-            logger.info("First node successfully updated");
-        } else {
-            logger.fatal("First node could not been created");
-            DAPNETCore.stopDAPNETCore();
-        }
+        clusterManager.getState().writeToFile();
+        logger.info("First node successfully updated");
     }
 
     private void createFirstUser() {

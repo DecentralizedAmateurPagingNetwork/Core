@@ -212,6 +212,7 @@ public class RpcListener {
     }
 
     //### Node #########################################################################################################
+    // Now only used to inform other nodes that going to suspend mode
     public synchronized RpcResponse updateNodeStatus(String nodeName, Node.Status status) {
         RpcResponse response = null;
         try {
