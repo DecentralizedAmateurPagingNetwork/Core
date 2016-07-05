@@ -74,7 +74,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     protected Status status;
 
     public enum Status {
-        ONLINE, OFFLINE, ERROR
+        ONLINE, OFFLINE, ERROR, DISABLED
     }
 
     public Transmitter() {

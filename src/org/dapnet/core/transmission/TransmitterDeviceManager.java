@@ -44,8 +44,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
         this.listener = listener;
     }
 
-    public void performReconnect(List<Transmitter> transmitters)
-    {
+    public void performReconnect(List<Transmitter> transmitters) {
         reconnecting = true;
         reconnectTransmitters = transmitters;
         disconnectFromAllTransmitters();
@@ -55,7 +54,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
         disconnectingFromAll = false;
         for (Transmitter transmitter : transmitters)
             connectToTransmitter(transmitter);
-        if(reconnecting){
+        if (reconnecting) {
             reconnecting = false;
             reconnectTransmitters = null;
             logger.info("Finished reconnect operation");
@@ -64,6 +63,10 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
     }
 
     public void connectToTransmitter(Transmitter transmitter) {
+        if (transmitter.getStatus() == Transmitter.Status.ERROR
+                || transmitter.getStatus() == Transmitter.Status.DISABLED) {
+            return;
+        }
         disconnectingFromAll = false;
         switch (transmitter.getDeviceType()) {
             case RASPPAGER1:
@@ -72,8 +75,8 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             case ERICSSON:
                 connectToRasppager1(transmitter);
                 break;
-        }
 
+        }
     }
 
     private void connectToRasppager1(Transmitter transmitter) {
@@ -119,18 +122,16 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 && disconnectingTransmitterDevices.isEmpty()) {
             logger.info("Successfully disconnected from all Transmitters");
 
-            if(reconnecting)
+            if (reconnecting)
                 connectToTransmitters(reconnectTransmitters);
             else
                 listener.handleDisconnectedFromAllTransmitters();
         }
 
-        while(!connectingTransmitterDevices.isEmpty())
-        {
+        while (!connectingTransmitterDevices.isEmpty()) {
             disconnectFromTransmitter(connectingTransmitterDevices.get(0));
         }
-        while(!connectedTransmitterDevices.isEmpty())
-        {
+        while (!connectedTransmitterDevices.isEmpty()) {
             disconnectFromTransmitter(connectedTransmitterDevices.get(0));
         }
     }
@@ -173,6 +174,26 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             listener.handleTransmitterStatusChanged(transmitterDevice.getName(), transmitterDevice.getStatus());
         }
     }
+
+    public void handleTransmitterDeviceOffline(TransmitterDevice transmitterDevice, TransmitterDeviceException e) {
+        logger.warn(transmitterDevice.getName() + " is offline due to an exception: " + e.getMessage());
+
+        if (connectedTransmitterDevices.contains(transmitterDevice)) {
+            //Move Device to connecting  List
+            connectedTransmitterDevices.remove(transmitterDevice);
+            connectingTransmitterDevices.add(transmitterDevice);
+
+            //Set DeviceStatus
+            transmitterDevice.setStatus(Transmitter.Status.OFFLINE);
+            if (listener != null) {
+                logger.info("Setting status of " + transmitterDevice.getName() + " to " + Transmitter.Status.OFFLINE);
+                listener.handleTransmitterStatusChanged(transmitterDevice.getName(), transmitterDevice.getStatus());
+            }
+        } else {
+            logger.error("Unknown TransmitterDevice " + transmitterDevice.getName() + "go offline");
+        }
+    }
+
 
     @Override
     public void handleTransmitterDeviceStarted(TransmitterDevice transmitterDevice) {
@@ -233,7 +254,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 && connectedTransmitterDevices.isEmpty()
                 && disconnectingTransmitterDevices.isEmpty()) {
             logger.info("Successfully disconnected from all Transmitters");
-            if(reconnecting)
+            if (reconnecting)
                 connectToTransmitters(reconnectTransmitters);
             else
                 listener.handleDisconnectedFromAllTransmitters();

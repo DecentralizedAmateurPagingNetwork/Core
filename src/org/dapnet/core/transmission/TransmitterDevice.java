@@ -83,6 +83,14 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable{
         }
     }
 
+    protected void throwTransmitterDeviceOffline(TransmitterDeviceException e)
+    {
+        if(transmitterDeviceListener !=null) {
+            logger.warn(this + " is offline now and throws Exception: " + e.getMessage());
+            transmitterDeviceListener.handleTransmitterDeviceOffline(this, e);
+        }
+    }
+
     //Handle Socket
     protected Socket deviceSocket = null;
     protected BufferedReader fromServer = null;

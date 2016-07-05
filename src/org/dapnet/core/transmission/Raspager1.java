@@ -44,31 +44,38 @@ public class Raspager1 extends TransmitterDevice {
     }
 
     public void run() {
-        try {
-            //Connect to Raspager
-            connect();
-            logger.info("Successfully connected to " + this);
+        while(true) {
+            try {
+                //Connect to Raspager
+                connect();
+                logger.info("Successfully connected to " + this);
 
-            //Handle Welcome
-            transmitterDeviceProtocol.handleWelcome(this, toServer, fromServer);
-            logger.info("Successfully welcome with " + this);
-            transmitterDeviceListener.handleTransmitterDeviceStarted(this);
+                //Handle Welcome
+                transmitterDeviceProtocol.handleWelcome(this, toServer, fromServer);
+                logger.info("Successfully welcome with " + this);
+                transmitterDeviceListener.handleTransmitterDeviceStarted(this);
 
-            //Handle Messages until Interrupt or Error
-            handleMessages();
-        } catch (InterruptedException e) {
-            //Nothing to do, TransmitterDevice will be stopped
-        } catch (IOException e) {
-            throwTransmitterDeviceException(
-                    new TransmitterDeviceException("Connection error: " + e.getMessage()));
-        } catch (TransmitterDeviceException e) {
-            throwTransmitterDeviceException(e);
+                //Handle Messages until Interrupt or Error
+                handleMessages();
+            } catch (InterruptedException e) {
+                //Device is called to stop, so break loop and stop
+                break;
+            } catch (IOException e) {
+                //Exception while communication with device, so inform listener and try to reconnect
+                throwTransmitterDeviceOffline(new TransmitterDeviceException("Connection error: " + e.getMessage()));
+            } catch (TransmitterDeviceConnectionFailedException e) {
+                //Device failed finally to connect, so break loop and stop
+                throwTransmitterDeviceException(new TransmitterDeviceException("Connection error: " + e.getMessage()));
+                break;
+            } catch (TransmitterDeviceException e) {
+                //Unknown TransmitterDeviceException, so inform listener and try to reconnect
+                throwTransmitterDeviceOffline(new TransmitterDeviceException("Connection error: " + e.getMessage()));
+            }
         }
-        finally {
-            cleanup();
-        }
+        cleanup();
         logger.info("Successfully stopped " + this);
         transmitterDeviceListener.handleTransmitterDeviceStopped(this);
+
     }
 
 
@@ -89,8 +96,8 @@ public class Raspager1 extends TransmitterDevice {
                 logger.warn(this + " could not create connection: " + e.getMessage());
             }
 
-            if (numberOfReconnects > settings.getMaxNumberOfReconnects())
-                throw new TransmitterDeviceException("Connection could not been established");
+            if (settings.getMaxNumberOfReconnects()!=-1 && numberOfReconnects > settings.getMaxNumberOfReconnects())
+                throw new TransmitterDeviceConnectionFailedException("Connection could not been established");
 
             if(!thread.isInterrupted())
             {
