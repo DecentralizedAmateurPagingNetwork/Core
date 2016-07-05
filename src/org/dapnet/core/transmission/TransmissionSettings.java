@@ -47,9 +47,9 @@ public class TransmissionSettings implements Serializable {
     }
 
     public class Raspager1Settings implements Serializable{
-        private int maxNumberOfReconnects = 5;
+        private int maxNumberOfReconnects = -1;
         private int reconnectWaitTime = 20 * 1000;
-        private int connectionTimeout = 5000;
+        private int connectionTimeout = 20000;
         private int maxMessageCount = 4;
         private int transmissionDelay = 500;
 

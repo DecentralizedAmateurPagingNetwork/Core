@@ -25,9 +25,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.jgroups.util.Util.readFile;
@@ -112,6 +113,31 @@ public class State implements Serializable {
         } catch (Exception e) {
             logger.fatal("Failed to write state file: ", e);
         }
+    }
+
+    public void clean() {
+        Date currentDate = new Date();
+        {
+            //Clean Calls:
+            Iterator<Call> i = calls.iterator();
+            while (i.hasNext()) {
+                Call call = i.next();
+                if (currentDate.after(new Date(call.getTimestamp().getTime()
+                        + Settings.getModelSettings().getCallExpirationTimeInMinutes() * 60 * 1000)))
+                    i.remove();
+            }
+        }
+        {
+            //Clean News:
+            Iterator<News> i = news.iterator();
+            while (i.hasNext()) {
+                News news = i.next();
+                if (currentDate.after(new Date(news.getTimestamp().getTime()
+                        + Settings.getModelSettings().getNewsExpirationTimeInMinutes() * 60 * 1000)))
+                    i.remove();
+            }
+        }
+        logger.info("Successfully finished cleaning operation");
     }
 
     public List<Call> getCalls() {

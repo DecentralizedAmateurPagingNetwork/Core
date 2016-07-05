@@ -74,7 +74,10 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     protected Status status;
 
     public enum Status {
-        ONLINE, OFFLINE, ERROR, DISABLED
+        ONLINE, //successfully connected
+        OFFLINE, //(re)connection is in progress or will start in some moments
+        ERROR, //connections finally fails (count of retransmission exceed
+        DISABLED //manually deactivated, won't be connected
     }
 
     public Transmitter() {

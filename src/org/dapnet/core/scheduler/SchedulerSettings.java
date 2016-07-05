@@ -20,6 +20,7 @@ public class SchedulerSettings implements Serializable {
     private String timeTransmissionCron = "0 0/20 * * * ?";
     private String rubricNameTransmissionCron = "15 0/20 * * * ?";
     private String stateSavingCron = "30 0/10 * * * ?";
+    private String stateCleaningCron = "0 0 0 * * ?";
 
     public String getTimeTransmissionCron() {
         return timeTransmissionCron;
@@ -30,4 +31,8 @@ public class SchedulerSettings implements Serializable {
     }
 
     public String getStateSavingCron() {return stateSavingCron; }
+
+    public String getStateCleaningCron() {
+        return stateCleaningCron;
+    }
 }

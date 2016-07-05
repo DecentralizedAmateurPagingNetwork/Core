@@ -40,6 +40,7 @@ public class SchedulerManager {
         registerTimeTransmissionJob();
         registerRubricNameTransmissionJob();
         registerStateSavingJob();
+        registerStateCleaningJob();
 
         logger.info("SchedulerManager successfully started");
     }
@@ -78,6 +79,18 @@ public class SchedulerManager {
                 .withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateSavingCron()))
                 .build();
         scheduler.scheduleJob(stateSavingJob, stateSavingTrigger);
+    }
+
+    private void registerStateCleaningJob() throws SchedulerException {
+        JobDetail stateCleaningJob = newJob(StateCleaningJob.class)
+                .withIdentity("stateCleaningJob", "main")
+                .build();
+
+        CronTrigger stateCleaningTrigger = newTrigger()
+                .withIdentity("stateCleaningTrigger", "main")
+                .withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateCleaningCron()))
+                .build();
+        scheduler.scheduleJob(stateCleaningJob, stateCleaningTrigger);
     }
 
     public void stop() {
