@@ -137,6 +137,7 @@ public class State implements Serializable {
                     i.remove();
             }
         }
+        writeToFile();
         logger.info("Successfully finished cleaning operation");
     }
 
