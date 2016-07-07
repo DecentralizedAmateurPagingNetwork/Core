@@ -49,6 +49,7 @@ public class NodeResource extends AbstractResource {
         if(node!=null) {
             node.setName(nodeName);
             node.setKey(HashUtil.createHash(node.getKey()));
+            node.setStatus(Node.Status.SUSPENDED);
         }
         else
             throw new EmptyBodyException();
