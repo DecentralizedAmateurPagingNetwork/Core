@@ -15,6 +15,7 @@
 package org.dapnet.core.transmission;
 
 import org.dapnet.core.Settings;
+import org.dapnet.core.model.Transmitter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +27,16 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
     private static final TransmissionSettings.PagingProtocolSettings settings =
             Settings.getTransmissionSettings().getPagingProtocolSettings();
     private int sequenceNumber = 0;
+    //The RaspagerProtocol is a generic one and can also been used for C9000, PR430 and SDR Transmitter
+    private Transmitter.DeviceType deviceType;
+
+    public RaspagerProtocol(Transmitter.DeviceType deviceType) {
+        this.deviceType = deviceType;
+    }
+
+    //public RaspagerProtocol() {
+    //    this.deviceType= Transmitter.DeviceType.RASPPAGER1;
+    //}
 
     private int getSequenceNumber() {
         int sequenceNumber = this.sequenceNumber;
@@ -40,6 +51,20 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         if (msg == null) {
             throw new TransmitterDeviceException("No SID");
         }
+
+        String expectedSid;
+        switch (deviceType){
+            case RASPPAGER1: expectedSid="[RasPager"; break;
+            case C9000: expectedSid="[uPSDrpc/XOS"; break;
+            case PR430: expectedSid="[PR430"; break;
+            case SDRPAGER: expectedSid="[SDRPager"; break;
+            default: throw new TransmitterDeviceException("UNSUPPOTED_DEVICE_TYPE: Initialize RaspagerProtocol with unsupported DeviceType");
+        }
+
+        if(!msg.startsWith(expectedSid))
+            throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
+
+        /* Might be useful later for version control
         Pattern sid = Pattern.compile("\\[(\\w+) v(\\d+[.]\\d+)-SCP-#(\\d+)\\][ ]?\\d?[ ]?\\d?[ ]?\\d?[ ]?\\d?[ ]?\\d?[ ]?");    // [RasPager v1.0-SCP-#2345678]
         Matcher sid_matchm = sid.matcher(msg);
         if (!sid_matchm.matches()) { //
@@ -48,7 +73,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         String name = sid_matchm.group(1); // group(0) is whole search string, no need to check correct name because ip already checked
         String version = sid_matchm.group(2);
         String supportedProtocols = sid_matchm.group(3);  // maybe useful later if new features are introduced and some devices are not yet updated
-
+        */
 
         // 2. Sync System Times
         // 2.a) get min_rtt

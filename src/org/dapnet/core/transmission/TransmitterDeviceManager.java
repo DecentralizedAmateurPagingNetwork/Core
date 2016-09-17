@@ -68,28 +68,30 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             return;
         }
         disconnectingFromAll = false;
-        switch (transmitter.getDeviceType()) {
-            case RASPPAGER1:
-                connectToRasppager1(transmitter);
-                break;
-            case ERICSSON:
-                connectToRasppager1(transmitter);
-                break;
-
+        if(transmitter.getDeviceType()==Transmitter.DeviceType.C9000
+                ||transmitter.getDeviceType()==Transmitter.DeviceType.RASPPAGER1
+                ||transmitter.getDeviceType()==Transmitter.DeviceType.PR430
+                ||transmitter.getDeviceType()==Transmitter.DeviceType.SDRPAGER) {
+            connectToRaspagerDerivative(transmitter);
         }
     }
 
-    private void connectToRasppager1(Transmitter transmitter) {
+    private void connectToRaspagerDerivative(Transmitter transmitter) {
         logger.info("Start connecting to " + transmitter.getName());
-
+        Raspager raspager = null;
         //Create TransmitterDevice
-        Raspager1 raspager1 = new Raspager1(transmitter, this);
-
+        switch (transmitter.getDeviceType())
+        {
+            case C9000: raspager = new C9000(transmitter, this); break;
+            case PR430: raspager = new PR430(transmitter, this); break;
+            case RASPPAGER1: raspager = new Raspager1(transmitter, this); break;
+            case SDRPAGER: raspager = new SDRPager(transmitter, this); break;
+        }
         //Add to Connecting List
-        connectingTransmitterDevices.add(raspager1);
+        connectingTransmitterDevices.add(raspager);
 
         //Start Device
-        raspager1.start();
+        raspager.start();
     }
 
     public synchronized void disconnectFromTransmitter(Transmitter transmitter) {

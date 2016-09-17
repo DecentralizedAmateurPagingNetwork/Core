@@ -16,8 +16,8 @@ package org.dapnet.core.transmission;
 
 import org.dapnet.core.model.Transmitter;
 
-public class Raspager1 extends Raspager {
-    public Raspager1(Transmitter transmitter, TransmitterDeviceListener listener) {
-        super(transmitter, listener, DeviceType.RASPPAGER1);
+public class C9000 extends Raspager {
+    public C9000(Transmitter transmitter, TransmitterDeviceListener listener) {
+        super(transmitter, listener, DeviceType.C9000);
     }
 }
