@@ -18,14 +18,14 @@ import java.io.Serializable;
 
 public class TransmissionSettings implements Serializable {
     private PagingProtocolSettings pagingProtocolSettings = new PagingProtocolSettings();
-    private Raspager1Settings raspager1Settings = new Raspager1Settings();
+    private RaspagerSettings raspagerSettings = new RaspagerSettings();
 
     public PagingProtocolSettings getPagingProtocolSettings() {
         return pagingProtocolSettings;
     }
 
-    public Raspager1Settings getRaspager1Settings() {
-        return raspager1Settings;
+    public RaspagerSettings getRaspagerSettings() {
+        return raspagerSettings;
     }
 
     public class PagingProtocolSettings implements Serializable{
@@ -46,7 +46,7 @@ public class TransmissionSettings implements Serializable {
         }
     }
 
-    public class Raspager1Settings implements Serializable{
+    public class RaspagerSettings implements Serializable{
         private int maxNumberOfReconnects = -1;
         private int reconnectWaitTime = 20 * 1000;
         private int connectionTimeout = 20000;

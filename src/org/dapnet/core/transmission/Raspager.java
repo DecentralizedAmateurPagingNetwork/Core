@@ -26,8 +26,8 @@ import java.util.Date;
 
 public abstract class Raspager extends TransmitterDevice {
     private static final Logger logger = LogManager.getLogger(Raspager.class.getName());
-    private static final TransmissionSettings.Raspager1Settings settings =
-            Settings.getTransmissionSettings().getRaspager1Settings();
+    private static final TransmissionSettings.RaspagerSettings settings =
+            Settings.getTransmissionSettings().getRaspagerSettings();
 
 
     private int messageCount = 0;
