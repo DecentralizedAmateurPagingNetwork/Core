@@ -16,6 +16,7 @@ package org.dapnet.core.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.DAPNETCore;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 
@@ -109,5 +110,9 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
                 "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
         responseContext.getHeaders().add("Access-Control-Allow-Methods",
                 "GET, POST, PUT, DELETE");
+        responseContext.getHeaders().add("DAPNET-Core-Version", DAPNETCore.getVersion());
+
     }
+
+
 }

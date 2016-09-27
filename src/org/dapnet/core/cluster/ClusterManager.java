@@ -160,7 +160,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         int namePosition = properties.indexOf("name=", gmsPosition);
         int startPosition = properties.indexOf('@', namePosition) + 1;
         int endPosition = properties.indexOf(';', startPosition);
-        return properties.substring(startPosition, endPosition);
+        return properties.substring(startPosition, endPosition) + DAPNETCore.getVersion();
     }
 
     private String getNodeName() {
