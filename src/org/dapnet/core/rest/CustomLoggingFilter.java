@@ -110,6 +110,5 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
                 "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");
         responseContext.getHeaders().add("Access-Control-Allow-Methods",
                 "GET, POST, PUT, DELETE");
-        responseContext.getHeaders().add("Accept", "application/dapnet.core.v"+DAPNETCore.getVersion()+"+json");
     }
 }

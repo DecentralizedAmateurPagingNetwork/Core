@@ -27,7 +27,6 @@ import org.dapnet.core.transmission.TransmitterDeviceManager;
 import org.dapnet.core.transmission.TransmitterDeviceManagerListener;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
-import org.jgroups.auth.AuthToken;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
@@ -160,7 +159,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         int namePosition = properties.indexOf("name=", gmsPosition);
         int startPosition = properties.indexOf('@', namePosition) + 1;
         int endPosition = properties.indexOf(';', startPosition);
-        return properties.substring(startPosition, endPosition) + DAPNETCore.getVersion();
+        return properties.substring(startPosition, endPosition) + DAPNETCore.getCoreVersion();
     }
 
     private String getNodeName() {
