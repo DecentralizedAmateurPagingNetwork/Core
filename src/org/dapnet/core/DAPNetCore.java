@@ -86,7 +86,8 @@ public class DAPNETCore {
 
     // Static
     private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
-    private static final String VERSION = "0.9.1.1";
+    private static final String CORE_VERSION = "0.9.1.2";
+    private static final String API_VERSION = "0.9.1";
     private static DAPNETCore dapnetCore;
 
     public static void main(String[] args) throws Exception {
@@ -128,8 +129,13 @@ public class DAPNETCore {
         dapnetCore.stop();
     }
 
-    public static String getVersion()
+    public static String getCoreVersion()
     {
-        return VERSION;
+        return CORE_VERSION;
+    }
+
+    public static String getApiVersion()
+    {
+        return API_VERSION;
     }
 }
