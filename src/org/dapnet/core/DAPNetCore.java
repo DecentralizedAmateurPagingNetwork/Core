@@ -37,7 +37,7 @@ public class DAPNETCore {
     private void start() {
         try {
             //Start
-            logger.info("Starting DAPNET_CORE...");
+            logger.info("Starting DAPNET_CORE Version "+CORE_VERSION+"...");
             logger.info("Starting TransmissionManager");
             transmissionManager = new TransmissionManager();
             logger.info("Starting Cluster");
@@ -70,7 +70,7 @@ public class DAPNETCore {
     }
 
     private void stop() {
-        logger.info("Stopping DAPNET_CORE Version "+CORE_VERSION+"...");
+        logger.info("Stopping DAPNET_CORE...");
         if (clusterManager != null)
             clusterManager.stop();
         if (restManager != null)

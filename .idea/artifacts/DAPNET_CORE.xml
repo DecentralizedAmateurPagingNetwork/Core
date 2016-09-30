@@ -13,9 +13,7 @@
         <element id="library" level="project" name="log4j2" />
         <element id="library" level="project" name="quartz" />
       </element>
-      <element id="directory" name="config">
-        <element id="dir-copy" path="$PROJECT_DIR$/config" />
-      </element>
+      <element id="directory" name="config" />
       <element id="directory" name="logs" />
       <element id="directory" name="data" />
       <element id="file-copy" path="$PROJECT_DIR$/README.md" output-file-name="README" />
