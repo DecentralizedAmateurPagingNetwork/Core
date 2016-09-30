@@ -70,6 +70,13 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                 }
             }
 
+            //Update node states:
+            updateNodeStates();
+
+            //Save and check for quorum:
+            clusterManager.checkQuorum();
+            clusterManager.getState().writeToFile();
+
             for (Address add : view.getMembers()){
                 PhysicalAddress physicalAddress = (PhysicalAddress)
                         clusterManager.getChannel().down(
@@ -81,13 +88,6 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                     clusterManager.getState().getNodes().findByName(add.toString()).setAddress((IpAddress) physicalAddress);
                 }
             }
-
-            //Update node states:
-            updateNodeStates();
-
-            //Save and check for quorum:
-            clusterManager.checkQuorum();
-            clusterManager.getState().writeToFile();
         }
 
         private void handleMerge(MergeView view) throws Exception {

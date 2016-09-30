@@ -86,7 +86,7 @@ public class DAPNETCore {
 
     // Static
     private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
-    private static final String CORE_VERSION = "0.9.2.1";
+    private static final String CORE_VERSION = "0.9.2.2";
     private static final String API_VERSION = "0.9.2";
     private static DAPNETCore dapnetCore;
 
