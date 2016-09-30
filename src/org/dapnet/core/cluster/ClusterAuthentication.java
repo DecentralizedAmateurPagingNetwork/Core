@@ -50,8 +50,8 @@ public class ClusterAuthentication extends AuthToken {
 
     public boolean authenticate(AuthToken token, Message msg) {
         Address sender = msg.getSrc();
-        IpAddress address =
-                sender != null ? (IpAddress) auth.down(new Event(Event.GET_PHYSICAL_ADDRESS, sender)) : null;
+        /*IpAddress address =
+                sender != null ? (IpAddress) auth.down(new Event(Event.GET_PHYSICAL_ADDRESS, sender)) : null;*/
         if (clusterManager == null) {
             logger.error("Authentication has no reference to ClusterManager");
             return false;
@@ -62,10 +62,11 @@ public class ClusterAuthentication extends AuthToken {
             logger.warn("Authentication of Node " + sender.toString() + " failed: Unknown node");
             return false;
         }
-        if (!address.equals(node.getAddress())) {
-            logger.warn("Authentication of Node " + sender.toString() + " failed: Unknown ip address");
+        /*if (!address.equals(node.getAddress())) {
+            logger.warn("Authentication of Node " + sender.toString() + " failed: Received ip address "
+                    + address.getIpAddress() + " is unequal to " + node.getAddress());
             return false;
-        }
+        }*/
 
         try {
             if (!HashUtil.validatePassword(((ClusterAuthentication) token).getAuthValue(), node.getKey())) {
