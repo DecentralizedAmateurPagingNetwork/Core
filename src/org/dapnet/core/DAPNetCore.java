@@ -70,7 +70,7 @@ public class DAPNETCore {
     }
 
     private void stop() {
-        logger.info("Stopping DAPNET_CORE...");
+        logger.info("Stopping DAPNET_CORE Version "+CORE_VERSION+"...");
         if (clusterManager != null)
             clusterManager.stop();
         if (restManager != null)
