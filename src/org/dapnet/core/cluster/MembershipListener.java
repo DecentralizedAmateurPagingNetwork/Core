@@ -18,9 +18,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.model.Node;
-import org.jgroups.Address;
-import org.jgroups.MergeView;
-import org.jgroups.View;
+import org.jgroups.*;
+import org.jgroups.stack.IpAddress;
 
 public class MembershipListener implements org.jgroups.MembershipListener {
     private static final Logger logger = LogManager.getLogger(MembershipListener.class.getName());
@@ -68,6 +67,18 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                     logger.fatal(e);
                     DAPNETCore.stopDAPNETCore();
                     return;
+                }
+            }
+
+            for (Address add : view.getMembers()){
+                PhysicalAddress physicalAddress = (PhysicalAddress)
+                        clusterManager.getChannel().down(
+                                new Event(
+                                        Event.GET_PHYSICAL_ADDRESS, add
+                                )
+                        );
+                if(physicalAddress instanceof IpAddress){
+                    clusterManager.getState().getNodes().findByName(add.toString()).setAddress((IpAddress) physicalAddress);
                 }
             }
 

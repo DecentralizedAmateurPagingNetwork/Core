@@ -38,7 +38,6 @@ public class Node implements Serializable, Searchable {
     @Max(+90)
     protected String latitude;
 
-    @NotNull
     private IpAddress address;
 
     @NotNull
