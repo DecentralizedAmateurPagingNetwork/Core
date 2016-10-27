@@ -60,7 +60,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
                 expectedSid = "[RasPager";
                 break;
             case XOS:
-                expectedSid = "[uPSDrpc/XOS";
+                expectedSid = "[*/XOS";
                 break;
             case PR430:
                 expectedSid = "[PR430";
