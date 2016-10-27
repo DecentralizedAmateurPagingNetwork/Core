@@ -27,7 +27,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
     private static final TransmissionSettings.PagingProtocolSettings settings =
             Settings.getTransmissionSettings().getPagingProtocolSettings();
     private int sequenceNumber = 0;
-    //The RaspagerProtocol is a generic one and can also been used for C9000, PR430 and SDR Transmitter
+    //The RaspagerProtocol is a generic one and can also been used for XOS, PR430 and SDR Transmitter
     private Transmitter.DeviceType deviceType;
 
     public RaspagerProtocol(Transmitter.DeviceType deviceType) {
@@ -45,7 +45,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
     }
 
     public void handleWelcome(TransmitterDevice transmitterDevice, PrintWriter toServer, BufferedReader fromServer) throws TransmitterDeviceException, InterruptedException, IOException {
-        //Experimental: Fix problems with C9000
+        //Experimental: Fix problems with XOS
         sequenceNumber = 0;
         // Mostly adapted from Sven Jung
         // 1. Read SID
@@ -59,7 +59,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
             case RASPPAGER1:
                 expectedSid = "[RasPager";
                 break;
-            case C9000:
+            case XOS:
                 expectedSid = "[uPSDrpc/XOS";
                 break;
             case PR430:
@@ -72,8 +72,15 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
                 throw new TransmitterDeviceException("UNSUPPOTED_DEVICE_TYPE: Initialize RaspagerProtocol with unsupported DeviceType");
         }
 
-        if (!msg.startsWith(expectedSid))
-            throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
+        // exception for XOS-devices
+        if (deviceType == Transmitter.DeviceType.XOS) {
+            // starts with "[", contains "/", which follows "XOS"
+            if (!(msg.startsWith("[") && msg.split("/")[1].startsWith("XOS")))
+                throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
+        } else {
+            if (!msg.startsWith(expectedSid))
+                throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
+        }
 
         /* Might be useful later for version control
         Pattern sid = Pattern.compile("\\[(\\w+) v(\\d+[.]\\d+)-SCP-#(\\d+)\\][ ]?\\d?[ ]?\\d?[ ]?\\d?[ ]?\\d?[ ]?\\d?[ ]?");    // [RasPager v1.0-SCP-#2345678]

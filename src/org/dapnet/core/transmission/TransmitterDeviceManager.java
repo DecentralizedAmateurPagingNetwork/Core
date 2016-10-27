@@ -68,7 +68,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             return;
         }
         disconnectingFromAll = false;
-        if (transmitter.getDeviceType() == Transmitter.DeviceType.C9000
+        if (transmitter.getDeviceType() == Transmitter.DeviceType.XOS
                 || transmitter.getDeviceType() == Transmitter.DeviceType.RASPPAGER1
                 || transmitter.getDeviceType() == Transmitter.DeviceType.PR430
                 || transmitter.getDeviceType() == Transmitter.DeviceType.SDRPAGER) {
@@ -81,8 +81,8 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
         Raspager raspager = null;
         //Create TransmitterDevice
         switch (transmitter.getDeviceType()) {
-            case C9000:
-                raspager = new C9000(transmitter, this);
+            case XOS:
+                raspager = new XOS(transmitter, this);
                 break;
             case PR430:
                 raspager = new PR430(transmitter, this);
