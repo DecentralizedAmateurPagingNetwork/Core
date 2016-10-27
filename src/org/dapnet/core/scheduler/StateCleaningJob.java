@@ -21,6 +21,7 @@ import org.quartz.*;
 
 public class StateCleaningJob implements Job {
     private static final Logger logger = LogManager.getLogger(StateCleaningJob.class.getName());
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 

@@ -14,12 +14,8 @@
 
 package org.dapnet.core.model.validator;
 
-import org.dapnet.core.model.User;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ValidNameValidator implements ConstraintValidator<ValidName, Object> {
     @Override
@@ -29,6 +25,6 @@ public class ValidNameValidator implements ConstraintValidator<ValidName, Object
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        return value!=null;
+        return value != null;
     }
 }

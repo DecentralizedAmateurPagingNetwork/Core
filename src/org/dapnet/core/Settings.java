@@ -24,12 +24,11 @@ import org.dapnet.core.rest.RestSettings;
 import org.dapnet.core.scheduler.SchedulerSettings;
 import org.dapnet.core.transmission.TransmissionSettings;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.beans.XMLEncoder;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
 
 import static org.jgroups.util.Util.readFile;
 
@@ -44,7 +43,7 @@ public class Settings implements Serializable {
     private ClusterSettings clusterSettings;
     private SchedulerSettings schedulerSettings;
 
-    private Settings(){
+    private Settings() {
         transmissionSettings = new TransmissionSettings();
         modelSettings = new ModelSettings();
         restSettings = new RestSettings();
@@ -72,9 +71,8 @@ public class Settings implements Serializable {
         return getSettings().schedulerSettings;
     }
 
-    private static Settings getSettings()
-    {
-        if(settings == null) {
+    private static Settings getSettings() {
+        if (settings == null) {
             try {
                 settings = new Gson().fromJson(readFile("config/Settings.json"), Settings.class);
             } catch (Exception e) {
@@ -85,7 +83,7 @@ public class Settings implements Serializable {
         return settings;
     }
 
-    private static Settings createDefaultSettings(){
+    private static Settings createDefaultSettings() {
         settings = new Settings();
         try {
             File file = new File("config/Settings.json");

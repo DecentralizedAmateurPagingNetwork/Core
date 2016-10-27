@@ -18,5 +18,6 @@ import org.dapnet.core.model.Transmitter;
 
 public interface TransmitterDeviceManagerListener {
     void handleTransmitterStatusChanged(String transmitterName, Transmitter.Status newStatus);
+
     void handleDisconnectedFromAllTransmitters();
 }

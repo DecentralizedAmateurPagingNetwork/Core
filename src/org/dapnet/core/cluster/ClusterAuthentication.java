@@ -19,11 +19,9 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.Node;
 import org.jgroups.Address;
-import org.jgroups.Event;
 import org.jgroups.Message;
 import org.jgroups.annotations.Property;
 import org.jgroups.auth.AuthToken;
-import org.jgroups.stack.IpAddress;
 import org.jgroups.util.Bits;
 import org.jgroups.util.Util;
 

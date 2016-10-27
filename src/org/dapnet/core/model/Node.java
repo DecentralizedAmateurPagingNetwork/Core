@@ -27,13 +27,13 @@ public class Node implements Serializable, Searchable {
     private String name;
 
     @NotNull
-    @Digits(integer=3, fraction=8)
+    @Digits(integer = 3, fraction = 8)
     @Min(-180)
     @Max(+180)
     protected String longitude;
 
     @NotNull
-    @Digits(integer=3, fraction=8)
+    @Digits(integer = 3, fraction = 8)
     @Min(-90)
     @Max(+90)
     protected String latitude;

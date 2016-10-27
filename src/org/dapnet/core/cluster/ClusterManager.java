@@ -95,8 +95,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
         //Connect to channel
         try {
             channel.connect(getChannelName());
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.fatal("Could not connect to cluster");
             System.out.println("Could not connect to cluster. Check your settings and make sure your node is already " +
                     "registered.");
@@ -130,8 +129,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
                     + violation.getPropertyPath() + " " + violation.getMessage());
         }
 
-        if(constraintViolations.size() != 0)
-        {
+        if (constraintViolations.size() != 0) {
             DAPNETCore.stopDAPNETCore();
         }
     }
@@ -173,7 +171,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
     }
 
     String getAuthValue() {
-        return  ((ClusterAuthentication) ((AUTH) channel.getProtocolStack().findProtocol("AUTH")).getAuthToken())
+        return ((ClusterAuthentication) ((AUTH) channel.getProtocolStack().findProtocol("AUTH")).getAuthToken())
                 .getAuthValue();
     }
 

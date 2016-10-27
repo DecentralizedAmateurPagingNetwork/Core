@@ -25,14 +25,12 @@ public class SearchableArrayList<T extends Searchable> extends ArrayList<T> {
         return null;
     }
 
-    public boolean removeByName(String name)
-    {
+    public boolean removeByName(String name) {
         T toRemove = findByName(name);
-        if(toRemove!=null) {
+        if (toRemove != null) {
             this.remove(findByName(name));
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }

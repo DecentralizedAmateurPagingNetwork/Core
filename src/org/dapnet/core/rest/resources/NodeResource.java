@@ -28,14 +28,14 @@ public class NodeResource extends AbstractResource {
     @GET
     public Response getNodes() throws Exception {
         RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-        return getObject(restListener.getState().getNodes(),status);
+        return getObject(restListener.getState().getNodes(), status);
     }
 
     @GET
     @Path("{node}")
     public Response getNode(@PathParam("node") String nodeName) throws Exception {
         RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-        return getObject(restListener.getState().getNodes().findByName(nodeName),status);
+        return getObject(restListener.getState().getNodes().findByName(nodeName), status);
     }
 
     @PUT
@@ -46,15 +46,14 @@ public class NodeResource extends AbstractResource {
 
         //Create Node
         Node node = gson.fromJson(nodeJSON, Node.class);
-        if(node!=null) {
+        if (node != null) {
             node.setName(nodeName);
             node.setKey(HashUtil.createHash(node.getKey()));
             node.setStatus(Node.Status.SUSPENDED);
-        }
-        else
+        } else
             throw new EmptyBodyException();
 
-        return handleObject(node,"putNode",!restListener.getState().getNodes().contains(nodeName), true);
+        return handleObject(node, "putNode", !restListener.getState().getNodes().contains(nodeName), true);
     }
 
     @DELETE

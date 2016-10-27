@@ -37,7 +37,7 @@ public class DAPNETCore {
     private void start() {
         try {
             //Start
-            logger.info("Starting DAPNET_CORE Version "+CORE_VERSION+"...");
+            logger.info("Starting DAPNET_CORE Version " + CORE_VERSION + "...");
             logger.info("Starting TransmissionManager");
             transmissionManager = new TransmissionManager();
             logger.info("Starting Cluster");
@@ -77,8 +77,7 @@ public class DAPNETCore {
             restManager.stopServer();
         if (schedulerManager != null)
             schedulerManager.stop();
-        if(clusterManager==null||restManager==null|| schedulerManager ==null)
-        {
+        if (clusterManager == null || restManager == null || schedulerManager == null) {
             //Used for stopping DAPNET while startup
             System.exit(-1);
         }
@@ -86,8 +85,8 @@ public class DAPNETCore {
 
     // Static
     private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
-    private static final String CORE_VERSION = "0.9.2.3";
-    private static final String API_VERSION = "0.9.2";
+    private static final String CORE_VERSION = "0.9.3.0";
+    private static final String API_VERSION = "0.9.3";
     private static DAPNETCore dapnetCore;
 
     public static void main(String[] args) throws Exception {
@@ -129,13 +128,11 @@ public class DAPNETCore {
         dapnetCore.stop();
     }
 
-    public static String getCoreVersion()
-    {
+    public static String getCoreVersion() {
         return CORE_VERSION;
     }
 
-    public static String getApiVersion()
-    {
+    public static String getApiVersion() {
         return API_VERSION;
     }
 }

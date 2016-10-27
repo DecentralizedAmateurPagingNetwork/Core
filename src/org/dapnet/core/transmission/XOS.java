@@ -14,8 +14,10 @@
 
 package org.dapnet.core.transmission;
 
-public class TransmitterDeviceException extends Exception {
-    public TransmitterDeviceException(String message) {
-        super(message);
+import org.dapnet.core.model.Transmitter;
+
+public class XOS extends Raspager {
+    public XOS(Transmitter transmitter, TransmitterDeviceListener listener) {
+        super(transmitter, listener, DeviceType.XOS);
     }
 }

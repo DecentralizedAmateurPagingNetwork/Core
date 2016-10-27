@@ -30,20 +30,20 @@ import java.util.List;
 public class CallResource extends AbstractResource {
     @GET
     public Response getCalls(@QueryParam("ownerName") String ownerName) throws Exception {
-            if (ownerName == null || ownerName.isEmpty()) {
-                RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-                return getObject(restListener.getState().getCalls(),status);
-            } else {
-                RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-                                            restListener.getState().getUsers().findByName(ownerName));
+        if (ownerName == null || ownerName.isEmpty()) {
+            RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+            return getObject(restListener.getState().getCalls(), status);
+        } else {
+            RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
+                    restListener.getState().getUsers().findByName(ownerName));
 
-                List<Call> calls = new ArrayList<>();
-                for (Call call : restListener.getState().getCalls()) {
-                    if (call.getOwnerName().equals(ownerName))
-                        calls.add(call);
-                }
-                return getObject(calls, status);
+            List<Call> calls = new ArrayList<>();
+            for (Call call : restListener.getState().getCalls()) {
+                if (call.getOwnerName().equals(ownerName))
+                    calls.add(call);
             }
+            return getObject(calls, status);
+        }
     }
 
     @POST
@@ -53,11 +53,10 @@ public class CallResource extends AbstractResource {
 
         //Create Call
         Call call = gson.fromJson(callJSON, Call.class);
-        if(call != null) {
+        if (call != null) {
             call.setTimestamp(new Date());
             call.setOwnerName(new LoginData(httpHeaders).getUsername());
-        }
-        else
+        } else
             throw new EmptyBodyException();
 
         return handleObject(call, "postCall", true, false);

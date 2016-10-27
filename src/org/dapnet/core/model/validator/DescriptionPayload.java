@@ -22,10 +22,22 @@ public abstract class DescriptionPayload implements Payload {
         public static String constraintName = "Test";
         public static String fieldName = "Test";
     }
-    public static class ValidOwnerNames extends DescriptionPayload {}
-    public static class ValidTransmitterGroupNames extends DescriptionPayload {}
-    public static class ValidCallSignNames extends DescriptionPayload {}
-    public static class ValidRubricName extends DescriptionPayload {}
-    public static class ValidNodeName extends DescriptionPayload {}
-    public static class ValidTransmitterNames extends DescriptionPayload {}
+
+    public static class ValidOwnerNames extends DescriptionPayload {
+    }
+
+    public static class ValidTransmitterGroupNames extends DescriptionPayload {
+    }
+
+    public static class ValidCallSignNames extends DescriptionPayload {
+    }
+
+    public static class ValidRubricName extends DescriptionPayload {
+    }
+
+    public static class ValidNodeName extends DescriptionPayload {
+    }
+
+    public static class ValidTransmitterNames extends DescriptionPayload {
+    }
 }

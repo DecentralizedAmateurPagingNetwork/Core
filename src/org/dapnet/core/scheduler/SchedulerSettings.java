@@ -30,7 +30,9 @@ public class SchedulerSettings implements Serializable {
         return rubricNameTransmissionCron;
     }
 
-    public String getStateSavingCron() {return stateSavingCron; }
+    public String getStateSavingCron() {
+        return stateSavingCron;
+    }
 
     public String getStateCleaningCron() {
         return stateCleaningCron;

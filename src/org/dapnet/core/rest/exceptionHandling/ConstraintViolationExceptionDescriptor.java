@@ -26,7 +26,7 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
         this.violations = new ArrayList<>();
         //lambda expressions seems not to be supported by this version of jersey
         Iterator<ConstraintViolation<?>> it = violations.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             this.violations.add(new Violation(it.next()));
         }
     }
@@ -60,18 +60,15 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
             this.message = message;
         }
 
-        public Violation(ConstraintViolation<?> violation)
-        {
+        public Violation(ConstraintViolation<?> violation) {
             //Set Code for all ConstraintViolations
 
-            if(violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName().equals("ValidName"))
-            {//Constraint Violation due to invalid names
-                Map<String,Object> attributes = violation.getConstraintDescriptor().getAttributes();
+            if (violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName().equals("ValidName")) {//Constraint Violation due to invalid names
+                Map<String, Object> attributes = violation.getConstraintDescriptor().getAttributes();
                 this.constraint = (String) attributes.get("constraintName");
                 this.field = (String) attributes.get("fieldName");
 
-                switch(this.constraint)
-                {
+                switch (this.constraint) {
                     case "ValidOwnerName":
                         this.code = 6201;
                         break;
@@ -125,7 +122,7 @@ public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor 
                     default:
                         this.code = 6000;
                 }
-           }
+            }
             this.message = violation.getMessage();
         }
 

@@ -47,16 +47,16 @@ public class UserResource extends AbstractResource {
 
         //Create User
         User user = gson.fromJson(userJSON, User.class);
-        if(user!=null) {
+        if (user != null) {
             user.setHash(HashUtil.createHash(user.getHash()));
             user.setName(userName);
         } else
             throw new EmptyBodyException();
 
-        if(user.isAdmin())
+        if (user.isAdmin())
             checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
         else {
-            if(restListener.getState().getUsers().contains(userName))
+            if (restListener.getState().getUsers().contains(userName))
                 checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
                         restListener.getState().getUsers().findByName(userName));
             else

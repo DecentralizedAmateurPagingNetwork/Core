@@ -19,8 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterManager;
 import org.quartz.*;
 
-public class StateSavingJob implements Job
-{
+public class StateSavingJob implements Job {
     private static final Logger logger = LogManager.getLogger(StateSavingJob.class.getName());
 
     @Override

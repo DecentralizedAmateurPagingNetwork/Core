@@ -16,7 +16,6 @@ package org.dapnet.core.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNETCore;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 
@@ -32,20 +31,20 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @Provider
-public class CustomLoggingFilter extends LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter
-{
+public class CustomLoggingFilter extends LoggingFilter implements ContainerRequestFilter, ContainerResponseFilter {
     private static final Logger logger = LogManager.getLogger(CustomLoggingFilter.class.getName());
+
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException
-    {
+    public void filter(ContainerRequestContext requestContext) throws IOException {
         StringBuilder sb = new StringBuilder();
 
         //Append username is available
         String user = null;
         try {
             user = new LoginData(requestContext.getHeaders().get("Authorization").get(0)).getUsername();
-        } catch (Exception e) {}
-        if(user != null && user.equals(""))
+        } catch (Exception e) {
+        }
+        if (user != null && user.equals(""))
             user = "";
         sb.append("User: ").append(user);
 
@@ -55,27 +54,25 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
         //Append entity shortened to 10000 chars
         String entity = getEntityBody(requestContext);
         entity = entity.replace("\n", "").replace("\r", "");
-        if(entity.length()>10001)
-            entity.substring(0,9999);
+        if (entity.length() > 10001)
+            entity.substring(0, 9999);
         sb.append(" - Entity: ").append(entity);
 
         logger.info("REST " + requestContext.getMethod() + " Request : " + sb.toString());
     }
 
-    private String getEntityBody(ContainerRequestContext requestContext)
-    {
+    private String getEntityBody(ContainerRequestContext requestContext) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         InputStream in = requestContext.getEntityStream();
         final StringBuilder b = new StringBuilder();
-        try
-        {
+        try {
             ReaderWriter.writeTo(in, out);
             byte[] requestEntity = out.toByteArray();
             if (requestEntity.length == 0)
                 b.append("");
             else
                 b.append(new String(requestEntity));
-            requestContext.setEntityStream( new ByteArrayInputStream(requestEntity) );
+            requestContext.setEntityStream(new ByteArrayInputStream(requestEntity));
         } catch (Exception ex) {
             return "";
         }
@@ -83,19 +80,18 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException
-    {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         addHeader(responseContext);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Header: ").append(responseContext.getHeaders());
         sb.append(" - Entity: ");
-        if(responseContext!=null && responseContext.getEntity()!=null)
+        if (responseContext != null && responseContext.getEntity() != null)
             sb.append(responseContext.getEntity().toString().replace("\n", "").replace("\r", ""));
         else
             sb.append("null");
 
-        if(responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
+        if (responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
                 || responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR)
             logger.info("REST " + requestContext.getMethod() + " Response : " + sb.toString());
         else
@@ -103,8 +99,7 @@ public class CustomLoggingFilter extends LoggingFilter implements ContainerReque
     }
 
     // Add Header to allow Web Module running on other server than DAPNET Core
-    private void addHeader(ContainerResponseContext responseContext)
-    {
+    private void addHeader(ContainerResponseContext responseContext) {
         responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
         responseContext.getHeaders().add("Access-Control-Allow-Headers",
                 "Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");

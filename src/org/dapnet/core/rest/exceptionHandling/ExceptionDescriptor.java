@@ -19,7 +19,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.Serializable;
 
-public class ExceptionDescriptor implements Serializable{
+public class ExceptionDescriptor implements Serializable {
     protected static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     protected int code;
@@ -32,13 +32,11 @@ public class ExceptionDescriptor implements Serializable{
         this.message = message;
     }
 
-    public String toJson()
-    {
+    public String toJson() {
         return gson.toJson(this);
     }
 
-    public String getLogMessage()
-    {
+    public String getLogMessage() {
         return name + " (" + code + ")";
     }
 

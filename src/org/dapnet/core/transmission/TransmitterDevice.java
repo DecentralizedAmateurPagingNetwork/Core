@@ -28,12 +28,11 @@ import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
 
-public abstract class TransmitterDevice extends Transmitter implements Runnable{
+public abstract class TransmitterDevice extends Transmitter implements Runnable {
     private static final Logger logger = LogManager.getLogger(TransmitterDevice.class.getName());
 
     protected TransmitterDevice(Transmitter transmitter,
-                                TransmitterDeviceListener transmitterDeviceListener)
-    {
+                                TransmitterDeviceListener transmitterDeviceListener) {
         this.name = transmitter.getName();
         this.longitude = transmitter.getLongitude();
         this.latitude = transmitter.getLatitude();
@@ -75,17 +74,15 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable{
 
     public abstract void run();
 
-    protected void throwTransmitterDeviceException(TransmitterDeviceException e)
-    {
-        if(transmitterDeviceListener !=null) {
+    protected void throwTransmitterDeviceException(TransmitterDeviceException e) {
+        if (transmitterDeviceListener != null) {
             logger.warn(this + " throws Exception: " + e.getMessage());
             transmitterDeviceListener.handleTransmitterDeviceError(this, e);
         }
     }
 
-    protected void throwTransmitterDeviceOffline(TransmitterDeviceException e)
-    {
-        if(transmitterDeviceListener !=null) {
+    protected void throwTransmitterDeviceOffline(TransmitterDeviceException e) {
+        if (transmitterDeviceListener != null) {
             logger.warn(this + " is offline now and throws Exception: " + e.getMessage());
             transmitterDeviceListener.handleTransmitterDeviceOffline(this, e);
         }
@@ -107,9 +104,9 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable{
         }
     }
 
-    protected void setupDeviceIO() throws IOException{
-            this.toServer = new PrintWriter(this.deviceSocket.getOutputStream(), true);
-            this.fromServer = new BufferedReader(new InputStreamReader(this.deviceSocket.getInputStream()));
+    protected void setupDeviceIO() throws IOException {
+        this.toServer = new PrintWriter(this.deviceSocket.getOutputStream(), true);
+        this.fromServer = new BufferedReader(new InputStreamReader(this.deviceSocket.getInputStream()));
     }
 
     protected void closeDeviceIO() {
@@ -144,8 +141,7 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable{
         messageQueue.addAll(m);
     }
 
-    public boolean isInterrupted()
-    {
+    public boolean isInterrupted() {
         return thread.isInterrupted();
     }
 

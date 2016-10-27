@@ -38,7 +38,7 @@ public class NewsResource extends AbstractResource {
                     restListener.getState().getRubrics().findByName(rubricName));
 
             List<News> newsList = new ArrayList<>();
-            for (News news: restListener.getState().getNews()) {
+            for (News news : restListener.getState().getNews()) {
                 if (news.getRubricName().equals(rubricName))
                     newsList.add(news);
             }
@@ -55,7 +55,7 @@ public class NewsResource extends AbstractResource {
 
         //Create News
         News news = gson.fromJson(newsJSON, News.class);
-        if (news != null){
+        if (news != null) {
             news.setTimestamp(new Date());
             news.setOwnerName(new LoginData(httpHeaders).getUsername());
         } else
@@ -65,6 +65,6 @@ public class NewsResource extends AbstractResource {
         RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
                 restListener.getState().getRubrics().findByName(news.getRubricName()));
 
-        return handleObject(news,"postNews",true,false);
+        return handleObject(news, "postNews", true, false);
     }
 }

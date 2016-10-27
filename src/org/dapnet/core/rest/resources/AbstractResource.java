@@ -85,7 +85,7 @@ public abstract class AbstractResource {
             status = restSecurity.getStatus(httpHeaders, level, restAuthorizable);
         }
 
-        switch(status) {
+        switch (status) {
             case INTERNAL_ERROR:
                 throw new InternalServerErrorException();
             case UNAUTHORIZED:
@@ -97,15 +97,14 @@ public abstract class AbstractResource {
         return status;
     }
 
-    protected RestSecurity.SecurityStatus  checkAuthorization(RestSecurity.SecurityLevel level) throws Exception {
+    protected RestSecurity.SecurityStatus checkAuthorization(RestSecurity.SecurityLevel level) throws Exception {
         return checkAuthorization(level, null);
     }
 
     //Validation Helper
     protected static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    protected void validateObject(Object object)
-    {
+    protected void validateObject(Object object) {
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
         if (constraintViolations.size() != 0) {
             throw new ConstraintViolationException(constraintViolations);

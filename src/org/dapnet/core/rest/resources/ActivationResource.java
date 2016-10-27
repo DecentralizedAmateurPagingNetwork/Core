@@ -18,7 +18,10 @@ import org.dapnet.core.model.Activation;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.util.Date;
 
@@ -32,10 +35,9 @@ public class ActivationResource extends AbstractResource {
 
         //Create Activation
         Activation activation = gson.fromJson(activationJSON, Activation.class);
-        if(activation != null) {
+        if (activation != null) {
             activation.setTimestamp(new Date());
-        }
-        else
+        } else
             throw new EmptyBodyException();
 
         return handleObject(activation, "postActivation", false, true);

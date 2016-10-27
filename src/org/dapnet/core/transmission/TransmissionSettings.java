@@ -28,7 +28,7 @@ public class TransmissionSettings implements Serializable {
         return raspagerSettings;
     }
 
-    public class PagingProtocolSettings implements Serializable{
+    public class PagingProtocolSettings implements Serializable {
         private int numberOfSyncLoops = 5;
         private int sendSpeed = 1;// 0: 512, 1: 1200, 2:2400
         private String activationCode = "0 7 50,0 7 34,0 7 53,0 7 51,0 7 51,0 7 52,0 7 52,0 7 52";
@@ -46,7 +46,7 @@ public class TransmissionSettings implements Serializable {
         }
     }
 
-    public class RaspagerSettings implements Serializable{
+    public class RaspagerSettings implements Serializable {
         private int maxNumberOfReconnects = -1;
         private int reconnectWaitTime = 20 * 1000;
         private int connectionTimeout = 20000;
