@@ -68,6 +68,9 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
             case SDRPAGER:
                 expectedSid = "[SDRPager";
                 break;
+            case DV4mini:
+                expectedSid = "[DV4mini";
+                break;
             default:
                 throw new TransmitterDeviceException("UNSUPPOTED_DEVICE_TYPE: Initialize RaspagerProtocol with unsupported DeviceType");
         }

@@ -93,6 +93,9 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             case SDRPAGER:
                 raspager = new SDRPager(transmitter, this);
                 break;
+            case DV4mini:
+                raspager = new DV4mini(transmitter, this);
+                break;
         }
         //Add to Connecting List
         connectingTransmitterDevices.add(raspager);
