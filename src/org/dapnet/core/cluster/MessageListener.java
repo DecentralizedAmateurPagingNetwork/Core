@@ -38,6 +38,7 @@ public class MessageListener implements org.jgroups.MessageListener {
     public MessageListener(ClusterManager clusterManager) {
         this.clusterManager = clusterManager;
     }
+
     @Override
     public void receive(Message message) {
         // Not used, only using Messages forwarded to RpcListener
@@ -46,7 +47,7 @@ public class MessageListener implements org.jgroups.MessageListener {
     @Override
     public void getState(OutputStream outputStream) throws Exception {
         logger.info("Start sending State to other Node");
-        synchronized(clusterManager.getState()) {
+        synchronized (clusterManager.getState()) {
             Util.objectToStream(clusterManager.getState(), new DataOutputStream(outputStream));
         }
         logger.info("Finished sending State to other Node");
@@ -57,7 +58,7 @@ public class MessageListener implements org.jgroups.MessageListener {
         logger.info("Receiving State from other Node");
         State state = (State) Util.objectFromStream(new DataInputStream(inputStream));
 
-        synchronized(clusterManager.getState()) {
+        synchronized (clusterManager.getState()) {
             clusterManager.setState(state);
             clusterManager.getState().setModelReferences();
         }

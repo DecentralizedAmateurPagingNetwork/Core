@@ -19,8 +19,8 @@ import java.io.Serializable;
 public class ModelSettings implements Serializable {
     private String stateFile = "data/State.json";
     private boolean savingImmediately = false;
-    private long callExpirationTimeInMinutes = 24*60;
-    private long newsExpirationTimeInMinutes = 24*60;
+    private long callExpirationTimeInMinutes = 24 * 60;
+    private long newsExpirationTimeInMinutes = 24 * 60;
 
     public String getStateFile() {
         return stateFile;

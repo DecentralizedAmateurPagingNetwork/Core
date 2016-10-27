@@ -24,8 +24,12 @@ import java.util.List;
 
 public interface PagerProtocol {
     Message createMessageFromTime(Date date);
+
     Message createMessageFromRubric(Rubric rubric);
+
     Message createMessageFromNews(News news);
+
     Message createMessageFromActivation(Activation avtivation);
+
     List<Message> createMessagesFromCall(Call call);
 }

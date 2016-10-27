@@ -31,19 +31,19 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
     protected String name;
 
     @NotNull
-    @Digits(integer=3, fraction=8)
+    @Digits(integer = 3, fraction = 8)
     @Min(-180)
     @Max(+180)
     protected String longitude;
 
     @NotNull
-    @Digits(integer=3, fraction=8)
+    @Digits(integer = 3, fraction = 8)
     @Min(-90)
     @Max(+90)
     protected String latitude;
 
     @NotNull
-    @Digits(integer=3, fraction=3)
+    @Digits(integer = 3, fraction = 3)
     @Min(0)
     @Max(200)
     protected String power;

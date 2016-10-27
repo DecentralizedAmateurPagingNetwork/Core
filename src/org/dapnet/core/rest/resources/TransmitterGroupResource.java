@@ -51,7 +51,7 @@ public class TransmitterGroupResource extends AbstractResource {
 
         //Create TransmitterGroup
         TransmitterGroup transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
-        if(transmitterGroup !=null)
+        if (transmitterGroup != null)
             transmitterGroup.setName(transmitterGroupName);
         else
             throw new EmptyBodyException();

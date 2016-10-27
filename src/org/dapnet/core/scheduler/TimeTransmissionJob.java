@@ -23,6 +23,7 @@ import java.util.Date;
 
 public class TimeTransmissionJob implements Job {
     private static final Logger logger = LogManager.getLogger(TimeTransmissionJob.class.getName());
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 

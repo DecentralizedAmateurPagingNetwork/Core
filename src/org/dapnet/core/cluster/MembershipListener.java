@@ -52,6 +52,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
     private class ViewHandler extends Thread {
         View view;
+
         private ViewHandler(View view) {
             this.view = view;
         }
@@ -62,7 +63,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
             if (view instanceof MergeView) {
                 try {
                     handleMerge((MergeView) view);
-                }catch (Exception e) {
+                } catch (Exception e) {
                     logger.fatal("Could not get State from majority");
                     logger.fatal(e);
                     DAPNETCore.stopDAPNETCore();
@@ -70,14 +71,14 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                 }
             }
 
-            for (Address add : view.getMembers()){
+            for (Address add : view.getMembers()) {
                 PhysicalAddress physicalAddress = (PhysicalAddress)
                         clusterManager.getChannel().down(
                                 new Event(
                                         Event.GET_PHYSICAL_ADDRESS, add
                                 )
                         );
-                if(physicalAddress instanceof IpAddress && clusterManager.getState().getNodes().contains(add.toString())){
+                if (physicalAddress instanceof IpAddress && clusterManager.getState().getNodes().contains(add.toString())) {
                     clusterManager.getState().getNodes().findByName(add.toString()).setAddress((IpAddress) physicalAddress);
                 }
             }
@@ -113,18 +114,14 @@ public class MembershipListener implements org.jgroups.MembershipListener {
                     logger.info("Receive State from majoritySubgroup");
                     //Get State sometimes fails, no idea why!
                     int numberOfAttempts = 0;
-                    while(true)
-                    {
-                        try
-                        {
+                    while (true) {
+                        try {
                             clusterManager.getChannel().getState(majorSubgroup.getMembers().get(0), 5000);
                             break; //Success
-                        }
-                        catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             logger.warn("Failed to receive State");
                             logger.warn(e);
-                            if(numberOfAttempts++>5)
+                            if (numberOfAttempts++ > 5)
                                 throw e;
                         }
                     }
@@ -148,8 +145,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
             return majorSubgroup;
         }
 
-        private void updateNodeStates()
-        {
+        private void updateNodeStates() {
             //All nodes in the view are already in state, since they would be otherwise rejected while authorization
             //(expect of first node, which might not be in the state, but will add itself immediately)
             for (Node node : clusterManager.getState().getNodes()) {

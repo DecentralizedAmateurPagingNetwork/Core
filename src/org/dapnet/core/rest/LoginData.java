@@ -14,8 +14,6 @@
 
 package org.dapnet.core.rest;
 
-import sun.rmi.runtime.Log;
-
 import javax.ws.rs.core.HttpHeaders;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;

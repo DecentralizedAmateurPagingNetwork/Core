@@ -46,7 +46,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 
     public void handleWelcome(TransmitterDevice transmitterDevice, PrintWriter toServer, BufferedReader fromServer) throws TransmitterDeviceException, InterruptedException, IOException {
         //Experimental: Fix problems with C9000
-        sequenceNumber=0;
+        sequenceNumber = 0;
         // Mostly adapted from Sven Jung
         // 1. Read SID
         String msg = fromServer.readLine();
@@ -55,15 +55,24 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         }
 
         String expectedSid;
-        switch (deviceType){
-            case RASPPAGER1: expectedSid="[RasPager"; break;
-            case C9000: expectedSid="[uPSDrpc/XOS"; break;
-            case PR430: expectedSid="[PR430"; break;
-            case SDRPAGER: expectedSid="[SDRPager"; break;
-            default: throw new TransmitterDeviceException("UNSUPPOTED_DEVICE_TYPE: Initialize RaspagerProtocol with unsupported DeviceType");
+        switch (deviceType) {
+            case RASPPAGER1:
+                expectedSid = "[RasPager";
+                break;
+            case C9000:
+                expectedSid = "[uPSDrpc/XOS";
+                break;
+            case PR430:
+                expectedSid = "[PR430";
+                break;
+            case SDRPAGER:
+                expectedSid = "[SDRPager";
+                break;
+            default:
+                throw new TransmitterDeviceException("UNSUPPOTED_DEVICE_TYPE: Initialize RaspagerProtocol with unsupported DeviceType");
         }
 
-        if(!msg.startsWith(expectedSid))
+        if (!msg.startsWith(expectedSid))
             throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
 
         /* Might be useful later for version control
@@ -166,12 +175,19 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         // Mostly adapted from Sven Jung
         //See Diplomarbeit Jansen Page 30
         TransmitterDeviceProtocol.PagingMessageType type = null;
-        switch (message.getFunctionalBits())
-        {
-            case ACTIVATION: type = PagingMessageType.ALPHANUM; break; //todo check whether correct
-            case ALPHANUM: type = PagingMessageType.ALPHANUM; break;
-            case NUMERIC: type = PagingMessageType.NUMERIC; break;
-            case TONE: type = PagingMessageType.ALPHANUM; break; //todo check whether correct
+        switch (message.getFunctionalBits()) {
+            case ACTIVATION:
+                type = PagingMessageType.ALPHANUM;
+                break; //todo check whether correct
+            case ALPHANUM:
+                type = PagingMessageType.ALPHANUM;
+                break;
+            case NUMERIC:
+                type = PagingMessageType.NUMERIC;
+                break;
+            case TONE:
+                type = PagingMessageType.ALPHANUM;
+                break; //todo check whether correct
         }
 
         String msg = String.format("#%02X %s:%X:%X:%s:%s",

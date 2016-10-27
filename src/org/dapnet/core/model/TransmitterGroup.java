@@ -108,8 +108,8 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
         if (transmitterNames == null)
             return null;
         for (String transmitterName : transmitterNames) {
-            if (state.getTransmitters().contains(transmitterName)){
-                    transmitters.add(state.getTransmitters().findByName(transmitterName));
+            if (state.getTransmitters().contains(transmitterName)) {
+                transmitters.add(state.getTransmitters().findByName(transmitterName));
             }
         }
         if (transmitters.size() == transmitterNames.size())

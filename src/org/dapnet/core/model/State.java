@@ -99,7 +99,7 @@ public class State implements Serializable {
     public void writeToFile() {
         File file = new File(Settings.getModelSettings().getStateFile());
         try {
-            if(file.getParentFile()!=null)
+            if (file.getParentFile() != null)
                 file.getParentFile().mkdirs();
 
             FileWriter writer = new FileWriter(file);

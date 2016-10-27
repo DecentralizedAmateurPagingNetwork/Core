@@ -20,8 +20,6 @@ import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.User;
 
 import javax.ws.rs.core.HttpHeaders;
-import java.util.Base64;
-import java.util.StringTokenizer;
 
 public class RestSecurity {
     public enum SecurityLevel {
@@ -91,8 +89,8 @@ public class RestSecurity {
         if (restAuthorizable == null) {
             return false;
         }
-        for(String ownerName : restAuthorizable.getOwnerNames()){
-            if(name.equals(ownerName)){
+        for (String ownerName : restAuthorizable.getOwnerNames()) {
+            if (name.equals(ownerName)) {
                 return true;
             }
         }

@@ -44,7 +44,7 @@ public class RestManager {
     public void startServer() {
         try {
             ResourceConfig rc = new ResourceConfig().packages("org/dapnet/core/rest");
-            URI endpoint = new URI("http://localhost:"+Settings.getRestSettings().getPort()+"/");
+            URI endpoint = new URI("http://localhost:" + Settings.getRestSettings().getPort() + "/");
             server = JdkHttpServerFactory.createHttpServer(endpoint, rc);
             logger.info("RestApi successfully started");
         } catch (Exception e) {
@@ -55,11 +55,10 @@ public class RestManager {
     }
 
     public void stopServer() {
-        if(server!=null) {
+        if (server != null) {
             server.stop(0);
             logger.info("RestApi successfully stopped");
-        }
-        else{
+        } else {
             logger.error("Stopping RestApi failed");
         }
     }

@@ -14,7 +14,7 @@
 
 package org.dapnet.core.transmission;
 
-public class TransmitterDeviceException extends Exception{
+public class TransmitterDeviceException extends Exception {
     public TransmitterDeviceException(String message) {
         super(message);
     }

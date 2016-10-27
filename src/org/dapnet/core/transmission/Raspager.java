@@ -44,7 +44,7 @@ public abstract class Raspager extends TransmitterDevice {
     }
 
     public void run() {
-        while(true) {
+        while (true) {
             try {
                 //Connect to Raspager
                 connect();
@@ -96,15 +96,14 @@ public abstract class Raspager extends TransmitterDevice {
                 logger.warn(this + " could not create connection: " + e.getMessage());
             }
 
-            if (settings.getMaxNumberOfReconnects()!=-1 && numberOfReconnects > settings.getMaxNumberOfReconnects())
+            if (settings.getMaxNumberOfReconnects() != -1 && numberOfReconnects > settings.getMaxNumberOfReconnects())
                 throw new TransmitterDeviceConnectionFailedException("Connection could not been established");
 
-            if(!thread.isInterrupted())
-            {
-                if(settings.getReconnectWaitTime()!=-1)
+            if (!thread.isInterrupted()) {
+                if (settings.getReconnectWaitTime() != -1)
                     thread.sleep(settings.getReconnectWaitTime()); //Wait fixed time between reconnects
                 else
-                    thread.sleep((long)(7500*Math.pow(2,numberOfReconnects)));  // Exponential wait time
+                    thread.sleep((long) (7500 * Math.pow(2, numberOfReconnects)));  // Exponential wait time
             }
         }
         throw new InterruptedException();
@@ -121,11 +120,11 @@ public abstract class Raspager extends TransmitterDevice {
             while (true) {
                 this.transmitterDeviceProtocol.handleMessage(message, toServer, fromServer);
                 logger.info("Successfully sent message \"" + message.getText() + "\" to " +
-                                message.getAddress() + " with " + this);
+                        message.getAddress() + " with " + this);
                 increaseMessageCount(message);
                 if (messageQueue.isEmpty() || isMessageCountOverflowed(messageQueue.peek()))
                     break;
-                else if(thread.isInterrupted())
+                else if (thread.isInterrupted())
                     throw new InterruptedException();
                 else
                     message = this.getMessage();
@@ -144,7 +143,7 @@ public abstract class Raspager extends TransmitterDevice {
     }
 
     protected boolean isMessageCountOverflowed(Message message) {
-        return (messageCount+1) > settings.getMaxMessageCount();  //No consideration of the message length
+        return (messageCount + 1) > settings.getMaxMessageCount();  //No consideration of the message length
         //return (messageCount + (message.getText().length() > 40 ? 2 : 1) > settings.getMaxMessageCount());
     }
 
