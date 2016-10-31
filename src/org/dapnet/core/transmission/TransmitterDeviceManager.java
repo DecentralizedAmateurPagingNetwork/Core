@@ -71,7 +71,8 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
         if (transmitter.getDeviceType() == Transmitter.DeviceType.XOS
                 || transmitter.getDeviceType() == Transmitter.DeviceType.RASPPAGER1
                 || transmitter.getDeviceType() == Transmitter.DeviceType.PR430
-                || transmitter.getDeviceType() == Transmitter.DeviceType.SDRPAGER) {
+                || transmitter.getDeviceType() == Transmitter.DeviceType.SDRPAGER
+                || transmitter.getDeviceType() == Transmitter.DeviceType.DV4mini) {
             connectToRaspagerDerivative(transmitter);
         }
     }
