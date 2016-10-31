@@ -45,7 +45,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
     }
 
     public void handleWelcome(TransmitterDevice transmitterDevice, PrintWriter toServer, BufferedReader fromServer) throws TransmitterDeviceException, InterruptedException, IOException {
-        //Experimental: Fix problems with XOS
+        // Fix problems with XOS
         sequenceNumber = 0;
         // Mostly adapted from Sven Jung
         // 1. Read SID
