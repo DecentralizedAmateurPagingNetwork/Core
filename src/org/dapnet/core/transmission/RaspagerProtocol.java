@@ -27,7 +27,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
     private static final TransmissionSettings.PagingProtocolSettings settings =
             Settings.getTransmissionSettings().getPagingProtocolSettings();
     private int sequenceNumber = 0;
-    //The RaspagerProtocol is a generic one and can also been used for XOS, PR430 and SDR Transmitter
+    //The RaspagerProtocol is a generic one and can also been used for XOS, PR430, SDR and DV4mini Transmitter
     private Transmitter.DeviceType deviceType;
 
     public RaspagerProtocol(Transmitter.DeviceType deviceType) {
