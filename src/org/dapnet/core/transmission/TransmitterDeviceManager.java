@@ -122,8 +122,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
             connectingTransmitterDevices.remove(device);
             disconnectingTransmitterDevices.add(device);
         } else
-            logger.warn("Cannot disconnect from transmitter " + transmitter.getName() + " because it is not connected" +
-                    "or connecting");
+            logger.warn("Cannot disconnect from transmitter " + transmitter.getName() + " because it is not connected or connecting");
     }
 
     public void disconnectFromAllTransmitters() {
@@ -224,7 +223,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 listener.handleTransmitterStatusChanged(transmitterDevice.getName(), transmitterDevice.getStatus());
             }
         } else {
-            logger.error("Unknown TransmitterDevice " + transmitterDevice.getName() + "connected");
+            logger.error("Unknown TransmitterDevice " + transmitterDevice.getName() + " connected");
         }
     }
 
