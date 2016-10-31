@@ -60,7 +60,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
                 expectedSid = "[RasPager";
                 break;
             case XOS:
-                expectedSid = "[*/XOS";
+                expectedSid = "*/XOS";
                 break;
             case PR430:
                 expectedSid = "[PR430";
@@ -77,8 +77,8 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 
         // exception for XOS-devices
         if (deviceType == Transmitter.DeviceType.XOS) {
-            // starts with "[", contains "/", which follows "XOS"
-            if (!(msg.startsWith("[") && msg.split("/")[1].startsWith("XOS")))
+            // contains "/", which follows "XOS"
+            if (!msg.contains("/") || !msg.split("/")[1].startsWith("XOS"))
                 throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
         } else {
             if (!msg.startsWith(expectedSid))
