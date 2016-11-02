@@ -202,7 +202,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
                 listener.handleTransmitterStatusChanged(transmitterDevice.getName(), transmitterDevice.getStatus());
             }
         } else {
-            logger.error("Unknown TransmitterDevice " + transmitterDevice.getName() + "go offline");
+            logger.error("Unknown TransmitterDevice " + transmitterDevice.getName() + " goes offline");
         }
     }
 
