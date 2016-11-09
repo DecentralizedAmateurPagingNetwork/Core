@@ -50,7 +50,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         // Mostly adapted from Sven Jung
         // 1. Read SID
         String msg = fromServer.readLine();
-        if (msg == null) {
+        if (msg == null || msg.equals("")) {
             throw new TransmitterDeviceException("No SID");
         }
 
@@ -78,8 +78,13 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         // exception for XOS-devices
         if (deviceType == Transmitter.DeviceType.XOS) {
             // contains "/", which follows "XOS"
-            if (!msg.contains("/") || !msg.split("/")[1].startsWith("XOS"))
+            if (!msg.contains("/")) {
                 throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
+            } else {
+                if (!msg.split("/")[1].startsWith("XOS")) {
+                    throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
+                }
+            }
         } else {
             if (!msg.startsWith(expectedSid))
                 throw new TransmitterDeviceException("WRONG SID: " + msg + " Expected SID to start with " + expectedSid);
