@@ -110,9 +110,10 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
             // send RadioServer system time
             long timemillis = System.currentTimeMillis();
             long seconds = timemillis / 1000;
-            long deltaTimemillis = timemillis - seconds * 1000; // additional milliseconds
-            long time_tx = (seconds * 10 + deltaTimemillis / 100) & 0xffff;
-
+            long deltaTimemillis = timemillis - seconds * 1000; // Milliseconds as long of current second
+	        // Time since last full minute in 0,1 s, lowest 16 bit
+	        // after 1 complete minute, counter will continue with 601, 602,... up to 0xffff, than wrap to 0x0000
+	        long time_tx = (seconds * 10 + deltaTimemillis / 100) & 0xffff;
             //long time_tx = RadioServer.getSysTime();
             String time_string_server = String.format("%04x", time_tx);
             toServer.println(String.format("%s:%s", PagingMessageType.SYNCREQUEST.getValue(), time_string_server));

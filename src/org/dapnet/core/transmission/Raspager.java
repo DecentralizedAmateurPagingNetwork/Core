@@ -114,7 +114,7 @@ public abstract class Raspager extends TransmitterDevice {
             //Blocking until Message is available
             Message message = this.getMessage();
             //Wait until next TX Slot
-            thread.sleep(getTimeToNextOpenSlot());
+            //thread.sleep(getTimeToNextOpenSlot());
 
             startMessageCount();
             while (true) {
@@ -156,9 +156,18 @@ public abstract class Raspager extends TransmitterDevice {
     }
 
     private int getCurrentSlot() {
-        long timeMilli = new Date().getTime() + settings.getTransmissionDelay();
+/*      long timeMilli = new Date().getTime() + settings.getTransmissionDelay();
         long phaseTime = timeMilli % 102400;
         int slot = (int) (phaseTime / 6400);
+*/
+
+        long timemillis = System.currentTimeMillis();
+        long seconds = timemillis / 1000;
+        long deltaTimemillis = timemillis - seconds * 1000; // additional milliseconds
+        long time_tx = (seconds * 10 + deltaTimemillis / 100) & 0xffff;
+
+
+        int slot = ((int) (time_tx / 37.5)) % 16;
         return slot;
     }
 
