@@ -101,12 +101,12 @@ public class MembershipListener implements org.jgroups.MembershipListener {
             if (majorSubgroup.containsMember(clusterManager.getChannel().getAddress())) {
                 logger.info("Node is in majorSubgroup: Nothing to be done");
             } else {
-                if (clusterManager.isQuorum()) {
+                /*if (clusterManager.isQuorum()) {
                     logger.fatal("Node has quorum although it is the minoritySubgroup " +
                             "(Seems to merge independent clusters). " +
                             "Stopping minority group.");
                     DAPNETCore.stopDAPNETCore();
-                } else {
+                } else {*/
                     logger.info("Node is minoritySubgroup");
 
 
@@ -128,7 +128,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
                     //Reconnect to transmitters (transmitters might have been edited in major subgroup)
                     clusterManager.getTransmitterDeviceManager().performReconnect(clusterManager.getNodeTransmitter());
-                }
+                //}
             }
             logger.info("Finished merge process");
         }
