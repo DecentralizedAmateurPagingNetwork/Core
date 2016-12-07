@@ -49,8 +49,34 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
         sequenceNumber = 0;
         // Mostly adapted from Sven Jung
         // 1. Read SID
-        String msg = fromServer.readLine();
-        if (msg == null || msg.equals("")) {
+
+        // check if server is ready (timeout: 10s)
+        int timeout = 0;
+        while (!fromServer.ready() && timeout < 9) {
+            Thread.sleep(1000);
+            timeout++;
+        }
+
+        // still not ready or timeout
+        if (!fromServer.ready() || timeout >= 10) {
+            throw new TransmitterDeviceException("No data from Transmitter received.");
+        }
+
+        // check for non-empty message (timeout: 10s)
+        timeout = 0;
+        String msg = "";
+        while (timeout < 9) {
+            msg = fromServer.readLine();
+            if (msg == null || msg.equals("")) {
+                Thread.sleep(1000);
+                timeout++;
+            } else {
+                break;
+            }
+        }
+
+        // still no non-empty message or timeout
+        if (msg == null || msg.equals("") || timeout >= 10) {
             throw new TransmitterDeviceException("No SID");
         }
 
