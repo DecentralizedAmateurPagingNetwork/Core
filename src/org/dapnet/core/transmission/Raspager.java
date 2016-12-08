@@ -80,6 +80,9 @@ public abstract class Raspager extends TransmitterDevice {
 
 
     protected void connect() throws TransmitterDeviceException, InterruptedException {
+        // first try to disconnect to remove an existing socket (if present)
+        this.disconnect();
+
         Socket socket;
         int numberOfReconnects = 0;
         while (!thread.isInterrupted()) {
