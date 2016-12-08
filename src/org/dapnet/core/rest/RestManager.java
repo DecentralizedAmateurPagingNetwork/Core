@@ -24,7 +24,6 @@ import org.dapnet.core.rest.resources.AbstractResource;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.ws.rs.ProcessingException;
 import java.net.BindException;
 import java.net.URI;
 
