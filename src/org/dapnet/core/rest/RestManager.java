@@ -24,6 +24,8 @@ import org.dapnet.core.rest.resources.AbstractResource;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import javax.ws.rs.ProcessingException;
+import java.net.BindException;
 import java.net.URI;
 
 public class RestManager {
@@ -49,7 +51,14 @@ public class RestManager {
             logger.info("RestApi successfully started");
         } catch (Exception e) {
             logger.fatal("Starting RestApi failed");
-            logger.catching(e);
+
+            // only short message in case of a BindException
+            if (e.getCause() instanceof BindException) {
+                logger.fatal(e.getCause().getMessage());
+            } else {
+                logger.catching(e);
+            }
+
             DAPNETCore.stopDAPNETCore();
         }
     }
