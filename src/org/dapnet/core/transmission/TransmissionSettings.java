@@ -51,7 +51,7 @@ public class TransmissionSettings implements Serializable {
         private int reconnectWaitTime = 20 * 1000;
         private int connectionTimeout = 20000;
         private int maxMessageCount = 4;
-        private int transmissionDelay = 500;
+        private int transmissionDelay = 4000;
 
         public int getConnectionTimeout() {
             return connectionTimeout;
