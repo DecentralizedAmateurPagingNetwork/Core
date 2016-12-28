@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="DAPNET_CORE_TEST">
-    <output-path>$PROJECT_DIR$/out/artifacts/DAPNET_CORE_TEST</output-path>
-    <root id="archive" name="DAPNET_CORE_TEST.jar">
-      <element id="artifact" artifact-name="DAPNET_CORE" />
-    </root>
-  </artifact>
-</component>
