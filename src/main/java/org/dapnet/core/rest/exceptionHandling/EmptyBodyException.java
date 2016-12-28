@@ -15,4 +15,5 @@
 package org.dapnet.core.rest.exceptionHandling;
 
 public class EmptyBodyException extends Exception {
+	private static final long serialVersionUID = -811294658984619459L;
 }

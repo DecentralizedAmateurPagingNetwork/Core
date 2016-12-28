@@ -26,73 +26,72 @@ import java.util.Date;
 import java.util.List;
 
 public class Activation implements Serializable {
-    //No ID
-    @NotNull
-    @Min(value = 0)
-    @Max(value = 2097151)
-    private int number;
+	private static final long serialVersionUID = 2653692303199008619L;
 
-    @NotNull
-    @Size(min = 1, message = "must contain at least one transmitterGroupName")
-    private List<String> transmitterGroupNames;
+	// No ID
+	@NotNull
+	@Min(value = 0)
+	@Max(value = 2097151)
+	private int number;
 
-    //Internally set
-    @NotNull
-    private Date timestamp;
+	@NotNull
+	@Size(min = 1, message = "must contain at least one transmitterGroupName")
+	private List<String> transmitterGroupNames;
 
-    public int getNumber() {
-        return number;
-    }
+	// Internally set
+	@NotNull
+	private Date timestamp;
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
+	public int getNumber() {
+		return number;
+	}
 
-    public List<String> getTransmitterGroupNames() {
-        return transmitterGroupNames;
-    }
+	public void setNumber(int number) {
+		this.number = number;
+	}
 
-    public void setTransmitterGroupNames(List<String> transmitterGroupNames) {
-        this.transmitterGroupNames = transmitterGroupNames;
-    }
+	public List<String> getTransmitterGroupNames() {
+		return transmitterGroupNames;
+	}
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
+	public void setTransmitterGroupNames(List<String> transmitterGroupNames) {
+		this.transmitterGroupNames = transmitterGroupNames;
+	}
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
+	public Date getTimestamp() {
+		return timestamp;
+	}
 
-    //Getter returning references instead of String
-    private static State state;
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public static void setState(State statePar) {
-        state = statePar;
-    }
+	// Getter returning references instead of String
+	private static State state;
 
-    @ValidName(message = "must contain names of existing transmitterGroups",
-            fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-    public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
-        if (state == null)
-            throw new Exception("StateNotSetException");
-        ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
-        if (transmitterGroupNames == null)
-            return null;
-        for (String transmitterGroup : transmitterGroupNames) {
-            if (state.getTransmitterGroups().contains(transmitterGroup))
-                transmitterGroups.add(state.getTransmitterGroups().findByName(transmitterGroup));
-        }
-        if (transmitterGroups.size() == transmitterGroups.size())
-            return transmitterGroups;
-        else
-            return null;
-    }
+	public static void setState(State statePar) {
+		state = statePar;
+	}
 
-    @Override
-    public String toString() {
-        return "Activation{" +
-                "pagerNumber='" + number + '\'' +
-                '}';
-    }
+	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
+	public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
+		if (state == null)
+			throw new Exception("StateNotSetException");
+		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
+		if (transmitterGroupNames == null)
+			return null;
+		for (String transmitterGroup : transmitterGroupNames) {
+			if (state.getTransmitterGroups().contains(transmitterGroup))
+				transmitterGroups.add(state.getTransmitterGroups().findByName(transmitterGroup));
+		}
+		if (transmitterGroups.size() == transmitterGroups.size())
+			return transmitterGroups;
+		else
+			return null;
+	}
+
+	@Override
+	public String toString() {
+		return "Activation{" + "pagerNumber='" + number + '\'' + '}';
+	}
 }

@@ -17,14 +17,15 @@ package org.dapnet.core.cluster;
 import java.io.Serializable;
 
 public class ClusterSettings implements Serializable {
-    private int responseTimeout = 10000;
-    private String clusterConfigurationFile = "config/ClusterConfig.xml";
+	private static final long serialVersionUID = 6362766257617737103L;
+	private int responseTimeout = 10000;
+	private String clusterConfigurationFile = "config/ClusterConfig.xml";
 
-    public int getResponseTimeout() {
-        return responseTimeout;
-    }
+	public int getResponseTimeout() {
+		return responseTimeout;
+	}
 
-    public String getClusterConfigurationFile() {
-        return clusterConfigurationFile;
-    }
+	public String getClusterConfigurationFile() {
+		return clusterConfigurationFile;
+	}
 }

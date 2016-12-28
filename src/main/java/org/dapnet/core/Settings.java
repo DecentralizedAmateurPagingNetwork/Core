@@ -34,67 +34,68 @@ import static org.jgroups.util.Util.readFile;
 
 @XmlRootElement
 public class Settings implements Serializable {
-    private static final Logger logger = LogManager.getLogger(Settings.class.getName());
-    private static Settings settings;
+	private static final long serialVersionUID = 937400690804047335L;
+	private static final Logger logger = LogManager.getLogger(Settings.class.getName());
+	private static Settings settings;
 
-    private TransmissionSettings transmissionSettings;
-    private ModelSettings modelSettings;
-    private RestSettings restSettings;
-    private ClusterSettings clusterSettings;
-    private SchedulerSettings schedulerSettings;
+	private TransmissionSettings transmissionSettings;
+	private ModelSettings modelSettings;
+	private RestSettings restSettings;
+	private ClusterSettings clusterSettings;
+	private SchedulerSettings schedulerSettings;
 
-    private Settings() {
-        transmissionSettings = new TransmissionSettings();
-        modelSettings = new ModelSettings();
-        restSettings = new RestSettings();
-        clusterSettings = new ClusterSettings();
-        schedulerSettings = new SchedulerSettings();
-    }
+	private Settings() {
+		transmissionSettings = new TransmissionSettings();
+		modelSettings = new ModelSettings();
+		restSettings = new RestSettings();
+		clusterSettings = new ClusterSettings();
+		schedulerSettings = new SchedulerSettings();
+	}
 
-    public static TransmissionSettings getTransmissionSettings() {
-        return getSettings().transmissionSettings;
-    }
+	public static TransmissionSettings getTransmissionSettings() {
+		return getSettings().transmissionSettings;
+	}
 
-    public static ModelSettings getModelSettings() {
-        return getSettings().modelSettings;
-    }
+	public static ModelSettings getModelSettings() {
+		return getSettings().modelSettings;
+	}
 
-    public static RestSettings getRestSettings() {
-        return getSettings().restSettings;
-    }
+	public static RestSettings getRestSettings() {
+		return getSettings().restSettings;
+	}
 
-    public static ClusterSettings getClusterSettings() {
-        return getSettings().clusterSettings;
-    }
+	public static ClusterSettings getClusterSettings() {
+		return getSettings().clusterSettings;
+	}
 
-    public static SchedulerSettings getSchedulerSettings() {
-        return getSettings().schedulerSettings;
-    }
+	public static SchedulerSettings getSchedulerSettings() {
+		return getSettings().schedulerSettings;
+	}
 
-    private static Settings getSettings() {
-        if (settings == null) {
-            try {
-                settings = new Gson().fromJson(readFile("config/Settings.json"), Settings.class);
-            } catch (Exception e) {
-                logger.warn("Creating new settings file");
-                settings = createDefaultSettings();
-            }
-        }
-        return settings;
-    }
+	private static Settings getSettings() {
+		if (settings == null) {
+			try {
+				settings = new Gson().fromJson(readFile("config/Settings.json"), Settings.class);
+			} catch (Exception e) {
+				logger.warn("Creating new settings file");
+				settings = createDefaultSettings();
+			}
+		}
+		return settings;
+	}
 
-    private static Settings createDefaultSettings() {
-        settings = new Settings();
-        try {
-            File file = new File("config/Settings.json");
-            FileWriter writer = new FileWriter(file);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            writer.write(gson.toJson(settings));
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            logger.error("Failed to create settings file. Using default values", e);
-        }
-        return settings;
-    }
+	private static Settings createDefaultSettings() {
+		settings = new Settings();
+		try {
+			File file = new File("config/Settings.json");
+			FileWriter writer = new FileWriter(file);
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			writer.write(gson.toJson(settings));
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			logger.error("Failed to create settings file. Using default values", e);
+		}
+		return settings;
+	}
 }

@@ -20,19 +20,18 @@ import org.dapnet.core.cluster.ClusterManager;
 import org.quartz.*;
 
 public class StateSavingJob implements Job {
-    private static final Logger logger = LogManager.getLogger(StateSavingJob.class.getName());
+	private static final Logger logger = LogManager.getLogger(StateSavingJob.class.getName());
 
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        SchedulerContext schedulerContext = null;
-        try {
-            schedulerContext = context.getScheduler().getContext();
-            ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
+	@Override
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		SchedulerContext schedulerContext = null;
+		try {
+			schedulerContext = context.getScheduler().getContext();
+			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-            clusterManager.getState().writeToFile();
-        } catch (SchedulerException e) {
-            logger.fatal("Failed to execute StateSavingJob", e);
-        }
-    }
+			clusterManager.getState().writeToFile();
+		} catch (SchedulerException e) {
+			logger.fatal("Failed to execute StateSavingJob", e);
+		}
+	}
 }
-

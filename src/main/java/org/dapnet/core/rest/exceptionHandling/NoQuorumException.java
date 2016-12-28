@@ -15,4 +15,5 @@
 package org.dapnet.core.rest.exceptionHandling;
 
 public class NoQuorumException extends Exception {
+	private static final long serialVersionUID = 2277456569892307356L;
 }

@@ -20,47 +20,48 @@ import com.google.gson.GsonBuilder;
 import java.io.Serializable;
 
 public class ExceptionDescriptor implements Serializable {
-    protected static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private static final long serialVersionUID = 7205168715512923074L;
+	protected static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    protected int code;
-    protected String name;
-    protected String message;
+	protected int code;
+	protected String name;
+	protected String message;
 
-    public ExceptionDescriptor(int code, String name, String message) {
-        this.code = code;
-        this.name = name;
-        this.message = message;
-    }
+	public ExceptionDescriptor(int code, String name, String message) {
+		this.code = code;
+		this.name = name;
+		this.message = message;
+	}
 
-    public String toJson() {
-        return gson.toJson(this);
-    }
+	public String toJson() {
+		return gson.toJson(this);
+	}
 
-    public String getLogMessage() {
-        return name + " (" + code + ")";
-    }
+	public String getLogMessage() {
+		return name + " (" + code + ")";
+	}
 
-    public int getCode() {
-        return code;
-    }
+	public int getCode() {
+		return code;
+	}
 
-    public void setCode(int code) {
-        this.code = code;
-    }
+	public void setCode(int code) {
+		this.code = code;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }

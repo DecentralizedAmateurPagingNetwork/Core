@@ -24,71 +24,71 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class User implements Serializable, Searchable, RestAuthorizable {
-    //ID
-    @NotNull
-    @Size(min = 3, max = 20)
-    private String name;
+	private static final long serialVersionUID = 8927103398113377284L;
 
-    @NotNull
-    @Size(min = 102, max = 102)
-    private String hash;
+	// ID
+	@NotNull
+	@Size(min = 3, max = 20)
+	private String name;
 
-    @NotNull
-    @EMail
-    private String mail;
+	@NotNull
+	@Size(min = 102, max = 102)
+	private String hash;
 
-    private boolean admin;
+	@NotNull
+	@EMail
+	private String mail;
 
-    // Used in case of creating new cluster
-    public User(String name, String hash, String mail, boolean admin) {
-        this.name = name;
-        this.hash = hash;
-        this.mail = mail;
-        this.admin = admin;
-    }
+	private boolean admin;
 
-    public String getName() {
-        return name;
-    }
+	// Used in case of creating new cluster
+	public User(String name, String hash, String mail, boolean admin) {
+		this.name = name;
+		this.hash = hash;
+		this.mail = mail;
+		this.admin = admin;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getHash() {
-        return hash;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
+	public String getHash() {
+		return hash;
+	}
 
-    public String getMail() {
-        return mail;
-    }
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
 
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
+	public String getMail() {
+		return mail;
+	}
 
-    public boolean isAdmin() {
-        return admin;
-    }
+	public void setMail(String mail) {
+		this.mail = mail;
+	}
 
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
-    }
+	public boolean isAdmin() {
+		return admin;
+	}
 
-    public ArrayList<String> getOwnerNames() {
-        ArrayList<String> list = new ArrayList();
-        list.add(name);
-        return list;
-    }
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
+	}
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "name='" + name + '\'' +
-                '}';
-    }
+	public ArrayList<String> getOwnerNames() {
+		ArrayList<String> list = new ArrayList<>();
+		list.add(name);
+		return list;
+	}
+
+	@Override
+	public String toString() {
+		return "User{" + "name='" + name + '\'' + '}';
+	}
 }

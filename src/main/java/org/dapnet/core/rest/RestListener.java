@@ -20,13 +20,13 @@ import org.jgroups.Address;
 import java.util.Collection;
 
 public interface RestListener {
-    //Give (ReadOnly) Access to the State
-    State getState();
+	// Give (ReadOnly) Access to the State
+	State getState();
 
-    //Handler for WriteOnly Operations on State
-    //Add here parameters for rollback
-    boolean handleStateOperation(Collection<Address> destination, String methodName, Object[] args, Class[] types);
+	// Handler for WriteOnly Operations on State
+	// Add here parameters for rollback
+	boolean handleStateOperation(Collection<Address> destination, String methodName, Object[] args, Class[] types);
 
-    //For pretest whether WriteOperation legal
-    boolean isQuorum();
+	// For pretest whether WriteOperation legal
+	boolean isQuorum();
 }

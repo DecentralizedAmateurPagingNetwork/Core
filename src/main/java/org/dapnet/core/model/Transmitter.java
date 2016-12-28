@@ -25,194 +25,191 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
-    //ID
-    @NotNull
-    @Size(min = 3, max = 20)
-    protected String name;
+	private static final long serialVersionUID = -8142160974834002456L;
 
-    @NotNull
-    @Digits(integer = 3, fraction = 8)
-    @Min(-180)
-    @Max(+180)
-    protected String longitude;
+	// ID
+	@NotNull
+	@Size(min = 3, max = 20)
+	protected String name;
 
-    @NotNull
-    @Digits(integer = 3, fraction = 8)
-    @Min(-90)
-    @Max(+90)
-    protected String latitude;
+	@NotNull
+	@Digits(integer = 3, fraction = 8)
+	@Min(-180)
+	@Max(+180)
+	protected String longitude;
 
-    @NotNull
-    @Digits(integer = 3, fraction = 3)
-    @Min(0)
-    @Max(200)
-    protected String power;
+	@NotNull
+	@Digits(integer = 3, fraction = 8)
+	@Min(-90)
+	@Max(+90)
+	protected String latitude;
 
-    @NotNull
-    protected String nodeName;
+	@NotNull
+	@Digits(integer = 3, fraction = 3)
+	@Min(0)
+	@Max(200)
+	protected String power;
 
-    @NotNull
-    protected IpAddress address;
+	@NotNull
+	protected String nodeName;
 
-    @NotNull
-    @TimeSlot()
-    protected String timeSlot;
+	@NotNull
+	protected IpAddress address;
 
-    @NotNull
-    @Size(min = 1, message = "must contain at least one ownerName")
-    protected ArrayList<String> ownerNames;
+	@NotNull
+	@TimeSlot()
+	protected String timeSlot;
 
-    @NotNull
-    protected DeviceType deviceType;
+	@NotNull
+	@Size(min = 1, message = "must contain at least one ownerName")
+	protected ArrayList<String> ownerNames;
 
-    public enum DeviceType {
-        RASPPAGER1, XOS, PR430, SDRPAGER, DV4mini
-    }
+	@NotNull
+	protected DeviceType deviceType;
 
-    //Internally set
-    @NotNull
-    protected Status status;
+	public enum DeviceType {
+		RASPPAGER1, XOS, PR430, SDRPAGER, DV4mini
+	}
 
-    public enum Status {
-        ONLINE, //successfully connected
-        OFFLINE, //(re)connection is in progress or will start in some moments
-        ERROR, //connections finally fails (count of retransmission exceed
-        DISABLED //manually deactivated, won't be connected
-    }
+	// Internally set
+	@NotNull
+	protected Status status;
 
-    public Transmitter() {
-    }
+	public enum Status {
+		ONLINE, // successfully connected
+		OFFLINE, // (re)connection is in progress or will start in some moments
+		ERROR, // connections finally fails (count of retransmission exceed
+		DISABLED // manually deactivated, won't be connected
+	}
 
-    public Transmitter(String name, String longitude, String latitude,
-                       String power, IpAddress address, DeviceType deviceType, String timeSlot, ArrayList<String> ownerNames) {
-        this.name = name;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.power = power;
-        this.address = address;
-        this.deviceType = deviceType;
-        this.timeSlot = timeSlot;
-        this.ownerNames = ownerNames;
-    }
+	public Transmitter() {
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Transmitter(String name, String longitude, String latitude, String power, IpAddress address,
+			DeviceType deviceType, String timeSlot, ArrayList<String> ownerNames) {
+		this.name = name;
+		this.longitude = longitude;
+		this.latitude = latitude;
+		this.power = power;
+		this.address = address;
+		this.deviceType = deviceType;
+		this.timeSlot = timeSlot;
+		this.ownerNames = ownerNames;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getLongitude() {
-        return longitude;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
+	public String getLongitude() {
+		return longitude;
+	}
 
-    public String getLatitude() {
-        return latitude;
-    }
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
+	public String getLatitude() {
+		return latitude;
+	}
 
-    public String getPower() {
-        return power;
-    }
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
 
-    public void setPower(String power) {
-        this.power = power;
-    }
+	public String getPower() {
+		return power;
+	}
 
-    public String getNodeName() {
-        return nodeName;
-    }
+	public void setPower(String power) {
+		this.power = power;
+	}
 
-    public void setNodeName(String nodeName) {
-        this.nodeName = nodeName;
-    }
+	public String getNodeName() {
+		return nodeName;
+	}
 
-    public IpAddress getAddress() {
-        return address;
-    }
+	public void setNodeName(String nodeName) {
+		this.nodeName = nodeName;
+	}
 
-    public void setAddress(IpAddress address) {
-        this.address = address;
-    }
+	public IpAddress getAddress() {
+		return address;
+	}
 
-    public DeviceType getDeviceType() {
-        return deviceType;
-    }
+	public void setAddress(IpAddress address) {
+		this.address = address;
+	}
 
-    public void setDeviceType(DeviceType deviceType) {
-        this.deviceType = deviceType;
-    }
+	public DeviceType getDeviceType() {
+		return deviceType;
+	}
 
-    public String getTimeSlot() {
-        return timeSlot;
-    }
+	public void setDeviceType(DeviceType deviceType) {
+		this.deviceType = deviceType;
+	}
 
-    public void setTimeSlot(String timeSlot) {
-        this.timeSlot = timeSlot;
-    }
+	public String getTimeSlot() {
+		return timeSlot;
+	}
 
-    public ArrayList<String> getOwnerNames() {
-        return ownerNames;
-    }
+	public void setTimeSlot(String timeSlot) {
+		this.timeSlot = timeSlot;
+	}
 
-    public void setOwnerNames(ArrayList<String> owners) {
-        this.ownerNames = owners;
-    }
+	public ArrayList<String> getOwnerNames() {
+		return ownerNames;
+	}
 
-    public Status getStatus() {
-        return status;
-    }
+	public void setOwnerNames(ArrayList<String> owners) {
+		this.ownerNames = owners;
+	}
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+	public Status getStatus() {
+		return status;
+	}
 
-    //Getter returning references instead of String
-    private static State state;
+	public void setStatus(Status status) {
+		this.status = status;
+	}
 
-    public static void setState(State statePar) {
-        state = statePar;
-    }
+	// Getter returning references instead of String
+	private static State state;
 
-    @ValidName(message = "must contain names of existing users",
-            fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-    public ArrayList<User> getOwners() throws Exception {
-        if (state == null)
-            throw new Exception("StateNotSetException");
-        ArrayList<User> users = new ArrayList<>();
-        if (ownerNames == null)
-            return null;
-        for (String owner : ownerNames) {
-            if (state.getUsers().contains(owner))
-                users.add(state.getUsers().findByName(owner));
-        }
-        if (ownerNames.size() == users.size())
-            return users;
-        else
-            return null;
-    }
+	public static void setState(State statePar) {
+		state = statePar;
+	}
 
-    @ValidName(message = "must contain the name of an existing node",
-            fieldName = "nodeName", constraintName = "ValidNodeName")
-    public Node getNode() throws Exception {
-        if (state == null)
-            throw new Exception("StateNotSetException");
-        return state.getNodes().findByName(nodeName);
-    }
+	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
+	public ArrayList<User> getOwners() throws Exception {
+		if (state == null)
+			throw new Exception("StateNotSetException");
+		ArrayList<User> users = new ArrayList<>();
+		if (ownerNames == null)
+			return null;
+		for (String owner : ownerNames) {
+			if (state.getUsers().contains(owner))
+				users.add(state.getUsers().findByName(owner));
+		}
+		if (ownerNames.size() == users.size())
+			return users;
+		else
+			return null;
+	}
 
-    @Override
-    public String toString() {
-        return "Transmitter{" +
-                "name='" + name + '\'' +
-                ", status=" + status +
-                '}';
-    }
+	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")
+	public Node getNode() throws Exception {
+		if (state == null)
+			throw new Exception("StateNotSetException");
+		return state.getNodes().findByName(nodeName);
+	}
+
+	@Override
+	public String toString() {
+		return "Transmitter{" + "name='" + name + '\'' + ", status=" + status + '}';
+	}
 }

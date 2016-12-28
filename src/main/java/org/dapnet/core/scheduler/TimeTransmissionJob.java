@@ -22,20 +22,21 @@ import org.quartz.*;
 import java.util.Date;
 
 public class TimeTransmissionJob implements Job {
-    private static final Logger logger = LogManager.getLogger(TimeTransmissionJob.class.getName());
+	private static final Logger logger = LogManager.getLogger(TimeTransmissionJob.class.getName());
 
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+	@Override
+	public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        SchedulerContext schedulerContext = null;
-        try {
-            schedulerContext = context.getScheduler().getContext();
-            TransmissionManager transmissionManager = (TransmissionManager) schedulerContext.get("transmissionManager");
+		SchedulerContext schedulerContext = null;
+		try {
+			schedulerContext = context.getScheduler().getContext();
+			TransmissionManager transmissionManager = (TransmissionManager) schedulerContext.get("transmissionManager");
 
-            //Possibility to implement TimeZones by adding here a TransmitterGroup
-            transmissionManager.handleTime(new Date());
-        } catch (SchedulerException e) {
-            logger.error("Failed to execute TimeTransmissionJob", e);
-        }
-    }
+			// Possibility to implement TimeZones by adding here a
+			// TransmitterGroup
+			transmissionManager.handleTime(new Date());
+		} catch (SchedulerException e) {
+			logger.error("Failed to execute TimeTransmissionJob", e);
+		}
+	}
 }

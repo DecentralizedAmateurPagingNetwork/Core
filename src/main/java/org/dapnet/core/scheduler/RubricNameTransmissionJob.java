@@ -22,20 +22,20 @@ import org.dapnet.core.transmission.TransmissionManager;
 import org.quartz.*;
 
 public class RubricNameTransmissionJob implements Job {
-    private static final Logger logger = LogManager.getLogger(RubricNameTransmissionJob.class.getName());
+	private static final Logger logger = LogManager.getLogger(RubricNameTransmissionJob.class.getName());
 
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        SchedulerContext schedulerContext = null;
-        try {
-            schedulerContext = context.getScheduler().getContext();
-            TransmissionManager transmissionManager = (TransmissionManager) schedulerContext.get("transmissionManager");
-            ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
+	@Override
+	public void execute(JobExecutionContext context) throws JobExecutionException {
+		SchedulerContext schedulerContext = null;
+		try {
+			schedulerContext = context.getScheduler().getContext();
+			TransmissionManager transmissionManager = (TransmissionManager) schedulerContext.get("transmissionManager");
+			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-            for (Rubric rubric : clusterManager.getState().getRubrics())
-                transmissionManager.handleRubric(rubric);
-        } catch (SchedulerException e) {
-            logger.error("Failed to execute RubricNameTransmissionJob", e);
-        }
-    }
+			for (Rubric rubric : clusterManager.getState().getRubrics())
+				transmissionManager.handleRubric(rubric);
+		} catch (SchedulerException e) {
+			logger.error("Failed to execute RubricNameTransmissionJob", e);
+		}
+	}
 }

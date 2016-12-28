@@ -21,98 +21,97 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 
 public class Node implements Serializable, Searchable {
-    //ID
-    @NotNull
-    @Size(min = 3, max = 20)
-    private String name;
+	private static final long serialVersionUID = -4104175163845286560L;
 
-    @NotNull
-    @Digits(integer = 3, fraction = 8)
-    @Min(-180)
-    @Max(+180)
-    protected String longitude;
+	// ID
+	@NotNull
+	@Size(min = 3, max = 20)
+	private String name;
 
-    @NotNull
-    @Digits(integer = 3, fraction = 8)
-    @Min(-90)
-    @Max(+90)
-    protected String latitude;
+	@NotNull
+	@Digits(integer = 3, fraction = 8)
+	@Min(-180)
+	@Max(+180)
+	protected String longitude;
 
-    private IpAddress address;
+	@NotNull
+	@Digits(integer = 3, fraction = 8)
+	@Min(-90)
+	@Max(+90)
+	protected String latitude;
 
-    @NotNull
-    private Status status;
+	private IpAddress address;
 
-    @NotNull
-    private String key;
+	@NotNull
+	private Status status;
 
-    public enum Status {
-        ONLINE, SUSPENDED, UNKNOWN
-    }
+	@NotNull
+	private String key;
 
-    // Used in case of creating new cluster
-    public Node(String name, IpAddress address, String longitude, String latitude, Status status, String key) {
-        this.name = name;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.address = address;
-        this.status = status;
-        this.key = key;
-    }
+	public enum Status {
+		ONLINE, SUSPENDED, UNKNOWN
+	}
 
-    public Status getStatus() {
-        return status;
-    }
+	// Used in case of creating new cluster
+	public Node(String name, IpAddress address, String longitude, String latitude, Status status, String key) {
+		this.name = name;
+		this.longitude = longitude;
+		this.latitude = latitude;
+		this.address = address;
+		this.status = status;
+		this.key = key;
+	}
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+	public Status getStatus() {
+		return status;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setStatus(Status status) {
+		this.status = status;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getLongitude() {
-        return longitude;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
+	public String getLongitude() {
+		return longitude;
+	}
 
-    public String getLatitude() {
-        return latitude;
-    }
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
 
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
+	public String getLatitude() {
+		return latitude;
+	}
 
-    public IpAddress getAddress() {
-        return address;
-    }
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
 
-    public void setAddress(IpAddress address) {
-        this.address = address;
-    }
+	public IpAddress getAddress() {
+		return address;
+	}
 
-    public String getKey() {
-        return key;
-    }
+	public void setAddress(IpAddress address) {
+		this.address = address;
+	}
 
-    public void setKey(String key) {
-        this.key = key;
-    }
+	public String getKey() {
+		return key;
+	}
 
-    @Override
-    public String toString() {
-        return "Node{" +
-                "status=" + status +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	@Override
+	public String toString() {
+		return "Node{" + "status=" + status + ", name='" + name + '\'' + '}';
+	}
 }

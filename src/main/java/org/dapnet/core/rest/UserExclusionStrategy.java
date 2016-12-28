@@ -23,17 +23,17 @@ import org.dapnet.core.model.User;
 
 public class UserExclusionStrategy implements ExclusionStrategy {
 
-    public boolean shouldSkipClass(Class<?> arg0) {
-        return false;
-    }
+	public boolean shouldSkipClass(Class<?> arg0) {
+		return false;
+	}
 
-    public boolean shouldSkipField(FieldAttributes f) {
-        //All Fields to hide in JSON if User is no Admin or Owner
-        return (f.getDeclaringClass() == CallSign.class && f.getName().equals("pagers"))
-                || (f.getDeclaringClass() == Node.class && f.getName().equals("key"))
-                || (f.getDeclaringClass() == Node.class && f.getName().equals("address"))
-                || (f.getDeclaringClass() == Transmitter.class && f.getName().equals("address"))
-                || (f.getDeclaringClass() == User.class && f.getName().equals("hash"));
-    }
+	public boolean shouldSkipField(FieldAttributes f) {
+		// All Fields to hide in JSON if User is no Admin or Owner
+		return (f.getDeclaringClass() == CallSign.class && f.getName().equals("pagers"))
+				|| (f.getDeclaringClass() == Node.class && f.getName().equals("key"))
+				|| (f.getDeclaringClass() == Node.class && f.getName().equals("address"))
+				|| (f.getDeclaringClass() == Transmitter.class && f.getName().equals("address"))
+				|| (f.getDeclaringClass() == User.class && f.getName().equals("hash"));
+	}
 
 }

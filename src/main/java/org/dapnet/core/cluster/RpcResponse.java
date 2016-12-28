@@ -15,5 +15,5 @@
 package org.dapnet.core.cluster;
 
 public enum RpcResponse {
-    OK, NO_QUORUM, BAD_REQUEST, VALIDATION_ERROR, INTERNAL_ERROR
+	OK, NO_QUORUM, BAD_REQUEST, VALIDATION_ERROR, INTERNAL_ERROR
 }

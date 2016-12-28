@@ -17,7 +17,9 @@ package org.dapnet.core.transmission;
 import org.dapnet.core.model.Transmitter;
 
 public class SDRPager extends Raspager {
-    public SDRPager(Transmitter transmitter, TransmitterDeviceListener listener) {
-        super(transmitter, listener, DeviceType.SDRPAGER);
-    }
+	private static final long serialVersionUID = 5883558421939398801L;
+
+	public SDRPager(Transmitter transmitter, TransmitterDeviceListener listener) {
+		super(transmitter, listener, DeviceType.SDRPAGER);
+	}
 }

@@ -15,7 +15,9 @@
 package org.dapnet.core.transmission;
 
 public class TransmitterDeviceException extends Exception {
-    public TransmitterDeviceException(String message) {
-        super(message);
-    }
+	private static final long serialVersionUID = 4661849096637821626L;
+
+	public TransmitterDeviceException(String message) {
+		super(message);
+	}
 }

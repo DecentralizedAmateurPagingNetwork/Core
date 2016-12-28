@@ -24,106 +24,103 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class News implements Serializable {
-    //No ID
-    @NotNull
-    @Size(min = 1, max = 80)
-    private String text;
+	private static final long serialVersionUID = 255218965991641092L;
 
-    @NotNull
-    private String rubricName;
+	// No ID
+	@NotNull
+	@Size(min = 1, max = 80)
+	private String text;
 
-    @NotNull
-    @Min(value = 1)
-    @Max(value = 10)
-    private int number;
+	@NotNull
+	private String rubricName;
 
-    //Internally set
-    @NotNull
-    private Date timestamp;
+	@NotNull
+	@Min(value = 1)
+	@Max(value = 10)
+	private int number;
 
-    //Internally set
-    @NotNull
-    @Size(min = 1, message = "must contain at least one ownerName")
-    private String ownerName;
+	// Internally set
+	@NotNull
+	private Date timestamp;
 
-    public String getText() {
-        return text;
-    }
+	// Internally set
+	@NotNull
+	@Size(min = 1, message = "must contain at least one ownerName")
+	private String ownerName;
 
-    public void setText(String text) {
-        this.text = text;
-    }
+	public String getText() {
+		return text;
+	}
 
-    public String getRubricName() {
-        return rubricName;
-    }
+	public void setText(String text) {
+		this.text = text;
+	}
 
-    public void setRubricName(String rubricName) {
-        this.rubricName = rubricName;
-    }
+	public String getRubricName() {
+		return rubricName;
+	}
 
-    public int getNumber() {
-        return number;
-    }
+	public void setRubricName(String rubricName) {
+		this.rubricName = rubricName;
+	}
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
+	public int getNumber() {
+		return number;
+	}
 
-    public Date getTimestamp() {
-        return timestamp;
-    }
+	public void setNumber(int number) {
+		this.number = number;
+	}
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
+	public Date getTimestamp() {
+		return timestamp;
+	}
 
-    public String getOwnerName() {
-        return ownerName;
-    }
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
+	public String getOwnerName() {
+		return ownerName;
+	}
 
-    public static State getState() {
-        return state;
-    }
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
+	}
 
-    //Getter returning references instead of String
-    private static State state;
+	public static State getState() {
+		return state;
+	}
 
-    public static void setState(State statePar) {
-        state = statePar;
-    }
+	// Getter returning references instead of String
+	private static State state;
 
-    @ValidName(message = "must contain the name of an existing rubric",
-            fieldName = "rubricName", constraintName = "ValidRubricName")
-    public Rubric getRubric() throws Exception {
-        if (state == null)
-            throw new Exception("StateNotSetException");
-        if (rubricName == null)
-            return null;
-        else
-            return state.getRubrics().findByName(rubricName);
-    }
+	public static void setState(State statePar) {
+		state = statePar;
+	}
 
-    @ValidName(message = "must contain the name of an existing user",
-            fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-    public User getOwner() throws Exception {
-        if (state == null)
-            throw new Exception("StateNotSetException");
-        if (ownerName == null)
-            return null;
-        else
-            return state.getUsers().findByName(ownerName);
-    }
+	@ValidName(message = "must contain the name of an existing rubric", fieldName = "rubricName", constraintName = "ValidRubricName")
+	public Rubric getRubric() throws Exception {
+		if (state == null)
+			throw new Exception("StateNotSetException");
+		if (rubricName == null)
+			return null;
+		else
+			return state.getRubrics().findByName(rubricName);
+	}
 
-    @Override
-    public String toString() {
-        return "News{" +
-                "rubricName='" + rubricName + '\'' +
-                ", number=" + number +
-                '}';
-    }
+	@ValidName(message = "must contain the name of an existing user", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
+	public User getOwner() throws Exception {
+		if (state == null)
+			throw new Exception("StateNotSetException");
+		if (ownerName == null)
+			return null;
+		else
+			return state.getUsers().findByName(ownerName);
+	}
+
+	@Override
+	public String toString() {
+		return "News{" + "rubricName='" + rubricName + '\'' + ", number=" + number + '}';
+	}
 }

@@ -17,7 +17,9 @@ package org.dapnet.core.transmission;
 import org.dapnet.core.model.Transmitter;
 
 public class XOS extends Raspager {
-    public XOS(Transmitter transmitter, TransmitterDeviceListener listener) {
-        super(transmitter, listener, DeviceType.XOS);
-    }
+	private static final long serialVersionUID = -7036556122309607845L;
+
+	public XOS(Transmitter transmitter, TransmitterDeviceListener listener) {
+		super(transmitter, listener, DeviceType.XOS);
+	}
 }

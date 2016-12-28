@@ -18,4 +18,5 @@ import javax.ws.rs.WebApplicationException;
 
 //used only to indicate that gson has a problem with an ipAddress
 public class InvalidAddressException extends WebApplicationException {
+	private static final long serialVersionUID = -810907789034331225L;
 }

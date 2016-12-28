@@ -17,7 +17,9 @@ package org.dapnet.core.transmission;
 import org.dapnet.core.model.Transmitter;
 
 public class PR430 extends Raspager {
-    public PR430(Transmitter transmitter, TransmitterDeviceListener listener) {
-        super(transmitter, listener, DeviceType.PR430);
-    }
+	private static final long serialVersionUID = 1208569785866432982L;
+
+	public PR430(Transmitter transmitter, TransmitterDeviceListener listener) {
+		super(transmitter, listener, DeviceType.PR430);
+	}
 }

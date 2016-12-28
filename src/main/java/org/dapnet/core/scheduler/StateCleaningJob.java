@@ -20,19 +20,19 @@ import org.dapnet.core.cluster.ClusterManager;
 import org.quartz.*;
 
 public class StateCleaningJob implements Job {
-    private static final Logger logger = LogManager.getLogger(StateCleaningJob.class.getName());
+	private static final Logger logger = LogManager.getLogger(StateCleaningJob.class.getName());
 
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+	@Override
+	public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        SchedulerContext schedulerContext = null;
-        try {
-            schedulerContext = context.getScheduler().getContext();
-            ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
+		SchedulerContext schedulerContext = null;
+		try {
+			schedulerContext = context.getScheduler().getContext();
+			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-            clusterManager.getState().clean();
-        } catch (SchedulerException e) {
-            logger.error("Failed to execute StateCleaningJob", e);
-        }
-    }
+			clusterManager.getState().clean();
+		} catch (SchedulerException e) {
+			logger.error("Failed to execute StateCleaningJob", e);
+		}
+	}
 }

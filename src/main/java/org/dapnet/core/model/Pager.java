@@ -21,38 +21,36 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 public class Pager implements Serializable {
-    //No ID
+	private static final long serialVersionUID = -8518189973413053726L;
 
-    @NotNull
-    @Min(value = 0)
-    @Max(value = 2097151)
-    int number;
+	// No ID
+	@NotNull
+	@Min(value = 0)
+	@Max(value = 2097151)
+	int number;
 
-    @NotNull
-    @Size(min = 3, max = 20)
-    String name;
+	@NotNull
+	@Size(min = 3, max = 20)
+	String name;
 
-    public int getNumber() {
-        return number;
-    }
+	public int getNumber() {
+		return number;
+	}
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
+	public void setNumber(int number) {
+		this.number = number;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Override
-    public String toString() {
-        return "Pager{" +
-                "number=" + number +
-                ", name='" + name + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "Pager{" + "number=" + number + ", name='" + name + '\'' + '}';
+	}
 }

@@ -25,17 +25,17 @@ import javax.ws.rs.core.Response;
 @Path("/core")
 @Produces("application/json")
 public class CoreResource extends AbstractResource {
-    @Path("/core_version")
-    @GET
-    public Response getCoreVersion() throws Exception {
-        RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-        return getObject(DAPNETCore.getCoreVersion(), status);
-    }
+	@Path("/core_version")
+	@GET
+	public Response getCoreVersion() throws Exception {
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		return getObject(DAPNETCore.getCoreVersion(), status);
+	}
 
-    @Path("/api_version")
-    @GET
-    public Response getApiVersion() throws Exception {
-        RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-        return getObject(DAPNETCore.getApiVersion(), status);
-    }
+	@Path("/api_version")
+	@GET
+	public Response getApiVersion() throws Exception {
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		return getObject(DAPNETCore.getApiVersion(), status);
+	}
 }

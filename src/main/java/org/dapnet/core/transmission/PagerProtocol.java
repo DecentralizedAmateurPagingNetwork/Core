@@ -23,13 +23,13 @@ import java.util.Date;
 import java.util.List;
 
 public interface PagerProtocol {
-    Message createMessageFromTime(Date date);
+	Message createMessageFromTime(Date date);
 
-    Message createMessageFromRubric(Rubric rubric);
+	Message createMessageFromRubric(Rubric rubric);
 
-    Message createMessageFromNews(News news);
+	Message createMessageFromNews(News news);
 
-    Message createMessageFromActivation(Activation avtivation);
+	Message createMessageFromActivation(Activation avtivation);
 
-    List<Message> createMessagesFromCall(Call call);
+	List<Message> createMessagesFromCall(Call call);
 }

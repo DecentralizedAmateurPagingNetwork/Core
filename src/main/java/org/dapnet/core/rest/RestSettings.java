@@ -17,9 +17,10 @@ package org.dapnet.core.rest;
 import java.io.Serializable;
 
 public class RestSettings implements Serializable {
-    private int port = 8080;
+	private static final long serialVersionUID = 4524821306768847015L;
+	private int port = 8080;
 
-    public int getPort() {
-        return port;
-    }
+	public int getPort() {
+		return port;
+	}
 }
