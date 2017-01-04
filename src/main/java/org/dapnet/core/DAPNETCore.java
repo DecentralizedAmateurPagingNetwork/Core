@@ -14,6 +14,11 @@
 
 package org.dapnet.core;
 
+import java.util.Locale;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -21,12 +26,6 @@ import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.scheduler.SchedulerManager;
 import org.dapnet.core.transmission.TransmissionManager;
-
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 
 public class DAPNETCore {
 	private ClusterManager clusterManager;
@@ -48,22 +47,6 @@ public class DAPNETCore {
 			logger.info("Starting SchedulerManager");
 			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
 			logger.info("DAPNETCore started");
-
-			// TODO Replace with ctrl-c handler
-			// Wait for Stop
-			try {
-				System.out.println("Enter \"stop\" to quit");
-				Scanner sc = new Scanner(System.in);
-				while (true) {
-					if (sc.next().toLowerCase().equals("stop")) {
-						stop();
-						return;
-					}
-				}
-			} catch (Exception e) {
-				// Program was interrupted, not enough time for stopping!
-				logger.warn("DAPNET_CORE was interrupted");
-			}
 		} catch (Exception e) {
 			logger.fatal("Exception : ", e);
 			System.exit(1);
@@ -72,23 +55,31 @@ public class DAPNETCore {
 
 	private void stop() {
 		logger.info("Stopping DAPNET_CORE...");
-		if (clusterManager != null)
+
+		if (clusterManager != null) {
 			clusterManager.stop();
-		if (restManager != null)
-			restManager.stopServer();
-		if (schedulerManager != null)
-			schedulerManager.stop();
-		if (clusterManager == null || restManager == null || schedulerManager == null) {
-			// Used for stopping DAPNET while startup
-			System.exit(1);
 		}
+
+		if (restManager != null) {
+			restManager.stopServer();
+		}
+
+		if (schedulerManager != null) {
+			schedulerManager.stop();
+		}
+
+		// if (clusterManager == null || restManager == null || schedulerManager
+		// == null) {
+		// // Used for stopping DAPNET while startup
+		// System.exit(1);
+		// }
 	}
 
 	// Static
 	private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
 	private static final String CORE_VERSION = "0.9.3.2";
 	private static final String API_VERSION = "0.9.3";
-	private static DAPNETCore dapnetCore;
+	private static volatile DAPNETCore dapnetCore;
 
 	public static void main(String[] args) throws Exception {
 		// Disable IPv6 for Java VM, creates sometimes LogMessages
@@ -101,6 +92,20 @@ public class DAPNETCore {
 		System.setProperty("Dlogging.config", "LogSettings.xml");
 		// Set language to English
 		Locale.setDefault(Locale.ENGLISH);
+
+		// Register shutdown hook
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				try {
+					if (dapnetCore != null) {
+						dapnetCore.stop();
+					}
+				} catch (Exception ex) {
+					logger.fatal("Exception : ", ex);
+				}
+			}
+		});
 
 		dapnetCore = new DAPNETCore();
 		dapnetCore.start();
