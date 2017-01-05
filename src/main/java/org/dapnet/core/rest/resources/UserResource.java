@@ -14,6 +14,7 @@
 
 package org.dapnet.core.rest.resources;
 
+import com.google.gson.JsonSyntaxException;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
@@ -45,10 +46,15 @@ public class UserResource extends AbstractResource {
 		// Start request processing only if at least USER
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		// Create User
+		// Create User from received data
 		User user = gson.fromJson(userJSON, User.class);
 		if (user != null) {
-			user.setHash(HashUtil.createHash(user.getHash()));
+			if (user.getHash().equals("") && restListener.getState().getUsers().contains(userName)) {
+				// keep existing hash
+				user.setHash(restListener.getState().getUsers().findByName(userName).getHash());
+			} else {
+				user.setHash(HashUtil.createHash(user.getHash()));
+			}
 			user.setName(userName);
 		} else
 			throw new EmptyBodyException();
