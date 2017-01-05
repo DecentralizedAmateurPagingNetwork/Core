@@ -14,7 +14,6 @@
 
 package org.dapnet.core.rest.resources;
 
-import com.google.gson.JsonSyntaxException;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
