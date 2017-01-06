@@ -14,17 +14,17 @@
 
 package org.dapnet.core.rest;
 
-import com.sun.net.httpserver.HttpServer;
+import java.net.BindException;
+import java.net.URI;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.rest.resources.AbstractResource;
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-
-import java.net.BindException;
-import java.net.URI;
 
 public class RestManager {
 	private static final Logger logger = LogManager.getLogger(RestManager.class.getName());
@@ -45,7 +45,7 @@ public class RestManager {
 		try {
 			ResourceConfig rc = new ResourceConfig().packages("org/dapnet/core/rest");
 			URI endpoint = new URI("http://localhost:" + Settings.getRestSettings().getPort() + "/");
-			server = JdkHttpServerFactory.createHttpServer(endpoint, rc);
+			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
 			logger.info("RestApi successfully started");
 		} catch (Exception e) {
 			logger.fatal("Starting RestApi failed");
@@ -63,7 +63,7 @@ public class RestManager {
 
 	public void stopServer() {
 		if (server != null) {
-			server.stop(0);
+			server.shutdownNow();
 			logger.info("RestApi successfully stopped");
 		} else {
 			logger.error("Stopping RestApi failed");

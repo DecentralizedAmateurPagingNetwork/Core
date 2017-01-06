@@ -38,9 +38,9 @@ public abstract class Raspager extends TransmitterDevice {
 	}
 
 	private void cleanup() {
-		this.disconnect();
-		this.closeDeviceIO();
-		this.thread = null;
+		disconnect();
+		closeDeviceIO();
+		thread = null;
 	}
 
 	public void run() {

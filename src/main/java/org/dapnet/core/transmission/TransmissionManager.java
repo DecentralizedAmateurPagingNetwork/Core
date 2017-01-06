@@ -26,24 +26,20 @@ import java.util.List;
 
 public class TransmissionManager {
 	private static final Logger logger = LogManager.getLogger(TransmissionManager.class.getName());
-	private PagerProtocol pagerProtocol;
-	private TransmitterDeviceManager transmitterDeviceManager;
-
-	public TransmissionManager() {
-		pagerProtocol = new SkyperProtocol();
-		transmitterDeviceManager = new TransmitterDeviceManager();
-	}
+	private final PagerProtocol protocol = new SkyperProtocol();
+	private final TransmitterDeviceManager deviceManager = new TransmitterDeviceManager();
 
 	public void handleTime(Date date) {
 		try {
-			Message message = pagerProtocol.createMessageFromTime(date);
+			Message message = protocol.createMessageFromTime(date);
 			// Possibility to implement TimeZones by handling here
 			// TransmitterGroups
 			// Now sending Time to all connected Devices
-			for (TransmitterDevice transmitterDevice : transmitterDeviceManager.getTransmitterDevices())
+			for (TransmitterDevice transmitterDevice : deviceManager.getTransmitterDevices()) {
 				transmitterDevice.sendMessage(message);
+			}
 
-			logger.info("Time sent using " + transmitterDeviceManager.getTransmitterDevices().size() + " Transmitter");
+			logger.info("Time sent using " + deviceManager.getTransmitterDevices().size() + " Transmitter");
 		} catch (Exception e) {
 			logger.error("Failed to send Time", e);
 		}
@@ -51,8 +47,8 @@ public class TransmissionManager {
 
 	public void handleNews(News news) {
 		try {
-			Message message = pagerProtocol.createMessageFromNews(news);
-			List<TransmitterDevice> transmitterDevices = transmitterDeviceManager
+			Message message = protocol.createMessageFromNews(news);
+			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(news.getRubric().getTransmitterGroups());
 
 			for (TransmitterDevice transmitterDevice : transmitterDevices)
@@ -66,8 +62,8 @@ public class TransmissionManager {
 
 	public void handleRubric(Rubric rubric) {
 		try {
-			Message message = pagerProtocol.createMessageFromRubric(rubric);
-			List<TransmitterDevice> transmitterDevices = transmitterDeviceManager
+			Message message = protocol.createMessageFromRubric(rubric);
+			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(rubric.getTransmitterGroups());
 
 			for (TransmitterDevice transmitterDevice : transmitterDevices)
@@ -81,8 +77,8 @@ public class TransmissionManager {
 
 	public void handleCall(Call call) {
 		try {
-			List<Message> messages = pagerProtocol.createMessagesFromCall(call);
-			List<TransmitterDevice> transmitterDevices = transmitterDeviceManager
+			List<Message> messages = protocol.createMessagesFromCall(call);
+			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(call.getTransmitterGroups());
 
 			for (TransmitterDevice transmitterDevice : transmitterDevices)
@@ -98,8 +94,8 @@ public class TransmissionManager {
 
 	public void handleActivation(Activation activation) {
 		try {
-			Message message = pagerProtocol.createMessageFromActivation(activation);
-			List<TransmitterDevice> transmitterDevices = transmitterDeviceManager
+			Message message = protocol.createMessageFromActivation(activation);
+			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(activation.getTransmitterGroups());
 
 			for (TransmitterDevice transmitterDevice : transmitterDevices)
@@ -112,6 +108,6 @@ public class TransmissionManager {
 	}
 
 	public TransmitterDeviceManager getTransmitterDeviceManager() {
-		return transmitterDeviceManager;
+		return deviceManager;
 	}
 }

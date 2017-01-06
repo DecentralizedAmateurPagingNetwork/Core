@@ -25,6 +25,7 @@ public interface RestListener {
 
 	// Handler for WriteOnly Operations on State
 	// Add here parameters for rollback
+	@SuppressWarnings("rawtypes")
 	boolean handleStateOperation(Collection<Address> destination, String methodName, Object[] args, Class[] types);
 
 	// For pretest whether WriteOperation legal

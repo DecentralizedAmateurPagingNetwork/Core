@@ -25,20 +25,13 @@ import java.util.List;
 
 public class TransmitterDeviceManager implements TransmitterDeviceListener {
 	private static final Logger logger = LogManager.getLogger(TransmitterDeviceManager.class.getName());
-	private SearchableArrayList<TransmitterDevice> connectedTransmitterDevices;
-	private SearchableArrayList<TransmitterDevice> connectingTransmitterDevices;
-	private SearchableArrayList<TransmitterDevice> disconnectingTransmitterDevices;
+	private final SearchableArrayList<TransmitterDevice> connectedTransmitterDevices = new SearchableArrayList<>();
+	private final SearchableArrayList<TransmitterDevice> connectingTransmitterDevices = new SearchableArrayList<>();
+	private final SearchableArrayList<TransmitterDevice> disconnectingTransmitterDevices = new SearchableArrayList<>();
 	private TransmitterDeviceManagerListener listener;
 	private boolean disconnectingFromAll = false;
 	private boolean reconnecting = false;
 	private List<Transmitter> reconnectTransmitters;
-
-	public TransmitterDeviceManager() {
-		connectedTransmitterDevices = new SearchableArrayList<>();
-		connectingTransmitterDevices = new SearchableArrayList<>();
-		disconnectingTransmitterDevices = new SearchableArrayList<>();
-		disconnectingFromAll = false;
-	}
 
 	public void setListener(TransmitterDeviceManagerListener listener) {
 		this.listener = listener;

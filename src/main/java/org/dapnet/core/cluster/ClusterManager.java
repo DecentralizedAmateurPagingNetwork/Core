@@ -209,6 +209,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 
 	// ### Remote Procedure Call
 	// ########################################################################################
+	@SuppressWarnings("rawtypes")
 	public boolean handleStateOperation(Collection<Address> destination, String methodName, Object[] args,
 			Class[] types) {
 		try {
@@ -232,6 +233,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	private boolean isRspSuccessful(RspList list) {
 		if (list == null || list.getResults() == null || list.getResults().isEmpty())
 			return false;

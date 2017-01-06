@@ -35,10 +35,6 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 		this.deviceType = deviceType;
 	}
 
-	// public RaspagerProtocol() {
-	// this.deviceType= Transmitter.DeviceType.RASPPAGER1;
-	// }
-
 	private int getSequenceNumber() {
 		int sequenceNumber = this.sequenceNumber;
 		this.sequenceNumber = (this.sequenceNumber + 1) % 256;
@@ -56,7 +52,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 		int timeout = 0;
 		while (!fromServer.ready() && timeout < 9) {
 			Thread.sleep(1000);
-			timeout++;
+			++timeout;
 		}
 
 		// still not ready or timeout
@@ -71,7 +67,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 			msg = fromServer.readLine();
 			if (msg == null || msg.equals("")) {
 				Thread.sleep(1000);
-				timeout++;
+				++timeout;
 			} else {
 				break;
 			}
@@ -140,16 +136,13 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 		int numberOfSyncLoops = settings.getNumberOfSyncLoops();
 		long time_rtt_min = Long.MAX_VALUE;
 		long time_adjust = 0;
-		for (int i = 0; i < numberOfSyncLoops; i++) { // send multiple time
-														// requests and pick
-														// shortest RTT
+		// send multiple time requests and pick shortest RTT
+		for (int i = 0; i < numberOfSyncLoops; i++) {
 			// send RadioServer system time
 			long timemillis = System.currentTimeMillis();
 			long seconds = timemillis / 1000;
-			long deltaTimemillis = timemillis - seconds * 1000; // Milliseconds
-																// as long of
-																// current
-																// second
+			// Milliseconds as long of current second
+			long deltaTimemillis = timemillis - seconds * 1000;
 			// Time since last full minute in 0,1 s, lowest 16 bit
 			// after 1 complete minute, counter will continue with 601, 602,...
 			// up to 0xffff, than wrap to 0x0000
@@ -188,12 +181,8 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 			String time_string_client = ms2_match.group(3);
 			long time_long_client = Long.parseLong(time_string_client, 16);
 
-			if (msid != PagingMessageType.SYNCREQUEST.getValue() || !time_string_server.equals(time_string_resp)) { // ckeck
-																													// correctness
-																													// of
-																													// message
-																													// 2
-																													// response
+			// ckeck correctness of message 2 response
+			if (msid != PagingMessageType.SYNCREQUEST.getValue() || !time_string_server.equals(time_string_resp)) {
 				throw new TransmitterDeviceException("Wrong Sync Response: " + resp);
 			}
 
@@ -201,14 +190,8 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 			long rtt = time_rx - time_tx;
 			if (rtt < time_rtt_min) {
 				time_rtt_min = rtt;
-				time_adjust = (time_tx + rtt / 2) - time_long_client; // my time
-																		// when
-																		// client
-																		// received
-																		// message
-																		// -
-																		// client
-																		// time
+				// my time when client received message - client time
+				time_adjust = (time_tx + rtt / 2) - time_long_client;
 			}
 		}
 		// 2.b) adapt client time

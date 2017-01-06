@@ -62,7 +62,7 @@ public class NewsResource extends AbstractResource {
 			throw new EmptyBodyException();
 
 		// Check whether OWNER of rubric
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
+		checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
 				restListener.getState().getRubrics().findByName(news.getRubricName()));
 
 		return handleObject(news, "postNews", true, false);
