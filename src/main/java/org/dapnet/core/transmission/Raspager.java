@@ -34,7 +34,7 @@ public abstract class Raspager extends TransmitterDevice {
 
 	public Raspager(Transmitter transmitter, TransmitterDeviceListener listener, DeviceType deviceType) {
 		super(transmitter, listener);
-		this.transmitterDeviceProtocol = new RaspagerProtocol(deviceType);
+		deviceProtocol = new RaspagerProtocol(deviceType);
 	}
 
 	private void cleanup() {
@@ -51,9 +51,9 @@ public abstract class Raspager extends TransmitterDevice {
 				logger.info("Successfully connected to " + this);
 
 				// Handle Welcome
-				transmitterDeviceProtocol.handleWelcome(this, toServer, fromServer);
+				deviceProtocol.handleWelcome(this, toServer, fromServer);
 				logger.info("Successfully welcome with " + this);
-				transmitterDeviceListener.handleTransmitterDeviceStarted(this);
+				deviceListener.handleTransmitterDeviceStarted(this);
 
 				// Handle Messages until Interrupt or Error
 				handleMessages();
@@ -76,13 +76,13 @@ public abstract class Raspager extends TransmitterDevice {
 		}
 		cleanup();
 		logger.info("Successfully stopped " + this);
-		transmitterDeviceListener.handleTransmitterDeviceStopped(this);
+		deviceListener.handleTransmitterDeviceStopped(this);
 
 	}
 
 	protected void connect() throws TransmitterDeviceException, InterruptedException {
 		// first try to disconnect to remove an existing socket (if present)
-		this.disconnect();
+		disconnect();
 
 		Socket socket;
 		int numberOfReconnects = 0;
@@ -91,8 +91,10 @@ public abstract class Raspager extends TransmitterDevice {
 				socket = new Socket();
 				socket.connect(new InetSocketAddress(address.getIpAddress().getHostAddress(), address.getPort()),
 						settings.getConnectionTimeout());
-				this.deviceSocket = socket;
+				deviceSocket = socket;
+
 				setupDeviceIO();
+
 				return;
 			} catch (IOException e) {
 				numberOfReconnects++;
@@ -119,24 +121,29 @@ public abstract class Raspager extends TransmitterDevice {
 	protected void handleMessages() throws TransmitterDeviceException, InterruptedException, IOException {
 		while (!thread.isInterrupted()) {
 			// Blocking until Message is available
-			Message message = this.getMessage();
+			Message message = getMessage();
 			// Wait until next TX Slot
 			// thread.sleep(getTimeToNextOpenSlot());
 
 			startMessageCount();
+
 			while (true) {
-				this.transmitterDeviceProtocol.handleMessage(message, toServer, fromServer);
-				logger.info("Successfully sent message \"" + message.getText() + "\" to " + message.getAddress()
-						+ " with " + this);
+				deviceProtocol.handleMessage(message, toServer, fromServer);
 				increaseMessageCount(message);
-				if (messageQueue.isEmpty() || isMessageCountOverflowed(messageQueue.peek()))
+
+				logger.info("Successfully sent message \"{}\" to {} with {}", message.getText(), message.getAddress(),
+						this);
+
+				if (messageQueue.isEmpty() || isMessageCountOverflowed(messageQueue.peek())) {
 					break;
-				else if (thread.isInterrupted())
+				} else if (thread.isInterrupted()) {
 					throw new InterruptedException();
-				else
-					message = this.getMessage();
+				} else {
+					message = getMessage();
+				}
 			}
 		}
+
 		throw new InterruptedException();
 	}
 
@@ -148,7 +155,7 @@ public abstract class Raspager extends TransmitterDevice {
 		// No consideration of the message length
 		// messageCount = messageCount + (message.getText().length() > 40 ? 2 :
 		// 1);
-		messageCount++;
+		++messageCount;
 	}
 
 	protected boolean isMessageCountOverflowed(Message message) {
@@ -179,8 +186,10 @@ public abstract class Raspager extends TransmitterDevice {
 		int phaseTime = (int) (timeMilli % 102400);
 		int slotTime = slot * 6400;
 		int timeDiff = slotTime - phaseTime;
-		if (timeDiff < 0)
+		if (timeDiff < 0) {
 			timeDiff += 102400;
+		}
+
 		return timeDiff - settings.getTransmissionDelay();
 	}
 
@@ -191,6 +200,7 @@ public abstract class Raspager extends TransmitterDevice {
 			if (slot > currentSlot)
 				return slot;
 		}
+
 		return Integer.parseInt(timeSlot.substring(0, 1), 16);
 	}
 }

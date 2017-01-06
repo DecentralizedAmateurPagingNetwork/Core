@@ -41,15 +41,13 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 		this.deviceType = transmitter.getDeviceType();
 		this.status = transmitter.getStatus();
 
-		this.transmitterDeviceListener = transmitterDeviceListener;
-
-		this.messageQueue = new PriorityBlockingQueue<>();
+		this.deviceListener = transmitterDeviceListener;
 	}
 
 	// Handle Thread
 	protected boolean running;
 	protected volatile Thread thread = null;
-	protected TransmitterDeviceListener transmitterDeviceListener;
+	protected TransmitterDeviceListener deviceListener;
 
 	public void start() {
 		if (thread == null) {
@@ -73,16 +71,16 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 	public abstract void run();
 
 	protected void throwTransmitterDeviceException(TransmitterDeviceException e) {
-		if (transmitterDeviceListener != null) {
+		if (deviceListener != null) {
 			logger.warn(this + " throws Exception: " + e.getMessage());
-			transmitterDeviceListener.handleTransmitterDeviceError(this, e);
+			deviceListener.handleTransmitterDeviceError(this, e);
 		}
 	}
 
 	protected void throwTransmitterDeviceOffline(TransmitterDeviceException e) {
-		if (transmitterDeviceListener != null) {
+		if (deviceListener != null) {
 			logger.warn(this + " is offline now and throws Exception: " + e.getMessage());
-			transmitterDeviceListener.handleTransmitterDeviceOffline(this, e);
+			deviceListener.handleTransmitterDeviceOffline(this, e);
 		}
 	}
 
@@ -92,47 +90,47 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 	protected PrintWriter toServer = null;
 
 	protected void disconnect() {
-		if (this.deviceSocket != null) { // clean up aborted connection
+		if (deviceSocket != null) { // clean up aborted connection
 			try {
-				this.deviceSocket.close();
+				deviceSocket.close();
 			} catch (IOException e1) {
 				logger.warn(this + " could not close socket");
 			}
-			this.deviceSocket = null;
+			deviceSocket = null;
 		}
 	}
 
 	protected void setupDeviceIO() throws IOException {
-		this.toServer = new PrintWriter(this.deviceSocket.getOutputStream(), true);
-		this.fromServer = new BufferedReader(new InputStreamReader(this.deviceSocket.getInputStream()));
+		toServer = new PrintWriter(deviceSocket.getOutputStream(), true);
+		fromServer = new BufferedReader(new InputStreamReader(deviceSocket.getInputStream()));
 	}
 
 	protected void closeDeviceIO() {
-		if (this.fromServer != null) {
+		if (fromServer != null) {
 			try {
-				this.fromServer.close();
+				fromServer.close();
 			} catch (IOException e) {
 				logger.warn(this + " could not close BufferedReader");
 			}
-			this.fromServer = null;
+			fromServer = null;
 		}
 
-		if (this.toServer != null) {
-			this.toServer.close();
-			this.fromServer = null;
+		if (toServer != null) {
+			toServer.close();
+			toServer = null;
 		}
 	}
 
 	// Handle Messages
-	protected PriorityBlockingQueue<Message> messageQueue;
-	protected TransmitterDeviceProtocol transmitterDeviceProtocol;
+	protected final PriorityBlockingQueue<Message> messageQueue = new PriorityBlockingQueue<>();
+	protected TransmitterDeviceProtocol deviceProtocol;
 
 	public Message getMessage() throws InterruptedException {
 		return messageQueue.take();
 	}
 
 	public void sendMessage(Message m) {
-		this.messageQueue.add(m);
+		messageQueue.add(m);
 	}
 
 	public void sendMessages(List<Message> m) {

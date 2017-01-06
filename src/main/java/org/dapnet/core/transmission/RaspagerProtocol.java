@@ -36,9 +36,10 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 	}
 
 	private int getSequenceNumber() {
-		int sequenceNumber = this.sequenceNumber;
-		this.sequenceNumber = (this.sequenceNumber + 1) % 256;
-		return sequenceNumber;
+		int sn = sequenceNumber;
+		sequenceNumber = (sequenceNumber + 1) % 256;
+
+		return sn;
 	}
 
 	public void handleWelcome(TransmitterDevice transmitterDevice, PrintWriter toServer, BufferedReader fromServer)

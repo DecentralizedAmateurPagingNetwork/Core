@@ -17,11 +17,11 @@ package org.dapnet.core.transmission;
 import java.util.Date;
 
 public class Message implements Comparable<Message> {
-	private String text;
-	private int address;
-	private Date timestamp;
-	private MessagePriority priority;
-	private FunctionalBits functionalBits;
+	private final String text;
+	private final int address;
+	private final Date timestamp;
+	private final MessagePriority priority;
+	private final FunctionalBits functionalBits;
 
 	public enum MessagePriority {
 		EMERGENCY, TIME, CALL, NEWS, ACTIVATION, RUBRIC

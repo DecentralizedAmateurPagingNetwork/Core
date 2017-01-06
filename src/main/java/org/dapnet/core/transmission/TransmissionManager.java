@@ -35,11 +35,9 @@ public class TransmissionManager {
 			// Possibility to implement TimeZones by handling here
 			// TransmitterGroups
 			// Now sending Time to all connected Devices
-			for (TransmitterDevice transmitterDevice : deviceManager.getTransmitterDevices()) {
-				transmitterDevice.sendMessage(message);
-			}
+			deviceManager.getTransmitterDevices().forEach((e) -> e.sendMessage(message));
 
-			logger.info("Time sent using " + deviceManager.getTransmitterDevices().size() + " Transmitter");
+			logger.info("Time sent using {} Transmitter", deviceManager.getTransmitterDevices().size());
 		} catch (Exception e) {
 			logger.error("Failed to send Time", e);
 		}
@@ -51,10 +49,9 @@ public class TransmissionManager {
 			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(news.getRubric().getTransmitterGroups());
 
-			for (TransmitterDevice transmitterDevice : transmitterDevices)
-				transmitterDevice.sendMessage(message);
+			transmitterDevices.forEach((e) -> e.sendMessage(message));
 
-			logger.info("News sent using " + transmitterDevices.size() + " Transmitter");
+			logger.info("News sent using {} Transmitter", transmitterDevices.size());
 		} catch (Exception e) {
 			logger.error("Failed to send News", e);
 		}
@@ -66,10 +63,9 @@ public class TransmissionManager {
 			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(rubric.getTransmitterGroups());
 
-			for (TransmitterDevice transmitterDevice : transmitterDevices)
-				transmitterDevice.sendMessage(message);
+			transmitterDevices.forEach((e) -> e.sendMessage(message));
 
-			logger.info("Rubric sent using " + transmitterDevices.size() + " Transmitter");
+			logger.info("Rubric sent using {} Transmitter", transmitterDevices.size());
 		} catch (Exception e) {
 			logger.error("Failed to send Rubric", e);
 		}
@@ -81,12 +77,11 @@ public class TransmissionManager {
 			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(call.getTransmitterGroups());
 
-			for (TransmitterDevice transmitterDevice : transmitterDevices)
-				transmitterDevice.sendMessages(messages);
+			transmitterDevices.forEach((e) -> e.sendMessages(messages));
 
-			logger.info("Call sent to " + call.getCallSigns().size() + " CallSigns, to " + messages.size()
-					+ " Pager, using " + call.getTransmitterGroupNames().size() + " TransmitterGroups and "
-					+ transmitterDevices.size() + " Transmitter");
+			logger.info("Call sent to {} CallSigns, to {} Pager, using {} TransmitterGroups and {} Transmitter",
+					call.getCallSigns().size(), messages.size(), call.getTransmitterGroupNames().size(),
+					transmitterDevices.size());
 		} catch (Exception e) {
 			logger.error("Failed to send Call", e);
 		}
@@ -98,10 +93,9 @@ public class TransmissionManager {
 			List<TransmitterDevice> transmitterDevices = deviceManager
 					.getTransmitterDevices(activation.getTransmitterGroups());
 
-			for (TransmitterDevice transmitterDevice : transmitterDevices)
-				transmitterDevice.sendMessage(message);
+			transmitterDevices.forEach((e) -> e.sendMessage(message));
 
-			logger.info("Activation sent using " + transmitterDevices.size() + " Transmitter");
+			logger.info("Activation sent using {} Transmitter", transmitterDevices.size());
 		} catch (Exception e) {
 			logger.error("Failed to send Activation", e);
 		}
