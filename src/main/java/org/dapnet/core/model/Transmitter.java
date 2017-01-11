@@ -68,7 +68,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	protected DeviceType deviceType;
 
 	public enum DeviceType {
-		RASPPAGER1, XOS, PR430, SDRPAGER, DV4mini
+		RASPPAGER1, XOS, PR430, SDRPAGER, DV4MINI, UNKNOWN
 	}
 
 	// Internally set

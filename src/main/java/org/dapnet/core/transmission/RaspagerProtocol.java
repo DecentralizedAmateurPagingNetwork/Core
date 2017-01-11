@@ -93,7 +93,7 @@ public class RaspagerProtocol implements TransmitterDeviceProtocol {
 		case SDRPAGER:
 			expectedSid = "[SDRPager";
 			break;
-		case DV4mini:
+		case DV4MINI:
 			expectedSid = "[DV4mini";
 			break;
 		default:

@@ -43,6 +43,7 @@ public abstract class Raspager extends TransmitterDevice {
 		thread = null;
 	}
 
+	@Override
 	public void run() {
 		while (true) {
 			try {
@@ -165,6 +166,7 @@ public abstract class Raspager extends TransmitterDevice {
 		return (messageCount + 1) > settings.getMaxMessageCount();
 	}
 
+	@Override
 	public String toString() {
 		return name;
 	}

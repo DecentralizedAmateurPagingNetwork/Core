@@ -20,6 +20,6 @@ public class DV4mini extends Raspager {
 	private static final long serialVersionUID = 3949091578203640141L;
 
 	public DV4mini(Transmitter transmitter, TransmitterDeviceListener listener) {
-		super(transmitter, listener, DeviceType.DV4mini);
+		super(transmitter, listener, DeviceType.DV4MINI);
 	}
 }

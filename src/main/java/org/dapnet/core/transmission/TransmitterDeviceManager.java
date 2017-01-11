@@ -65,7 +65,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 				|| transmitter.getDeviceType() == Transmitter.DeviceType.RASPPAGER1
 				|| transmitter.getDeviceType() == Transmitter.DeviceType.PR430
 				|| transmitter.getDeviceType() == Transmitter.DeviceType.SDRPAGER
-				|| transmitter.getDeviceType() == Transmitter.DeviceType.DV4mini) {
+				|| transmitter.getDeviceType() == Transmitter.DeviceType.DV4MINI) {
 			connectToRaspagerDerivative(transmitter);
 		}
 	}
@@ -87,9 +87,11 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 		case SDRPAGER:
 			raspager = new SDRPager(transmitter, this);
 			break;
-		case DV4mini:
+		case DV4MINI:
 			raspager = new DV4mini(transmitter, this);
 			break;
+		default:
+			throw new IllegalArgumentException("Unsupported transmitter device type.");
 		}
 		// Add to Connecting List
 		connectingTransmitterDevices.add(raspager);
