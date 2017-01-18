@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 public interface TransmitterDeviceProtocol {
 	// enum to distinguish between different message types
 	enum PagingMessageType {
-		SYNCREQUEST(2), SYNCORDER(3), SLOTS(4), NUMERIC(5), ALPHANUM(6),;
+		SYNCREQUEST(2), SYNCORDER(3), SLOTS(4), NUMERIC(5), ALPHANUM(6);
 
 		private int value;
 

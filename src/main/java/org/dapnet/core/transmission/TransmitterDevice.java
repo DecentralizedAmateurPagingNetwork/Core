@@ -30,7 +30,7 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 	private static final long serialVersionUID = -1103013950116394580L;
 	private static final Logger logger = LogManager.getLogger(TransmitterDevice.class.getName());
 
-	protected TransmitterDevice(Transmitter transmitter, TransmitterDeviceListener transmitterDeviceListener) {
+	protected TransmitterDevice(Transmitter transmitter, TransmitterDeviceListener deviceListener) {
 		this.name = transmitter.getName();
 		this.longitude = transmitter.getLongitude();
 		this.latitude = transmitter.getLatitude();
@@ -39,9 +39,16 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 		this.timeSlot = transmitter.getTimeSlot();
 		this.ownerNames = transmitter.getOwnerNames();
 		this.deviceType = transmitter.getDeviceType();
+		this.deviceMode = transmitter.getDeviceMode();
 		this.status = transmitter.getStatus();
 
-		this.deviceListener = transmitterDeviceListener;
+		this.deviceListener = deviceListener;
+	}
+
+	protected TransmitterDevice(Socket socket, TransmitterDeviceListener deviceListener) {
+		this.deviceType = DeviceType.UNKNOWN;
+		this.deviceMode = DeviceMode.CLIENT;
+		this.deviceListener = deviceListener;
 	}
 
 	// Handle Thread

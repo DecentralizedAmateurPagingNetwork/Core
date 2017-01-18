@@ -78,7 +78,6 @@ public abstract class Raspager extends TransmitterDevice {
 		cleanup();
 		logger.info("Successfully stopped " + this);
 		deviceListener.handleTransmitterDeviceStopped(this);
-
 	}
 
 	protected void connect() throws TransmitterDeviceException, InterruptedException {

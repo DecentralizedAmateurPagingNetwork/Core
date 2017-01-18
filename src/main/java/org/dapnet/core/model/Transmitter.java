@@ -71,6 +71,13 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		RASPPAGER1, XOS, PR430, SDRPAGER, DV4MINI, UNKNOWN
 	}
 
+	@NotNull
+	protected DeviceMode deviceMode;
+
+	public enum DeviceMode {
+		CLIENT, SERVER
+	}
+
 	// Internally set
 	@NotNull
 	protected Status status;
@@ -151,6 +158,14 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	public void setDeviceType(DeviceType deviceType) {
 		this.deviceType = deviceType;
+	}
+
+	public DeviceMode getDeviceMode() {
+		return deviceMode;
+	}
+
+	public void setDeviceMode(DeviceMode deviceMode) {
+		this.deviceMode = deviceMode;
 	}
 
 	public String getTimeSlot() {

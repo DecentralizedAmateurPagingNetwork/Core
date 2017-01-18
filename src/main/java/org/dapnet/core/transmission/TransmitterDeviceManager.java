@@ -14,14 +14,15 @@
 
 package org.dapnet.core.transmission;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Transmitter;
+import org.dapnet.core.model.Transmitter.DeviceMode;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.list.SearchableArrayList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TransmitterDeviceManager implements TransmitterDeviceListener {
 	private static final Logger logger = LogManager.getLogger(TransmitterDeviceManager.class.getName());
@@ -52,7 +53,6 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 			reconnectTransmitters = null;
 			logger.info("Finished reconnect operation");
 		}
-
 	}
 
 	public void connectToTransmitter(Transmitter transmitter) {
@@ -60,7 +60,9 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 				|| transmitter.getStatus() == Transmitter.Status.DISABLED) {
 			return;
 		}
+
 		disconnectingFromAll = false;
+
 		if (transmitter.getDeviceType() == Transmitter.DeviceType.XOS
 				|| transmitter.getDeviceType() == Transmitter.DeviceType.RASPPAGER1
 				|| transmitter.getDeviceType() == Transmitter.DeviceType.PR430
@@ -71,33 +73,37 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 	}
 
 	private void connectToRaspagerDerivative(Transmitter transmitter) {
-		logger.info("Start connecting to " + transmitter.getName());
-		Raspager raspager = null;
-		// Create TransmitterDevice
-		switch (transmitter.getDeviceType()) {
-		case XOS:
-			raspager = new XOS(transmitter, this);
-			break;
-		case PR430:
-			raspager = new PR430(transmitter, this);
-			break;
-		case RASPPAGER1:
-			raspager = new Raspager1(transmitter, this);
-			break;
-		case SDRPAGER:
-			raspager = new SDRPager(transmitter, this);
-			break;
-		case DV4MINI:
-			raspager = new DV4mini(transmitter, this);
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported transmitter device type.");
-		}
-		// Add to Connecting List
-		connectingTransmitterDevices.add(raspager);
+		TransmitterDevice device = null;
+		if (transmitter instanceof RaspagerClient) {
+			device = (RaspagerClient) transmitter;
+		} else if (transmitter.getDeviceMode() == DeviceMode.SERVER) {
+			logger.info("Start connecting to " + transmitter.getName());
 
-		// Start Device
-		raspager.start();
+			switch (transmitter.getDeviceType()) {
+			case XOS:
+				device = new XOS(transmitter, this);
+				break;
+			case PR430:
+				device = new PR430(transmitter, this);
+				break;
+			case RASPPAGER1:
+				device = new Raspager1(transmitter, this);
+				break;
+			case SDRPAGER:
+				device = new SDRPager(transmitter, this);
+				break;
+			case DV4MINI:
+				device = new DV4mini(transmitter, this);
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported transmitter device type.");
+			}
+		} else {
+			throw new IllegalArgumentException("Cannot connect to transmitter.");
+		}
+
+		connectingTransmitterDevices.add(device);
+		device.start();
 	}
 
 	public synchronized void disconnectFromTransmitter(Transmitter transmitter) {
@@ -108,7 +114,6 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 			// Move Device to disconnecting List
 			connectedTransmitterDevices.remove(device);
 			disconnectingTransmitterDevices.add(device);
-
 		} else if (connectingTransmitterDevices.contains(transmitter.getName())) {
 			logger.info("Start disconnecting from " + transmitter.getName());
 			TransmitterDevice device = connectingTransmitterDevices.findByName(transmitter.getName());
@@ -116,9 +121,10 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 			// Move Device to disconnecting List
 			connectingTransmitterDevices.remove(device);
 			disconnectingTransmitterDevices.add(device);
-		} else
+		} else {
 			logger.warn("Cannot disconnect from transmitter " + transmitter.getName()
 					+ " because it is not connected or connecting");
+		}
 	}
 
 	public void disconnectFromAllTransmitters() {
@@ -129,10 +135,11 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 				&& disconnectingTransmitterDevices.isEmpty()) {
 			logger.info("Successfully disconnected from all Transmitters");
 
-			if (reconnecting)
+			if (reconnecting) {
 				connectToTransmitters(reconnectTransmitters);
-			else
+			} else {
 				listener.handleDisconnectedFromAllTransmitters();
+			}
 		}
 
 		while (!connectingTransmitterDevices.isEmpty()) {
@@ -159,16 +166,18 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 	}
 
 	private List<String> getTransmitterNames(List<TransmitterGroup> transmitterGroups) {
-		ArrayList<String> transmitter = new ArrayList<>();
 		try {
+			ArrayList<String> transmitter = new ArrayList<>();
+
 			for (TransmitterGroup transmitterGroup : transmitterGroups) {
 				transmitter.addAll(transmitterGroup.getTransmitterNames());
 			}
+
+			return transmitter;
 		} catch (Exception e) {
 			logger.error("Failed to get TransmitterNames", e);
 			return null;
 		}
-		return transmitter;
 	}
 
 	public void handleTransmitterDeviceError(TransmitterDevice transmitterDevice, TransmitterDeviceException e) {
@@ -186,9 +195,12 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 		logger.warn(transmitterDevice.getName() + " is offline due to an exception: " + e.getMessage());
 
 		if (connectedTransmitterDevices.contains(transmitterDevice)) {
-			// Move Device to connecting List
 			connectedTransmitterDevices.remove(transmitterDevice);
-			connectingTransmitterDevices.add(transmitterDevice);
+
+			// Move device to connecting list if it is a server device
+			if (transmitterDevice.getDeviceMode() == DeviceMode.SERVER) {
+				connectingTransmitterDevices.add(transmitterDevice);
+			}
 
 			// Set DeviceStatus
 			transmitterDevice.setStatus(Transmitter.Status.OFFLINE);
@@ -247,16 +259,11 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 			break;
 		}
 
-		// Remove from TransmitterDeviceLists
-		if (connectingTransmitterDevices.contains(transmitterDevice)) {
-			connectingTransmitterDevices.remove(transmitterDevice);
-		}
-		if (connectedTransmitterDevices.contains(transmitterDevice)) {
-			connectedTransmitterDevices.remove(transmitterDevice);
-		}
-		if (disconnectingTransmitterDevices.contains(transmitterDevice)) {
-			disconnectingTransmitterDevices.remove(transmitterDevice);
-		}
+		// Remove from TransmitterDeviceLists (remove returns false if device
+		// does not exist)
+		connectingTransmitterDevices.remove(transmitterDevice);
+		connectedTransmitterDevices.remove(transmitterDevice);
+		disconnectingTransmitterDevices.remove(transmitterDevice);
 
 		// DisconnectingFromAll completed?
 		if (disconnectingFromAll && connectingTransmitterDevices.isEmpty() && connectedTransmitterDevices.isEmpty()

@@ -25,6 +25,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.scheduler.SchedulerManager;
+import org.dapnet.core.transmission.Server;
 import org.dapnet.core.transmission.TransmissionManager;
 
 public class DAPNETCore {
@@ -32,20 +33,31 @@ public class DAPNETCore {
 	private RestManager restManager;
 	private TransmissionManager transmissionManager;
 	private SchedulerManager schedulerManager;
+	private Server deviceServer;
 
 	private void start() {
 		try {
 			// Start
 			logger.info("Starting DAPNET_CORE Version " + CORE_VERSION + "...");
+
 			logger.info("Starting TransmissionManager");
 			transmissionManager = new TransmissionManager();
+
+			logger.info("Starting device server");
+			deviceServer = new Server(50034, transmissionManager.getTransmitterDeviceManager());
+			Thread serverThread = new Thread(deviceServer);
+			serverThread.start();
+
 			logger.info("Starting Cluster");
 			clusterManager = new ClusterManager(transmissionManager);
+
 			logger.info("Starting RestManager");
 			restManager = new RestManager(clusterManager);
 			restManager.startServer();
+
 			logger.info("Starting SchedulerManager");
 			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
+
 			logger.info("DAPNETCore started");
 		} catch (Exception e) {
 			logger.fatal("Exception : ", e);
@@ -66,6 +78,14 @@ public class DAPNETCore {
 
 		if (schedulerManager != null) {
 			schedulerManager.stop();
+		}
+
+		try {
+			if (deviceServer != null) {
+				deviceServer.close();
+			}
+		} catch (Exception ex) {
+			logger.error("Failed to close the device server.", ex);
 		}
 
 		// if (clusterManager == null || restManager == null || schedulerManager
