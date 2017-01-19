@@ -84,7 +84,7 @@ public class TransmissionSettings implements Serializable {
 
 	public class ServerSettings implements Serializable {
 		private static final long serialVersionUID = 5452321606678683312L;
-		private int port = 50034;
+		private int port = 43434;
 
 		public int getPort() {
 			return port;
