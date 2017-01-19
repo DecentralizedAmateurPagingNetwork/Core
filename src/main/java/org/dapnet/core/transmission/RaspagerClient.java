@@ -16,7 +16,8 @@ public class RaspagerClient extends TransmitterDevice {
 
 	public RaspagerClient(Socket socket, TransmitterDeviceListener deviceListener) {
 		super(socket, deviceListener);
-
+		// TODO Nope
+		this.deviceType = DeviceType.RASPPAGER1;
 		this.status = Status.OFFLINE;
 		deviceProtocol = new RaspagerClientProtocol();
 	}

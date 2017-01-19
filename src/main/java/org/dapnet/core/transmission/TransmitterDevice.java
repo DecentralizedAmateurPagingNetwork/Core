@@ -46,6 +46,7 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 	}
 
 	protected TransmitterDevice(Socket socket, TransmitterDeviceListener deviceListener) {
+		this.deviceSocket = socket;
 		this.deviceType = DeviceType.UNKNOWN;
 		this.deviceMode = DeviceMode.CLIENT;
 		this.deviceListener = deviceListener;
