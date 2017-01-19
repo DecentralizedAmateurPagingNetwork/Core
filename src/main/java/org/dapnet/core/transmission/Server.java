@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 
 public class Server implements Runnable, AutoCloseable {
 
@@ -15,8 +16,8 @@ public class Server implements Runnable, AutoCloseable {
 	private volatile boolean shutdownRequested = false;
 	private volatile ServerSocket serverSocket;
 
-	public Server(int port, TransmitterDeviceManager deviceManager) {
-		this.port = port;
+	public Server(TransmitterDeviceManager deviceManager) {
+		this.port = Settings.getTransmissionSettings().getServerSettings().getPort();
 		this.deviceManager = deviceManager;
 	}
 

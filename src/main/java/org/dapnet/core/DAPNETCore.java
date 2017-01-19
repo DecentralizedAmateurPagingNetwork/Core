@@ -44,7 +44,7 @@ public class DAPNETCore {
 			transmissionManager = new TransmissionManager();
 
 			logger.info("Starting device server");
-			deviceServer = new Server(50034, transmissionManager.getTransmitterDeviceManager());
+			deviceServer = new Server(transmissionManager.getTransmitterDeviceManager());
 			Thread serverThread = new Thread(deviceServer);
 			serverThread.start();
 

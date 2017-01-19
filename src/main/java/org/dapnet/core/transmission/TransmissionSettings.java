@@ -20,6 +20,7 @@ public class TransmissionSettings implements Serializable {
 	private static final long serialVersionUID = 6990520510506509511L;
 	private PagingProtocolSettings pagingProtocolSettings = new PagingProtocolSettings();
 	private RaspagerSettings raspagerSettings = new RaspagerSettings();
+	private ServerSettings serverSettings = new ServerSettings();
 
 	public PagingProtocolSettings getPagingProtocolSettings() {
 		return pagingProtocolSettings;
@@ -27,6 +28,10 @@ public class TransmissionSettings implements Serializable {
 
 	public RaspagerSettings getRaspagerSettings() {
 		return raspagerSettings;
+	}
+
+	public ServerSettings getServerSettings() {
+		return serverSettings;
 	}
 
 	public class PagingProtocolSettings implements Serializable {
@@ -74,6 +79,15 @@ public class TransmissionSettings implements Serializable {
 
 		public int getTransmissionDelay() {
 			return transmissionDelay;
+		}
+	}
+
+	public class ServerSettings implements Serializable {
+		private static final long serialVersionUID = 5452321606678683312L;
+		private int port = 50034;
+
+		public int getPort() {
+			return port;
 		}
 	}
 }
