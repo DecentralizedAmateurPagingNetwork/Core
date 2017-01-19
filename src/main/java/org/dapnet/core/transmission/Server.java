@@ -61,6 +61,7 @@ public class Server implements Runnable, AutoCloseable {
 
 	private void handleClient(Socket socket) {
 		try {
+			LOGGER.info("Connection accepted, creating client instance");
 			RaspagerClient client = new RaspagerClient(socket, deviceManager);
 			deviceManager.connectToTransmitter(client);
 		} catch (Exception ex) {
