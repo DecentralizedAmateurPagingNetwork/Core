@@ -20,7 +20,6 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Transmitter;
-import org.dapnet.core.model.Transmitter.DeviceMode;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.list.SearchableArrayList;
 
@@ -180,7 +179,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 		}
 	}
 
-	public void handleTransmitterDeviceError(TransmitterDevice transmitterDevice, TransmitterDeviceException e) {
+	public void onDeviceError(TransmitterDevice transmitterDevice, TransmitterDeviceException e) {
 		logger.warn(transmitterDevice.getName() + " throw Exception: " + e.getMessage());
 
 		// Set Device Status
@@ -191,7 +190,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 		}
 	}
 
-	public void handleTransmitterDeviceOffline(TransmitterDevice transmitterDevice, TransmitterDeviceException e) {
+	public void onDeviceOffline(TransmitterDevice transmitterDevice, TransmitterDeviceException e) {
 		logger.warn(transmitterDevice.getName() + " is offline due to an exception: " + e.getMessage());
 
 		if (connectedTransmitterDevices.contains(transmitterDevice)) {
@@ -214,7 +213,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 	}
 
 	@Override
-	public void handleTransmitterDeviceStarted(TransmitterDevice transmitterDevice) {
+	public void onDeviceStarted(TransmitterDevice transmitterDevice) {
 		if (connectingTransmitterDevices.contains(transmitterDevice)) {
 			logger.info("Connected to " + transmitterDevice.getName() + " successfully");
 
@@ -235,7 +234,7 @@ public class TransmitterDeviceManager implements TransmitterDeviceListener {
 	}
 
 	@Override
-	public void handleTransmitterDeviceStopped(TransmitterDevice transmitterDevice) {
+	public void onDeviceStopped(TransmitterDevice transmitterDevice) {
 		// Log and change Status
 		switch (transmitterDevice.getStatus()) {
 		case ERROR:

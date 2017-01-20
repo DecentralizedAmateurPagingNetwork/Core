@@ -54,7 +54,7 @@ public abstract class Raspager extends TransmitterDevice {
 				// Handle Welcome
 				deviceProtocol.handleWelcome(this, toServer, fromServer);
 				logger.info("Successfully welcome with " + this);
-				deviceListener.handleTransmitterDeviceStarted(this);
+				deviceListener.onDeviceStarted(this);
 
 				// Handle Messages until Interrupt or Error
 				handleMessages();
@@ -77,7 +77,7 @@ public abstract class Raspager extends TransmitterDevice {
 		}
 		cleanup();
 		logger.info("Successfully stopped " + this);
-		deviceListener.handleTransmitterDeviceStopped(this);
+		deviceListener.onDeviceStopped(this);
 	}
 
 	protected void connect() throws TransmitterDeviceException, InterruptedException {

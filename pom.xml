@@ -89,6 +89,11 @@
 			<artifactId>jersey-container-grizzly2-http</artifactId>
 			<version>2.25</version>
 		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.7.Final</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

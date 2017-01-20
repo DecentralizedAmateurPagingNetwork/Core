@@ -71,18 +71,20 @@ public class Message implements Comparable<Message> {
 
 	@Override
 	public int compareTo(Message message) {
-		if (priority.ordinal() < message.getPriority().ordinal())
+		if (priority.ordinal() < message.getPriority().ordinal()) {
 			return -1;
-		if (priority.ordinal() > message.getPriority().ordinal())
+		} else if (priority.ordinal() > message.getPriority().ordinal()) {
 			return 1;
+		}
 
 		// Same Priority, check Timestamp
-		if (timestamp.before(message.getTimestamp()))
+		if (timestamp.before(message.getTimestamp())) {
 			return -1;
-		if (timestamp.after(message.getTimestamp()))
+		} else if (timestamp.after(message.getTimestamp())) {
 			return 1;
-
-		// Also same Timestamp:
-		return 0;
+		} else {
+			return 0;
+		}
 	}
+
 }

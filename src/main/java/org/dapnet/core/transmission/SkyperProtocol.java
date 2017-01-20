@@ -29,12 +29,14 @@ import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 
 public class SkyperProtocol implements PagerProtocol {
-	private static final TransmissionSettings.PagingProtocolSettings settings = Settings.getTransmissionSettings()
+	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
-	private static final Logger logger = LogManager.getLogger(SkyperProtocol.class.getName());
+	private static final Logger logger = LogManager.getLogger(SkyperProtocol.class);
 
+	@Override
 	public List<Message> createMessagesFromCall(Call call) {
 		// Collect all addresses
 		List<Integer> addresses = new ArrayList<>();
@@ -58,6 +60,7 @@ public class SkyperProtocol implements PagerProtocol {
 		return messages;
 	}
 
+	@Override
 	public Message createMessageFromTime(Date date) {
 		// Generate timeString in necessary format
 		String timeString = new SimpleDateFormat("HHmmss   ddMMyy").format(date);
@@ -66,6 +69,7 @@ public class SkyperProtocol implements PagerProtocol {
 		return new Message(timeString, 2504, Message.MessagePriority.TIME, Message.FunctionalBits.NUMERIC);
 	}
 
+	@Override
 	public Message createMessageFromRubric(Rubric rubric) {
 		// Generate Rubric String: Coding adapted from Funkrufmaster
 		String rubricString = new String("1");
@@ -83,6 +87,7 @@ public class SkyperProtocol implements PagerProtocol {
 		return message;
 	}
 
+	@Override
 	public Message createMessageFromNews(News news) {
 		// Generate News String: Coding adapted from Funkrufmaster
 		String newsString = new String("");

@@ -27,10 +27,12 @@ import java.util.ArrayList;
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = -8142160974834002456L;
 
-	// ID
 	@NotNull
 	@Size(min = 3, max = 20)
 	protected String name;
+
+	@NotNull
+	protected String authKey;
 
 	@NotNull
 	@Digits(integer = 3, fraction = 8)
@@ -65,43 +67,16 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	protected ArrayList<String> ownerNames;
 
 	@NotNull
-	protected DeviceType deviceType;
-
-	public enum DeviceType {
-		RASPPAGER1, XOS, PR430, SDRPAGER, DV4MINI, UNKNOWN
-	}
+	protected String deviceType;
 
 	@NotNull
-	protected DeviceMode deviceMode;
+	protected String deviceVersion;
 
-	public enum DeviceMode {
-		CLIENT, SERVER
-	}
-
-	// Internally set
 	@NotNull
 	protected Status status;
 
 	public enum Status {
-		ONLINE, // successfully connected
-		OFFLINE, // (re)connection is in progress or will start in some moments
-		ERROR, // connections finally fails (count of retransmission exceed
-		DISABLED // manually deactivated, won't be connected
-	}
-
-	public Transmitter() {
-	}
-
-	public Transmitter(String name, String longitude, String latitude, String power, IpAddress address,
-			DeviceType deviceType, String timeSlot, ArrayList<String> ownerNames) {
-		this.name = name;
-		this.longitude = longitude;
-		this.latitude = latitude;
-		this.power = power;
-		this.address = address;
-		this.deviceType = deviceType;
-		this.timeSlot = timeSlot;
-		this.ownerNames = ownerNames;
+		ONLINE, OFFLINE, ERROR, DISABLED
 	}
 
 	public String getName() {
@@ -110,6 +85,14 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getAuthKey() {
+		return authKey;
+	}
+
+	public void setAuthKey(String authKey) {
+		this.authKey = authKey;
 	}
 
 	public String getLongitude() {
@@ -152,20 +135,20 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		this.address = address;
 	}
 
-	public DeviceType getDeviceType() {
+	public String getDeviceType() {
 		return deviceType;
 	}
 
-	public void setDeviceType(DeviceType deviceType) {
+	public void setDeviceType(String deviceType) {
 		this.deviceType = deviceType;
 	}
 
-	public DeviceMode getDeviceMode() {
-		return deviceMode;
+	public String getDeviceVersion() {
+		return deviceVersion;
 	}
 
-	public void setDeviceMode(DeviceMode deviceMode) {
-		this.deviceMode = deviceMode;
+	public void setDeviceVersion(String deviceVersion) {
+		this.deviceVersion = deviceVersion;
 	}
 
 	public String getTimeSlot() {
@@ -192,7 +175,6 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		this.status = status;
 	}
 
-	// Getter returning references instead of String
 	private static State state;
 
 	public static void setState(State statePar) {
@@ -218,13 +200,18 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")
 	public Node getNode() throws Exception {
-		if (state == null)
+		if (state != null) {
+			return state.getNodes().findByName(nodeName);
+		} else {
 			throw new Exception("StateNotSetException");
-		return state.getNodes().findByName(nodeName);
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "Transmitter{" + "name='" + name + '\'' + ", status=" + status + '}';
+		return String.format("Transmitter{name=\'%s', status=%s}", name, status);
+		// return "Transmitter{" + "name='" + name + '\'' + ", status=" + status
+		// + '}';
 	}
+
 }

@@ -1,20 +1,21 @@
 package org.dapnet.core.transmission;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
+
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class Server implements Runnable, AutoCloseable {
 
 	private static final Logger LOGGER = LogManager.getLogger(Server.class);
 	private final int port;
 	private final TransmitterDeviceManager deviceManager;
-	private volatile boolean shutdownRequested = false;
-	private volatile ServerSocket serverSocket;
+	private volatile ChannelFuture serverFuture;
 
 	public Server(TransmitterDeviceManager deviceManager) {
 		this.port = Settings.getTransmissionSettings().getServerSettings().getPort();
@@ -23,64 +24,38 @@ public class Server implements Runnable, AutoCloseable {
 
 	@Override
 	public void run() {
+		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
+
 		try {
-			serverSocket = new ServerSocket(port);
+			ServerBootstrap b = new ServerBootstrap();
+			b.group(bossGroup, workerGroup);
+			b.channel(NioServerSocketChannel.class);
+			b.childHandler(new ServerInitializer(deviceManager));
+
+			serverFuture = b.bind(port).sync();
+
+			LOGGER.info("Server started on port: {}", port);
+
+			serverFuture.channel().closeFuture().sync();
 		} catch (Exception ex) {
-			LOGGER.fatal("Failed to start server.", ex);
-			return;
-		}
-
-		LOGGER.info("Server started on port: {}", port);
-
-		while (!shutdownRequested) {
-			Socket clsock = null;
-			try {
-				clsock = serverSocket.accept();
-			} catch (Exception ex) {
-				if (!shutdownRequested) {
-					LOGGER.error("Exception in server.", ex);
-				}
-			}
-
-			if (clsock != null) {
-				handleClient(clsock);
-			}
-		}
-
-		try {
-			if (serverSocket != null) {
-				serverSocket.close();
-				serverSocket = null;
-			}
-		} catch (IOException ex) {
-			LOGGER.error("Failed to close the server socket", ex);
+			LOGGER.fatal("Exception in server thread.", ex);
+		} finally {
+			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
 		}
 
 		LOGGER.info("Server stopped.");
 	}
 
-	private void handleClient(Socket socket) {
-		try {
-			LOGGER.info("Connection accepted, creating client instance");
-			RaspagerClient client = new RaspagerClient(socket, deviceManager);
-			deviceManager.connectToTransmitter(client);
-		} catch (Exception ex) {
-			LOGGER.error("Failed to create client instance.", ex);
-
-			try {
-				socket.close();
-			} catch (Exception ex2) {
-				LOGGER.error("Failed to close client socket.", ex2);
-			}
-		}
-	}
-
 	@Override
 	public void close() throws Exception {
-		shutdownRequested = true;
-
-		if (serverSocket != null) {
-			serverSocket.close();
+		try {
+			if (serverFuture != null) {
+				serverFuture.channel().close().sync();
+			}
+		} catch (InterruptedException e) {
+			LOGGER.warn("Interrupted while closing server channel.", e);
 		}
 	}
 

@@ -15,11 +15,11 @@
 package org.dapnet.core.transmission;
 
 public interface TransmitterDeviceListener {
-	void handleTransmitterDeviceError(TransmitterDevice transmitterDevice, TransmitterDeviceException e);
+	void onDeviceError(TransmitterDevice device, TransmitterDeviceException e);
 
-	void handleTransmitterDeviceOffline(TransmitterDevice transmitterDevice, TransmitterDeviceException e);
+	void onDeviceOffline(TransmitterDevice device, TransmitterDeviceException e);
 
-	void handleTransmitterDeviceStarted(TransmitterDevice transmitterDevice);
+	void onDeviceStarted(TransmitterDevice device);
 
-	void handleTransmitterDeviceStopped(TransmitterDevice transmitterDevice);
+	void onDeviceStopped(TransmitterDevice device);
 }

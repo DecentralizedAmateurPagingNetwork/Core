@@ -39,7 +39,6 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 		this.timeSlot = transmitter.getTimeSlot();
 		this.ownerNames = transmitter.getOwnerNames();
 		this.deviceType = transmitter.getDeviceType();
-		this.deviceMode = transmitter.getDeviceMode();
 		this.status = transmitter.getStatus();
 
 		this.deviceListener = deviceListener;
@@ -47,8 +46,6 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 
 	protected TransmitterDevice(Socket socket, TransmitterDeviceListener deviceListener) {
 		this.deviceSocket = socket;
-		this.deviceType = DeviceType.UNKNOWN;
-		this.deviceMode = DeviceMode.CLIENT;
 		this.deviceListener = deviceListener;
 	}
 
@@ -81,14 +78,14 @@ public abstract class TransmitterDevice extends Transmitter implements Runnable 
 	protected void throwTransmitterDeviceException(TransmitterDeviceException e) {
 		if (deviceListener != null) {
 			logger.warn(this + " throws Exception: " + e.getMessage());
-			deviceListener.handleTransmitterDeviceError(this, e);
+			deviceListener.onDeviceError(this, e);
 		}
 	}
 
 	protected void throwTransmitterDeviceOffline(TransmitterDeviceException e) {
 		if (deviceListener != null) {
 			logger.warn(this + " is offline now and throws Exception: " + e.getMessage());
-			deviceListener.handleTransmitterDeviceOffline(this, e);
+			deviceListener.onDeviceOffline(this, e);
 		}
 	}
 
