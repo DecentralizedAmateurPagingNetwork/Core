@@ -7,6 +7,7 @@ import java.util.Set;
 import org.dapnet.core.model.Transmitter;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 
 /**
  * This class holds the client session.
@@ -34,6 +35,15 @@ class TransmitterClient {
 		}
 
 		this.channel = channel;
+	}
+
+	/**
+	 * Returns the unique channel identifier of this transmitter client.
+	 * 
+	 * @return Unique channel identifier.
+	 */
+	public ChannelId getId() {
+		return channel.id();
 	}
 
 	/**

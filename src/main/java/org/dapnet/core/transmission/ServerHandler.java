@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.model.Transmitter;
+import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -21,12 +23,17 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private static final Logger logger = LogManager.getLogger(ServerHandler.class);
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
 	// Ack message #04 +
-	private final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}+) (\\+)");
+	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}+) (\\+)");
+	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
+	private static final Pattern authPattern = Pattern
+			.compile("\\[(\\w+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
+	private final TransmitterManager manager;
 	private final TransmitterClient client;
 	private State state = State.OFFLINE;
 	private ChannelPromise handshakePromise;
 
-	public ServerHandler(TransmitterClient client) {
+	public ServerHandler(TransmitterManager manager, TransmitterClient client) {
+		this.manager = manager;
 		this.client = client;
 	}
 
@@ -61,9 +68,11 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		state = State.OFFLINE;
 
-		int pending = client.getPendingAckCount();
-		if (pending > 0) {
-			logger.warn("Pending acks: {}", pending);
+		if (client != null) {
+			int pending = client.getPendingAckCount();
+			if (pending > 0) {
+				logger.warn("Pending acks: {}", pending);
+			}
 		}
 	}
 
@@ -110,18 +119,25 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
-		// [RasPager v1.0-SCP-#2345678 test1234]
-		// TODO Pattern
-		Pattern authPattern = Pattern.compile("");
 		Matcher authMatcher = authPattern.matcher(msg);
-
 		if (!authMatcher.matches()) {
-			throw new TransmitterDeviceException("Invalid auth message format.");
+			throw new TransmitterDeviceException("Invalid welcome message format.");
 		}
 
 		String type = authMatcher.group(1);
 		String version = authMatcher.group(2);
 		String key = authMatcher.group(3);
+
+		Transmitter t = manager.auth(key);
+		if (t == null) {
+			throw new TransmitterDeviceException("Invalid auth key supplied.");
+		}
+
+		t.setDeviceType(type);
+		t.setDeviceVersion(version);
+		// t.setAddress(new IpAddress(ctx.channel().remoteAddress()));
+
+		client.setTransmitter(t);
 
 		// TODO Impl
 		state = State.SYNC_SYS_TIME;

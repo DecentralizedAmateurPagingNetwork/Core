@@ -16,10 +16,10 @@ import io.netty.handler.codec.string.StringEncoder;
 class ServerInitializer extends ChannelInitializer<SocketChannel> {
 	private static final StringEncoder encoder = new StringEncoder();
 	private static final StringDecoder decoder = new StringDecoder();
-	private final TransmitterDeviceManager deviceManager;
+	private final TransmitterManager manager;
 
-	public ServerInitializer(TransmitterDeviceManager deviceManager) {
-		this.deviceManager = deviceManager;
+	public ServerInitializer(TransmitterManager manager) {
+		this.manager = manager;
 	}
 
 	@Override
@@ -33,7 +33,7 @@ class ServerInitializer extends ChannelInitializer<SocketChannel> {
 		p.addLast(decoder);
 		p.addLast(new MessageEncoder(client));
 		p.addLast(encoder);
-		p.addLast(new ServerHandler(client));
+		p.addLast(new ServerHandler(manager, client));
 	}
 
 }
