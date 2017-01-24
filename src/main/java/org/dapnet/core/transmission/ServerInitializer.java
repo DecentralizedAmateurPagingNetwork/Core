@@ -16,6 +16,7 @@ import io.netty.handler.codec.string.StringEncoder;
 class ServerInitializer extends ChannelInitializer<SocketChannel> {
 	private static final StringEncoder encoder = new StringEncoder();
 	private static final StringDecoder decoder = new StringDecoder();
+	private static final MessageEncoder msgEncoder = new MessageEncoder();
 	private final TransmitterManager manager;
 
 	public ServerInitializer(TransmitterManager manager) {
@@ -24,16 +25,13 @@ class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
 	@Override
 	protected void initChannel(SocketChannel ch) throws Exception {
-		// Create new client instance
-		TransmitterClient client = new TransmitterClient(ch);
-
 		// Setup channel pipeline
 		ChannelPipeline p = ch.pipeline();
 		p.addLast(new DelimiterBasedFrameDecoder(2048, Delimiters.lineDelimiter()));
 		p.addLast(decoder);
-		p.addLast(new MessageEncoder(client));
+		p.addLast(msgEncoder);
 		p.addLast(encoder);
-		p.addLast(new ServerHandler(manager, client));
+		p.addLast(new ServerHandler(manager));
 	}
 
 }

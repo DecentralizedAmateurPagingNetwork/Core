@@ -14,12 +14,12 @@ public class Server implements Runnable, AutoCloseable {
 
 	private static final Logger LOGGER = LogManager.getLogger(Server.class);
 	private final int port;
-	private final TransmitterDeviceManager deviceManager;
+	private final TransmitterManager manager;
 	private volatile ChannelFuture serverFuture;
 
-	public Server(TransmitterDeviceManager deviceManager) {
+	public Server(TransmitterManager manager) {
 		this.port = Settings.getTransmissionSettings().getServerSettings().getPort();
-		this.deviceManager = deviceManager;
+		this.manager = manager;
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class Server implements Runnable, AutoCloseable {
 			ServerBootstrap b = new ServerBootstrap();
 			b.group(bossGroup, workerGroup);
 			b.channel(NioServerSocketChannel.class);
-			b.childHandler(new ServerInitializer(deviceManager));
+			b.childHandler(new ServerInitializer(manager));
 
 			serverFuture = b.bind(port).sync();
 

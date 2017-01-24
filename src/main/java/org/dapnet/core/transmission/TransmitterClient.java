@@ -1,13 +1,15 @@
 package org.dapnet.core.transmission;
 
+import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.dapnet.core.model.Transmitter;
+import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelId;
 
 /**
  * This class holds the client session.
@@ -18,8 +20,10 @@ class TransmitterClient {
 
 	private final Set<Integer> pendingAcks = new HashSet<>();
 	private final Channel channel;
+	private ClientStateHandler stateHandler;
 	private int sequenceNumber = 0;
 	private Transmitter transmitter;
+	private AtomicBoolean handshakeDone = new AtomicBoolean(false);
 
 	/**
 	 * Creates a new client session.
@@ -31,19 +35,10 @@ class TransmitterClient {
 	 */
 	public TransmitterClient(Channel channel) {
 		if (channel == null) {
-			throw new NullPointerException("Channel cannot be null.");
+			throw new NullPointerException("channel");
 		}
 
 		this.channel = channel;
-	}
-
-	/**
-	 * Returns the unique channel identifier of this transmitter client.
-	 * 
-	 * @return Unique channel identifier.
-	 */
-	public ChannelId getId() {
-		return channel.id();
 	}
 
 	/**
@@ -62,6 +57,10 @@ class TransmitterClient {
 	 *            Transmitter data
 	 */
 	public void setTransmitter(Transmitter transmitter) {
+		if (transmitter != null) {
+			transmitter.setAddress(new IpAddress((InetSocketAddress) channel.remoteAddress()));
+		}
+
 		this.transmitter = transmitter;
 	}
 
@@ -73,6 +72,11 @@ class TransmitterClient {
 	 */
 	public void sendMessage(Message msg) {
 		synchronized (channel) {
+			msg.setSequenceNumber(sequenceNumber);
+
+			pendingAcks.add(sequenceNumber + 1);
+			sequenceNumber = (sequenceNumber + 1) % 256;
+
 			channel.writeAndFlush(msg);
 		}
 	}
@@ -92,24 +96,8 @@ class TransmitterClient {
 	}
 
 	/**
-	 * Gets a sequence number and adds it to the list of pending acks.
-	 * 
-	 * @return Sequence number
-	 */
-	public int getSequenceNumber() {
-		synchronized (pendingAcks) {
-			int sn = sequenceNumber;
-			sequenceNumber = (sequenceNumber + 1) % 256;
-
-			pendingAcks.add(sn + 1);
-
-			return sn;
-		}
-	}
-
-	/**
 	 * Acknowledges a sequence number and removes it from the list of pending
-	 * acks.
+	 * acks if it was valid.
 	 * 
 	 * @param sequenceNumber
 	 *            Sequence number to ack.
@@ -132,4 +120,19 @@ class TransmitterClient {
 		}
 	}
 
+	public boolean isHandshakeDone() {
+		return handshakeDone.get();
+	}
+
+	public void setHandshakeDone(boolean done) {
+		this.handshakeDone.set(done);
+	}
+
+	public void setStateHandler(ClientStateHandler handler) {
+		this.stateHandler = handler;
+	}
+
+	public void onReceive(String msg) throws Exception {
+		stateHandler.onReceive(this, msg);
+	}
 }

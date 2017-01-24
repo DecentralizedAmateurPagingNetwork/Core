@@ -5,6 +5,7 @@ import java.util.List;
 import org.dapnet.core.Settings;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 
@@ -13,13 +14,10 @@ import io.netty.handler.codec.MessageToMessageEncoder;
  * 
  * @author Philipp Thiel
  */
+@Sharable
 class MessageEncoder extends MessageToMessageEncoder<Message> {
 
-	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
-			.getPagingProtocolSettings();
-	private final TransmitterClient client;
-
-	private enum PagingMessageType {
+	public enum PagingMessageType {
 		SYNCREQUEST(2), SYNCORDER(3), SLOTS(4), NUMERIC(5), ALPHANUM(6);
 
 		private final int value;
@@ -33,9 +31,8 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 		}
 	}
 
-	public MessageEncoder(TransmitterClient client) {
-		this.client = client;
-	}
+	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
+			.getPagingProtocolSettings();
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
@@ -57,17 +54,10 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 			break;
 		}
 
-		final int sn = client.getSequenceNumber();
-		try {
-			String encoded = String.format("#%02X %s:%X:%X:%s:%s\r\n", sn, type.getValue(), settings.getSendSpeed(),
-					msg.getAddress(), msg.getFunctionalBits().getValue(), msg.getText());
+		String encoded = String.format("#%02X %s:%X:%X:%s:%s\r\n", msg.getSequenceNumber(), type.getValue(),
+				settings.getSendSpeed(), msg.getAddress(), msg.getFunctionalBits().getValue(), msg.getText());
 
-			out.add(encoded);
-		} catch (Exception ex) {
-			// Release sequence number
-			client.ackSequenceNumber(sn);
-			throw ex;
-		}
+		out.add(encoded);
 	}
 
 }

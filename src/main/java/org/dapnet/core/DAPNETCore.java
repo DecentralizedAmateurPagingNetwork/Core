@@ -37,14 +37,14 @@ public class DAPNETCore {
 
 	private void start() {
 		try {
-			// Start
 			logger.info("Starting DAPNET_CORE Version " + CORE_VERSION + "...");
 
 			logger.info("Starting TransmissionManager");
 			transmissionManager = new TransmissionManager();
 
 			logger.info("Starting device server");
-			deviceServer = new Server(transmissionManager.getTransmitterDeviceManager());
+			// TODO Set transmitter manager
+			deviceServer = new Server(null);
 			Thread serverThread = new Thread(deviceServer);
 			serverThread.start();
 

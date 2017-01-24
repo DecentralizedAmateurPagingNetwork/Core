@@ -1,5 +1,6 @@
 package org.dapnet.core.transmission;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,49 +17,35 @@ import io.netty.util.concurrent.ScheduledFuture;
 
 class ServerHandler extends SimpleChannelInboundHandler<String> {
 
-	private enum State {
-		PENDING_AUTH, SYNC_SYS_TIME, ONLINE, OFFLINE
+	private enum ConnectionState {
+		AUTH_PENDING, SYNC_SYS_TIME, SYNC_SYS_TIME_ACK, ONLINE
 	}
 
 	private static final Logger logger = LogManager.getLogger(ServerHandler.class);
+
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
-	// Ack message #04 +
-	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}+) (\\+)");
-	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
-	private static final Pattern authPattern = Pattern
-			.compile("\\[(\\w+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
 	private final TransmitterManager manager;
-	private final TransmitterClient client;
-	private State state = State.OFFLINE;
+	private TransmitterClient client;
 	private ChannelPromise handshakePromise;
 
-	public ServerHandler(TransmitterManager manager, TransmitterClient client) {
+	public ServerHandler(TransmitterManager manager) {
 		this.manager = manager;
-		this.client = client;
 	}
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-		switch (state) {
-		case PENDING_AUTH:
-			handleAuth(ctx, msg);
-			break;
-		case SYNC_SYS_TIME:
-			handleSyncSysTime(ctx, msg);
-			break;
-		case ONLINE:
-			handleMessage(ctx, msg);
-			break;
-		case OFFLINE:
-			break;
+		if (client != null) {
+			client.onReceive(msg);
 		}
 	}
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-		logger.info("Accepted new connection from {}.", ctx.channel().remoteAddress());
+		logger.info("Accepted new connection from {}", ctx.channel().remoteAddress());
 
-		state = State.PENDING_AUTH;
+		client = new TransmitterClient(ctx.channel());
+		// Do not add the client to the transmitter manager yet. This is done
+		// once the handshake is finished.
 
 		handshakePromise = ctx.newPromise();
 		initHandshakeTimeout(ctx);
@@ -66,28 +53,64 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		state = State.OFFLINE;
+		logger.info("Connection closed.");
 
 		if (client != null) {
-			int pending = client.getPendingAckCount();
-			if (pending > 0) {
-				logger.warn("Pending acks: {}", pending);
+			int count = client.getPendingAckCount();
+			if (count > 0) {
+				logger.warn("Client has {} pending acks.", count);
 			}
+
+			manager.onDisconnect(client);
 		}
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("Exception in server handler.", cause);
-		ctx.close();
 	}
 
-	/**
-	 * Initializes the handshake timeout.
-	 * 
-	 * @param ctx
-	 *            Channel handler context
-	 */
+	private void handleMessage(String msg) throws Exception {
+
+	}
+
+	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
+		Matcher authMatcher = authPattern.matcher(msg);
+		if (!authMatcher.matches()) {
+			throw new TransmitterDeviceException("Invalid welcome message format.");
+		}
+
+		String type = authMatcher.group(1);
+		String version = authMatcher.group(2);
+		String key = authMatcher.group(3);
+
+		Transmitter t = manager.get(key);
+		if (t == null) {
+			throw new TransmitterDeviceException("The received auth key is not registered.");
+		}
+
+		t.setDeviceType(type);
+		t.setDeviceVersion(version);
+		t.setAddress(new IpAddress((InetSocketAddress) ctx.channel().remoteAddress()));
+
+		client.setTransmitter(t);
+
+		state = ConnectionState.SYNC_SYS_TIME;
+	}
+
+	private void handleSyncSysTime(ChannelHandlerContext ctx, String msg) {
+		// TODO Impl
+
+		// Handshake is finished
+		handshakePromise.trySuccess();
+		// Now it is time to inform the transmitter manager of the new client
+		manager.onConnect(client);
+	}
+
+	private void handleSyncSysTimeAck(String msg) {
+
+	}
+
 	private void initHandshakeTimeout(final ChannelHandlerContext ctx) {
 		final ChannelPromise p = handshakePromise;
 
@@ -102,48 +125,5 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		p.addListener((f) -> {
 			timeoutFuture.cancel(false);
 		});
-	}
-
-	private void handleMessage(ChannelHandlerContext ctx, String msg) throws Exception {
-		// Only acks expected
-		Matcher ackMatcher = ackPattern.matcher(msg);
-		if (!ackMatcher.matches()) {
-			throw new TransmitterDeviceException("Invalid response received.");
-		}
-
-		int seq = Integer.parseInt(ackMatcher.group(1), 16);
-		String ack = ackMatcher.group(2);
-		if (!ack.equals("+") || !client.ackSequenceNumber(seq)) {
-			throw new TransmitterDeviceException("Unexpected response received.");
-		}
-	}
-
-	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
-		Matcher authMatcher = authPattern.matcher(msg);
-		if (!authMatcher.matches()) {
-			throw new TransmitterDeviceException("Invalid welcome message format.");
-		}
-
-		String type = authMatcher.group(1);
-		String version = authMatcher.group(2);
-		String key = authMatcher.group(3);
-
-		Transmitter t = manager.auth(key);
-		if (t == null) {
-			throw new TransmitterDeviceException("Invalid auth key supplied.");
-		}
-
-		t.setDeviceType(type);
-		t.setDeviceVersion(version);
-		// t.setAddress(new IpAddress(ctx.channel().remoteAddress()));
-
-		client.setTransmitter(t);
-
-		// TODO Impl
-		state = State.SYNC_SYS_TIME;
-	}
-
-	private void handleSyncSysTime(ChannelHandlerContext ctx, String msg) throws Exception {
-		handshakePromise.trySuccess();
 	}
 }
