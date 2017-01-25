@@ -126,7 +126,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
 				// Reconnect to transmitters (transmitters might have been
 				// edited in major subgroup)
-				clusterManager.getTransmitterDeviceManager().performReconnect(clusterManager.getNodeTransmitter());
+				// clusterManager.getTransmitterManager().performReconnect(clusterManager.getNodeTransmitter());
 				// }
 			}
 			logger.info("Finished merge process");

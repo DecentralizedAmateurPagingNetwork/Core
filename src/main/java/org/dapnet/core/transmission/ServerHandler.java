@@ -7,7 +7,11 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.Transmitter;
+import org.dapnet.core.model.Transmitter.Status;
+import org.dapnet.core.transmission.MessageEncoder.PagingMessageType;
+import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -18,15 +22,23 @@ import io.netty.util.concurrent.ScheduledFuture;
 class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	private enum ConnectionState {
-		AUTH_PENDING, SYNC_SYS_TIME, SYNC_SYS_TIME_ACK, ONLINE
+		AUTH_PENDING, SYNC_TIME, TIMESLOTS_SENT, ONLINE, OFFLINE
 	}
 
 	private static final Logger logger = LogManager.getLogger(ServerHandler.class);
-
+	// Ack message #04 +
+	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}+) (\\+)");
+	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
+	private static final Pattern authPattern = Pattern
+			.compile("\\[(\\w+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
+	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
+			.getPagingProtocolSettings();
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
 	private final TransmitterManager manager;
+	private ConnectionState state = ConnectionState.OFFLINE;
 	private TransmitterClient client;
 	private ChannelPromise handshakePromise;
+	private SyncTimeHandler syncHandler;
 
 	public ServerHandler(TransmitterManager manager) {
 		this.manager = manager;
@@ -34,8 +46,21 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-		if (client != null) {
-			client.onReceive(msg);
+		switch (state) {
+		case AUTH_PENDING:
+			handleAuth(ctx, msg);
+			break;
+		case SYNC_TIME:
+			handleSyncTime(ctx, msg);
+			break;
+		case TIMESLOTS_SENT:
+			handleTimeslotsAck(ctx, msg);
+			break;
+		case ONLINE:
+			handleMessageAck(msg);
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -47,8 +72,12 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		// Do not add the client to the transmitter manager yet. This is done
 		// once the handshake is finished.
 
+		syncHandler = new SyncTimeHandler(settings.getNumberOfSyncLoops());
+
 		handshakePromise = ctx.newPromise();
 		initHandshakeTimeout(ctx);
+
+		state = ConnectionState.AUTH_PENDING;
 	}
 
 	@Override
@@ -63,15 +92,35 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 			manager.onDisconnect(client);
 		}
+
+		state = ConnectionState.OFFLINE;
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("Exception in server handler.", cause);
+
+		if (client != null) {
+			Transmitter t = client.getTransmitter();
+			if (t != null) {
+				t.setStatus(Status.ERROR);
+			}
+		}
+
+		ctx.close();
 	}
 
-	private void handleMessage(String msg) throws Exception {
+	private void handleMessageAck(String msg) throws Exception {
+		Matcher ackMatcher = ackPattern.matcher(msg);
+		if (!ackMatcher.matches()) {
+			throw new TransmitterDeviceException("Invalid response received.");
+		}
 
+		int seq = Integer.parseInt(ackMatcher.group(1), 16);
+		String ack = ackMatcher.group(2);
+		if (!ack.equals("+") || !client.ackSequenceNumber(seq)) {
+			throw new TransmitterDeviceException("Unexpected response received.");
+		}
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
@@ -87,6 +136,11 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		Transmitter t = manager.get(key);
 		if (t == null) {
 			throw new TransmitterDeviceException("The received auth key is not registered.");
+		} else if (t.getStatus() == Status.ONLINE || t.getStatus() == Status.DISABLED) {
+			// TODO This is likely vulnerable to race conditions
+			logger.error("Transmitter already connected or disabled.");
+			ctx.close();
+			return;
 		}
 
 		t.setDeviceType(type);
@@ -95,20 +149,35 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		client.setTransmitter(t);
 
-		state = ConnectionState.SYNC_SYS_TIME;
+		state = ConnectionState.SYNC_TIME;
 	}
 
-	private void handleSyncSysTime(ChannelHandlerContext ctx, String msg) {
-		// TODO Impl
+	private void handleSyncTime(ChannelHandlerContext ctx, String message) throws Exception {
+		syncHandler.handleMessage(ctx, message);
+		if (syncHandler.isDone()) {
+			syncHandler = null;
 
-		// Handshake is finished
+			// Send timeslots to client
+			Transmitter t = client.getTransmitter();
+			String msg = String.format("%d:%s", PagingMessageType.SLOTS.getValue(), t.getTimeSlot());
+			ctx.writeAndFlush(msg);
+
+			state = ConnectionState.TIMESLOTS_SENT;
+		}
+	}
+
+	private void handleTimeslotsAck(ChannelHandlerContext ctx, String msg) throws Exception {
+		if (!msg.equals("+")) {
+			throw new TransmitterDeviceException("Wrong ack received.");
+		}
+
 		handshakePromise.trySuccess();
+		handshakePromise = null;
+
 		// Now it is time to inform the transmitter manager of the new client
 		manager.onConnect(client);
-	}
 
-	private void handleSyncSysTimeAck(String msg) {
-
+		state = ConnectionState.ONLINE;
 	}
 
 	private void initHandshakeTimeout(final ChannelHandlerContext ctx) {

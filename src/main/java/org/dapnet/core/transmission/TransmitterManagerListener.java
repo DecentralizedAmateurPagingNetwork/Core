@@ -14,10 +14,10 @@
 
 package org.dapnet.core.transmission;
 
-public class TransmitterDeviceConnectionFailedException extends TransmitterDeviceException {
-	private static final long serialVersionUID = 3658343579078637409L;
+import org.dapnet.core.model.Transmitter.Status;
 
-	public TransmitterDeviceConnectionFailedException(String message) {
-		super(message);
-	}
+public interface TransmitterManagerListener {
+	void handleTransmitterStatusChanged(String transmitterName, Status newStatus);
+
+	void handleDisconnectedFromAllTransmitters();
 }

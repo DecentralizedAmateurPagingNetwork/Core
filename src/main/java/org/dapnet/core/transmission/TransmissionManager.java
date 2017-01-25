@@ -14,6 +14,9 @@
 
 package org.dapnet.core.transmission;
 
+import java.util.Date;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Activation;
@@ -21,23 +24,17 @@ import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
 
-import java.util.Date;
-import java.util.List;
-
 public class TransmissionManager {
 	private static final Logger logger = LogManager.getLogger(TransmissionManager.class.getName());
 	private final PagerProtocol protocol = new SkyperProtocol();
-	private final TransmitterDeviceManager deviceManager = new TransmitterDeviceManager();
+	private final TransmitterManager transmitterManager = new TransmitterManager();
 
 	public void handleTime(Date date) {
 		try {
 			Message message = protocol.createMessageFromTime(date);
-			// Possibility to implement TimeZones by handling here
-			// TransmitterGroups
-			// Now sending Time to all connected Devices
-			deviceManager.getTransmitterDevices().forEach((e) -> e.sendMessage(message));
+			transmitterManager.sendMessage(message);
 
-			logger.info("Time sent using {} Transmitter", deviceManager.getTransmitterDevices().size());
+			logger.info("Time sent to all connected transmitters.");
 		} catch (Exception e) {
 			logger.error("Failed to send Time", e);
 		}
@@ -46,12 +43,9 @@ public class TransmissionManager {
 	public void handleNews(News news) {
 		try {
 			Message message = protocol.createMessageFromNews(news);
-			List<TransmitterDevice> transmitterDevices = deviceManager
-					.getTransmitterDevices(news.getRubric().getTransmitterGroups());
+			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
 
-			transmitterDevices.forEach((e) -> e.sendMessage(message));
-
-			logger.info("News sent using {} Transmitter", transmitterDevices.size());
+			logger.info("News sent to transmitters.");
 		} catch (Exception e) {
 			logger.error("Failed to send News", e);
 		}
@@ -60,12 +54,9 @@ public class TransmissionManager {
 	public void handleRubric(Rubric rubric) {
 		try {
 			Message message = protocol.createMessageFromRubric(rubric);
-			List<TransmitterDevice> transmitterDevices = deviceManager
-					.getTransmitterDevices(rubric.getTransmitterGroups());
+			transmitterManager.sendMessage(message, rubric.getTransmitterGroups());
 
-			transmitterDevices.forEach((e) -> e.sendMessage(message));
-
-			logger.info("Rubric sent using {} Transmitter", transmitterDevices.size());
+			logger.info("Rubric sent to transmitters.");
 		} catch (Exception e) {
 			logger.error("Failed to send Rubric", e);
 		}
@@ -74,14 +65,10 @@ public class TransmissionManager {
 	public void handleCall(Call call) {
 		try {
 			List<Message> messages = protocol.createMessagesFromCall(call);
-			List<TransmitterDevice> transmitterDevices = deviceManager
-					.getTransmitterDevices(call.getTransmitterGroups());
+			transmitterManager.sendMessages(messages, call.getTransmitterGroups());
 
-			transmitterDevices.forEach((e) -> e.sendMessages(messages));
-
-			logger.info("Call sent to {} CallSigns, to {} Pager, using {} TransmitterGroups and {} Transmitter",
-					call.getCallSigns().size(), messages.size(), call.getTransmitterGroupNames().size(),
-					transmitterDevices.size());
+			logger.info("Call sent to {} CallSigns, to {} Pager, using {} TransmitterGroups.",
+					call.getCallSigns().size(), messages.size(), call.getTransmitterGroupNames().size());
 		} catch (Exception e) {
 			logger.error("Failed to send Call", e);
 		}
@@ -90,18 +77,15 @@ public class TransmissionManager {
 	public void handleActivation(Activation activation) {
 		try {
 			Message message = protocol.createMessageFromActivation(activation);
-			List<TransmitterDevice> transmitterDevices = deviceManager
-					.getTransmitterDevices(activation.getTransmitterGroups());
+			transmitterManager.sendMessage(message, activation.getTransmitterGroups());
 
-			transmitterDevices.forEach((e) -> e.sendMessage(message));
-
-			logger.info("Activation sent using {} Transmitter", transmitterDevices.size());
+			logger.info("Activation sent to transmitters.");
 		} catch (Exception e) {
 			logger.error("Failed to send Activation", e);
 		}
 	}
 
-	public TransmitterDeviceManager getTransmitterDeviceManager() {
-		return deviceManager;
+	public TransmitterManager getTransmitterManager() {
+		return transmitterManager;
 	}
 }

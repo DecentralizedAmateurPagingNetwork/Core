@@ -14,6 +14,15 @@
 
 package org.dapnet.core.cluster;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
@@ -23,8 +32,8 @@ import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.transmission.TransmissionManager;
-import org.dapnet.core.transmission.TransmitterDeviceManager;
-import org.dapnet.core.transmission.TransmitterDeviceManagerListener;
+import org.dapnet.core.transmission.TransmitterManagerListener;
+import org.dapnet.core.transmission.TransmitterManager;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.RequestOptions;
@@ -33,15 +42,7 @@ import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.protocols.AUTH;
 import org.jgroups.util.RspList;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-public class ClusterManager implements TransmitterDeviceManagerListener, RestListener {
+public class ClusterManager implements TransmitterManagerListener, RestListener {
 	private static final Logger logger = LogManager.getLogger(ClusterManager.class.getName());
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -55,7 +56,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 	private State state;
 
 	private TransmissionManager transmissionManager;
-	private TransmitterDeviceManager transmitterDeviceManager;
+	private TransmitterManager transmitterManager;
 
 	private boolean quorum = true;
 	private boolean stopping = false;
@@ -63,8 +64,8 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 	public ClusterManager(TransmissionManager transmissionManager) throws Exception {
 		// Register Transmission
 		this.transmissionManager = transmissionManager;
-		this.transmitterDeviceManager = transmissionManager.getTransmitterDeviceManager();
-		this.transmitterDeviceManager.setListener(this);
+		this.transmitterManager = transmissionManager.getTransmitterManager();
+		this.transmitterManager.setListener(this);
 
 		// Initiate State
 		initState();
@@ -102,8 +103,8 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 			DAPNETCore.stopDAPNETCore();
 		}
 
-		// Connect to Transmitter
-		transmitterDeviceManager.connectToTransmitters(getNodeTransmitter());
+		// Register transmitters
+		transmitterManager.registerTransmitters(getNodeTransmitter());
 	}
 
 	private void initState() {
@@ -144,7 +145,7 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 
 	public void stop() {
 		stopping = true;
-		transmitterDeviceManager.disconnectFromAllTransmitters();
+		transmitterManager.disconnectFromAll();
 	}
 
 	// ### Helper for reading Cluster Config
@@ -275,8 +276,8 @@ public class ClusterManager implements TransmitterDeviceManagerListener, RestLis
 		return transmissionManager;
 	}
 
-	public TransmitterDeviceManager getTransmitterDeviceManager() {
-		return transmitterDeviceManager;
+	public TransmitterManager getTransmitterManager() {
+		return transmitterManager;
 	}
 
 	public JChannel getChannel() {

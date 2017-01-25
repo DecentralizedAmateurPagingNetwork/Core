@@ -4,7 +4,6 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.dapnet.core.model.Transmitter;
 import org.jgroups.stack.IpAddress;
@@ -20,10 +19,8 @@ class TransmitterClient {
 
 	private final Set<Integer> pendingAcks = new HashSet<>();
 	private final Channel channel;
-	private ClientStateHandler stateHandler;
 	private int sequenceNumber = 0;
 	private Transmitter transmitter;
-	private AtomicBoolean handshakeDone = new AtomicBoolean(false);
 
 	/**
 	 * Creates a new client session.
@@ -120,19 +117,13 @@ class TransmitterClient {
 		}
 	}
 
-	public boolean isHandshakeDone() {
-		return handshakeDone.get();
+	/**
+	 * Closes the connection.
+	 */
+	public void close() {
+		if (channel != null) {
+			channel.close();
+		}
 	}
 
-	public void setHandshakeDone(boolean done) {
-		this.handshakeDone.set(done);
-	}
-
-	public void setStateHandler(ClientStateHandler handler) {
-		this.stateHandler = handler;
-	}
-
-	public void onReceive(String msg) throws Exception {
-		stateHandler.onReceive(this, msg);
-	}
 }
