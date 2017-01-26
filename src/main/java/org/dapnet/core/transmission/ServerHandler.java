@@ -30,7 +30,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}+) (\\+)");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
 	private static final Pattern authPattern = Pattern
-			.compile("\\[(\\w+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
+			.compile("\\[([/\\p{Alnum}]+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
@@ -83,6 +83,11 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		logger.info("Connection closed.");
+
+		// TODO ???
+		if (handshakePromise != null) {
+			handshakePromise.trySuccess();
+		}
 
 		if (client != null) {
 			int count = client.getPendingAckCount();
@@ -151,7 +156,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		// Begin the sync time procedure
 		syncHandler.handleMessage(ctx, msg);
-		
+
 		state = ConnectionState.SYNC_TIME;
 	}
 
