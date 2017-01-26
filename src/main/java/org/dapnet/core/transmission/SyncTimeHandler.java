@@ -3,6 +3,8 @@ package org.dapnet.core.transmission;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dapnet.core.transmission.MessageEncoder.PagingMessageType;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -19,6 +21,7 @@ final class SyncTimeHandler {
 		WRITE_TIME, READ_TIME, READ_TIME_ACK, READ_TIME_ADJUST_ACK, DONE
 	}
 
+	private static final Logger logger = LogManager.getLogger(SyncTimeHandler.class);
 	// 2:13d3:0026
 	private static final Pattern syncAckPattern = Pattern.compile("(\\d):(\\w+):(\\w+)");
 	private final int maxLoops;
@@ -52,6 +55,8 @@ final class SyncTimeHandler {
 	 *             If an error occurs.
 	 */
 	public void handleMessage(ChannelHandlerContext ctx, String message) throws Exception {
+		logger.info("State: " + state);
+
 		switch (state) {
 		case WRITE_TIME:
 			writeTime(ctx);
