@@ -46,6 +46,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+		logger.info("State: " + state);
+
 		switch (state) {
 		case AUTH_PENDING:
 			handleAuth(ctx, msg);
