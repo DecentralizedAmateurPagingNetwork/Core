@@ -104,7 +104,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 
 		// Register transmitters
-		transmitterManager.registerTransmitters(getNodeTransmitter());
+		transmitterManager.addTransmitters(getNodeTransmitter());
 	}
 
 	private void initState() {

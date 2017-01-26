@@ -19,7 +19,7 @@ public class TransmitterManager {
 	private final Set<TransmitterClient> connectedClients = new HashSet<>();
 	private TransmitterManagerListener listener;
 
-	public void registerTransmitter(Transmitter transmitter) {
+	public void addTransmitter(Transmitter transmitter) {
 		String key = transmitter.getAuthKey();
 		if (key != null && !key.isEmpty()) {
 			registeredTranmsitters.put(key, transmitter);
@@ -27,12 +27,21 @@ public class TransmitterManager {
 		}
 	}
 
+	public void removeTransmitter(Transmitter transmitter) {
+		String key = transmitter.getAuthKey();
+		if (key != null && !key.isEmpty()) {
+			registeredTranmsitters.remove(key);
+			// TODO Disconnect
+			logger.info("Transmitter removed.");
+		}
+	}
+
 	public void setListener(TransmitterManagerListener listener) {
 		this.listener = listener;
 	}
 
-	public void registerTransmitters(Collection<Transmitter> transmitters) {
-		transmitters.forEach(this::registerTransmitter);
+	public void addTransmitters(Collection<Transmitter> transmitters) {
+		transmitters.forEach(this::addTransmitter);
 	}
 
 	public Transmitter get(String key) {

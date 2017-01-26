@@ -442,8 +442,7 @@ public class RpcListener {
 				// Disconnect from Transmitter if my Transmitter
 				String myNodeName = clusterManager.getChannel().getName();
 				if (oldTransmitter.getNodeName().equals(myNodeName)) {
-					// TODO Impl
-					// clusterManager.getTransmitterManager().disconnectFrom(oldTransmitter);
+					clusterManager.getTransmitterManager().removeTransmitter(oldTransmitter);
 				}
 			}
 
@@ -455,8 +454,7 @@ public class RpcListener {
 			// Connect to Transmitter if my Transmitter
 			String myNodeName = clusterManager.getChannel().getName();
 			if (transmitter.getNodeName().equals(myNodeName)) {
-				// TODO Impl
-				// clusterManager.getTransmitterManager().connectToTransmitter(transmitter);
+				clusterManager.getTransmitterManager().addTransmitter(transmitter);
 			}
 
 			return response = RpcResponse.OK;
@@ -511,7 +509,7 @@ public class RpcListener {
 				// Disconnect from Transmitter if my Transmitter
 				String myNodeName = clusterManager.getChannel().getName();
 				if (transmitter.getNodeName().equals(myNodeName)) {
-					// TODO Impl?
+					clusterManager.getTransmitterManager().removeTransmitter(transmitter);
 					clusterManager.getTransmitterManager().disconnectFrom(transmitter);
 				}
 
