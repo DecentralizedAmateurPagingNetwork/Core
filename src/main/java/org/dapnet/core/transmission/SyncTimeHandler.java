@@ -93,7 +93,7 @@ final class SyncTimeHandler {
 		timeTx = (seconds * 10 + deltaTimemillis / 100) & 0xffff;
 
 		timeTxMsg = String.format("%04x", timeTx);
-		String resp = String.format("%d:%s", PagingMessageType.SYNCREQUEST.getValue(), timeTxMsg);
+		String resp = String.format("%d:%s\r\n", PagingMessageType.SYNCREQUEST.getValue(), timeTxMsg);
 		ctx.writeAndFlush(resp);
 
 		state = SyncState.READ_TIME;
@@ -155,7 +155,7 @@ final class SyncTimeHandler {
 			sign = "-";
 		}
 
-		String msg = String.format("%d:%s:%04x", PagingMessageType.SYNCORDER.getValue(), sign, abs);
+		String msg = String.format("%d:%s:%04x\r\n", PagingMessageType.SYNCORDER.getValue(), sign, abs);
 		ctx.writeAndFlush(msg);
 
 		state = SyncState.READ_TIME_ADJUST_ACK;
