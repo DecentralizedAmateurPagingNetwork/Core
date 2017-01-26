@@ -29,8 +29,8 @@ class ServerInitializer extends ChannelInitializer<SocketChannel> {
 		ChannelPipeline p = ch.pipeline();
 		p.addLast(new DelimiterBasedFrameDecoder(2048, Delimiters.lineDelimiter()));
 		p.addLast(decoder);
-		p.addLast(msgEncoder);
 		p.addLast(encoder);
+		p.addLast(msgEncoder);
 		p.addLast(new ServerHandler(manager));
 	}
 
