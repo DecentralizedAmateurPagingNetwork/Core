@@ -54,7 +54,7 @@ final class SyncTimeHandler {
 	public void handleMessage(ChannelHandlerContext ctx, String message) throws Exception {
 		switch (state) {
 		case WRITE_TIME:
-			writeTime(ctx, message);
+			writeTime(ctx);
 			break;
 		case READ_TIME:
 			readTime(message);
@@ -82,7 +82,7 @@ final class SyncTimeHandler {
 		return state == SyncState.DONE;
 	}
 
-	private void writeTime(ChannelHandlerContext ctx, String message) {
+	private void writeTime(ChannelHandlerContext ctx) {
 		long timemillis = System.currentTimeMillis();
 		long seconds = timemillis / 1000;
 		// Milliseconds as long of current second

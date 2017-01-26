@@ -149,6 +149,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		client.setTransmitter(t);
 
+		// Begin the sync time procedure
+		syncHandler.handleMessage(ctx, msg);
+		
 		state = ConnectionState.SYNC_TIME;
 	}
 
