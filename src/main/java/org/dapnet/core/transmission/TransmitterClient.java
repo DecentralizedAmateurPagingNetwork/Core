@@ -87,7 +87,14 @@ class TransmitterClient {
 	public void sendMessages(Collection<Message> messages) {
 		// TODO Sort messages?
 		synchronized (channel) {
-			messages.forEach(channel::write);
+			messages.forEach(m -> {
+				m.setSequenceNumber(sequenceNumber);
+
+				pendingAcks.add(sequenceNumber + 1);
+				sequenceNumber = (sequenceNumber + 1) % 256;
+
+				channel.write(m);
+			});
 			channel.flush();
 		}
 	}
