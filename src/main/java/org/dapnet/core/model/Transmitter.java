@@ -55,7 +55,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@NotNull
 	protected String nodeName;
 
-	@NotNull
+	//@NotNull
 	protected IpAddress address;
 
 	@NotNull
@@ -66,10 +66,10 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@Size(min = 1, message = "must contain at least one ownerName")
 	protected ArrayList<String> ownerNames;
 
-	@NotNull
+	//@NotNull
 	protected String deviceType;
 
-	@NotNull
+	//@NotNull
 	protected String deviceVersion;
 
 	@NotNull
