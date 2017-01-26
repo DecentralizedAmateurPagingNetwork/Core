@@ -70,7 +70,7 @@ public class TransmitterManager {
 	public void sendMessages(Collection<Message> messages, Collection<TransmitterGroup> groups) {
 		Set<String> names = getTransmitterNames(groups);
 		// TODO remove
-		logger.info("Selected transmitters: ", names.size());
+		logger.info("Selected transmitters: {}", names.size());
 		synchronized (connectedClients) {
 			for (TransmitterClient cl : connectedClients) {
 				if (names.equals(cl.getTransmitter().getName())) {
