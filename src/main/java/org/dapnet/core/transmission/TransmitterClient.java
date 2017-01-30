@@ -95,6 +95,7 @@ class TransmitterClient {
 
 				channel.write(m);
 			});
+
 			channel.flush();
 		}
 	}

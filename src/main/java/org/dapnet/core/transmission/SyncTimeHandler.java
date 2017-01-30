@@ -65,7 +65,7 @@ final class SyncTimeHandler {
 			if (message.equals("+")) {
 				state = SyncState.DONE;
 			} else {
-				throw new TransmitterDeviceException("Wrong ack received.");
+				throw new TransmitterException("Wrong ack received.");
 			}
 			break;
 		default:
@@ -113,12 +113,12 @@ final class SyncTimeHandler {
 
 	private void readTimeAck(ChannelHandlerContext ctx, String message) throws Exception {
 		if (!message.equals("+")) {
-			throw new TransmitterDeviceException("Wrong ack received.");
+			throw new TransmitterException("Wrong ack received.");
 		}
 
 		Matcher syncMatcher = syncAckPattern.matcher(timeRxMsg);
 		if (!syncMatcher.matches()) {
-			throw new TransmitterDeviceException("Wrong sync response received.");
+			throw new TransmitterException("Wrong sync response received.");
 		}
 
 		int id = Integer.parseInt(syncMatcher.group(1));
@@ -127,7 +127,7 @@ final class SyncTimeHandler {
 		long timeLongClient = Long.parseLong(timeStringClient, 16);
 
 		if (id != PagingMessageType.SYNCREQUEST.getValue() || !timeTxMsg.equals(timeStringResp)) {
-			throw new TransmitterDeviceException("Wrong sync response received.");
+			throw new TransmitterException("Wrong sync response received.");
 		}
 
 		long rtt = timeRx - timeTx;
@@ -147,7 +147,7 @@ final class SyncTimeHandler {
 	private void sendTimeAdjust(ChannelHandlerContext ctx) throws Exception {
 		long abs = Math.abs(timeAdjust);
 		if (abs > 65536) {
-			throw new TransmitterDeviceException("Time difference too large.");
+			throw new TransmitterException("Time difference too large.");
 		}
 
 		String sign = "+";

@@ -102,7 +102,11 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error("Exception in server handler.", cause);
+		if (cause instanceof TransmitterException) {
+			logger.error("Closing connection: {}", cause.getMessage());
+		} else {
+			logger.error("Exception in server handler.", cause);
+		}
 
 		if (client != null) {
 			Transmitter t = client.getTransmitter();
@@ -117,20 +121,20 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private void handleMessageAck(String msg) throws Exception {
 		Matcher ackMatcher = ackPattern.matcher(msg);
 		if (!ackMatcher.matches()) {
-			throw new TransmitterDeviceException("Invalid response received.");
+			throw new TransmitterException("Invalid response received.");
 		}
 
 		int seq = Integer.parseInt(ackMatcher.group(1), 16);
 		String ack = ackMatcher.group(2);
 		if (!ack.equals("+") || !client.ackSequenceNumber(seq)) {
-			throw new TransmitterDeviceException("Unexpected response received.");
+			throw new TransmitterException("Unexpected response received.");
 		}
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
 		Matcher authMatcher = authPattern.matcher(msg);
 		if (!authMatcher.matches()) {
-			throw new TransmitterDeviceException("Invalid welcome message format.");
+			throw new TransmitterException("Invalid welcome message format.");
 		}
 
 		String type = authMatcher.group(1);
@@ -139,10 +143,14 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		Transmitter t = manager.get(key);
 		if (t == null) {
-			throw new TransmitterDeviceException("The received auth key is not registered.");
-		} else if (t.getStatus() == Status.ONLINE || t.getStatus() == Status.DISABLED) {
-			// TODO This is likely vulnerable to race conditions
-			logger.error("Transmitter already connected or disabled.");
+			throw new TransmitterException("The received auth key is not registered.");
+		} else if (t.getStatus() == Status.DISABLED) {
+			logger.error("Transmitter is disabled and not allowed to connect.");
+			ctx.close();
+			return;
+		} else if (t.getStatus() == Status.ONLINE) {
+			// TODO Close existing connection?
+			logger.error("Transmitter is already connected.");
 			ctx.close();
 			return;
 		}
@@ -161,6 +169,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	private void handleSyncTime(ChannelHandlerContext ctx, String message) throws Exception {
 		syncHandler.handleMessage(ctx, message);
+
 		if (syncHandler.isDone()) {
 			syncHandler = null;
 
@@ -175,7 +184,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	private void handleTimeslotsAck(ChannelHandlerContext ctx, String msg) throws Exception {
 		if (!msg.equals("+")) {
-			throw new TransmitterDeviceException("Wrong ack received.");
+			throw new TransmitterException("Wrong ack received.");
 		}
 
 		handshakePromise.trySuccess();
