@@ -1,0 +1,95 @@
+Loginnachricht
+{
+	"type": "login",
+	"device": "SDRPager",
+	"version": "1.2",
+	"authKey": "abcd1234",
+  "ProxyUsed: {
+    enabled: false oder true,
+    version: "1.0"
+  }
+}
+
+Zeitabweichung würde zwar für die XOS-Geräte durch den Proxy implementieren, aber auf ich auf IP-basierten Maschinen durch
+Verpflichtung von NTP-Benutzung umgehen und die Werte aus dem timesync nicht benutzen. Evtl. kann man in die Client-Software
+eine Abfrage einbauen, ob die NTP-Synchronisierung ok ist. Ich habe so etwas hier:
+https://github.com/dh3wr/RasPagerDigi/blob/master/software/raspager-control/src/tools/networkcontrol.cpp
+Line 139: bool NetworkControl::NTPServerSynced() { ...
+
+
+Ermitteln der Zeitabweichung.
+Wird vom Client und Server genutzt.
+
+{
+	"type": "timesync",
+	"time": 1000000
+}
+
+Server sendet Zeitanpassung an den Client.
+
+{
+	"type": "timeadj",
+	"offset": -100
+}
+
+Server sendet Zeitschlitze an den Client (Handshake abgeschlossen).
+
+{
+	"type": "timeslots",
+	"slots": "123456"
+}
+
+Alternativ: Server sendet Zeitanpassung und Zeitschlitze in einem Rutsch an den Client (Handshake abgeschlossen).
+--> Würde ich einzeln machen der Übersicht halber
+{
+	"type": "timeadj",
+	"offset": -100,
+	"slots": "12AB"
+}
+
+Pagernachricht (sn mit ack benötigt?)
+
+{
+	"type": "message",
+	"sn": 1,
+	"priority": 1, <-- Ist das nötig? Wird das überhaupt vom Sender ausgewertet? Im alten Protokoll gibt es das nicht. Das Scheduling geschieht ja im Core.
+	"bits": 1, <-- Was ist das?
+	"ts": "20170201105700",
+	"ids": [1122334, 1122335],
+	"text": "hello, world"
+}
+
+Ack für Nachrichten, falls benötigt.
+
+{
+	"type": "ack",
+	"success": true
+	"sn": [1, 2]
+}
+
+Keep Alive - Auf jeden Fall
+
+{
+	"type": "ping",
+  "sn": 1 Evtl mit MOD 10000
+}
+Antwort:
+{
+	"type": "pong"
+  "sn": Aus Anfrage
+}
+
+Telemetrie
+
+{
+	"type": "telemetry"
+  "voltage": "12.2",
+  "current": "2.3",
+  "swr": "1.2",
+  "forwardPower: "20.2",
+  "reflectedPower: "0.4",
+  "temperatureAmbient: "25.3",
+  "temperaturePA: "34.3"
+}
+
+
