@@ -510,7 +510,6 @@ public class RpcListener {
 				String myNodeName = clusterManager.getChannel().getName();
 				if (transmitter.getNodeName().equals(myNodeName)) {
 					clusterManager.getTransmitterManager().removeTransmitter(transmitter);
-					clusterManager.getTransmitterManager().disconnectFrom(transmitter);
 				}
 
 				return response = RpcResponse.OK;

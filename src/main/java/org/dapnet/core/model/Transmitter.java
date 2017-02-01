@@ -25,7 +25,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
+
 	private static final long serialVersionUID = -8142160974834002456L;
+	private static State state;
 
 	@NotNull
 	@Size(min = 3, max = 20)
@@ -69,12 +71,38 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	protected String deviceVersion;
 
-	@NotNull
-	protected Status status;
-
 	public enum Status {
 		ONLINE, OFFLINE, ERROR, DISABLED
 	}
+
+	@NotNull
+	protected Status status;
+
+	@Min(0)
+	@Max(1000)
+	protected int antennaAboveGroundLevel;
+
+	public enum AntennaType {
+		OMNI, DIRECTIONAL
+	}
+
+	@NotNull
+	protected AntennaType antennaType;
+
+	@Min(0)
+	@Max(359)
+	protected int antennaDirection;
+
+	@Min(-50)
+	@Max(80)
+	protected float antennaGainDbi;
+
+	public enum Usage {
+		WIDERANGE, PERSONAL
+	}
+
+	@NotNull
+	protected Usage usage;
 
 	public String getName() {
 		return name;
@@ -164,15 +192,119 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		this.ownerNames = owners;
 	}
 
+	/**
+	 * Gets the antenna height above ground level in meters.
+	 * 
+	 * @return Antenna height above ground level in meters.
+	 */
+	public int getAntennaAboveGroundLevel() {
+		return antennaAboveGroundLevel;
+	}
+
+	/**
+	 * Sets the antenna height above ground level in meters.
+	 * 
+	 * @param antennaAboveGroundLevel
+	 *            Antenna height above ground level in meters.
+	 */
+	public void setAntennaAboveGroundLevel(int antennaAboveGroundLevel) {
+		this.antennaAboveGroundLevel = antennaAboveGroundLevel;
+	}
+
+	/**
+	 * Gets the antenna type.
+	 * 
+	 * @return Antenna type.
+	 */
+	public AntennaType getAntennaType() {
+		return antennaType;
+	}
+
+	/**
+	 * Sets the antenna type.
+	 * 
+	 * @param antennaType
+	 *            Antenna type.
+	 */
+	public void setAntennaType(AntennaType antennaType) {
+		this.antennaType = antennaType;
+	}
+
+	/**
+	 * Gets the antenna main direction (only for directional antennas).
+	 * 
+	 * @return Antenna main direction.
+	 */
+	public int getAntennaDirection() {
+		return antennaDirection;
+	}
+
+	/**
+	 * Sets the antenna main direction (only for directional antennas).
+	 * 
+	 * @param antennaDirection
+	 *            Antenna main direction.
+	 */
+	public void setAntennaDirection(int antennaDirection) {
+		this.antennaDirection = antennaDirection;
+	}
+
+	/**
+	 * Gets the antenna gain minus cable losses in dBi.
+	 * 
+	 * @return Antenna gain minus cable losses in dBi.
+	 */
+	public float getAntennaGainDbi() {
+		return antennaGainDbi;
+	}
+
+	/**
+	 * Sets the antenna gain minus cable losses in dBi.
+	 * 
+	 * @param antennaGainDbi
+	 *            Antenna gain minus cable losses in dBi.
+	 */
+	public void setAntennaGainDbi(float antennaGainDbi) {
+		this.antennaGainDbi = antennaGainDbi;
+	}
+
+	/**
+	 * Gets the transmitter usage.
+	 * 
+	 * @return Transmitter usage.
+	 */
+	public Usage getUsage() {
+		return usage;
+	}
+
+	/**
+	 * Sets the transmitter usage.
+	 * 
+	 * @param usage
+	 *            Transmitter usage.
+	 */
+	public void setUsage(Usage usage) {
+		this.usage = usage;
+	}
+
+	/**
+	 * Gets the transmitter status.
+	 * 
+	 * @return Transmitter status.
+	 */
 	public Status getStatus() {
 		return status;
 	}
 
+	/**
+	 * Sets the transmitter status.
+	 * 
+	 * @param status
+	 *            Transmitter status.
+	 */
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-
-	private static State state;
 
 	public static void setState(State statePar) {
 		state = statePar;
