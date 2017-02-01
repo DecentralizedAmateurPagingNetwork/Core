@@ -92,6 +92,6 @@ public class Activation implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Activation{" + "pagerNumber='" + number + '\'' + '}';
+		return String.format("Activation{pagerNumber=%07d}", number);
 	}
 }

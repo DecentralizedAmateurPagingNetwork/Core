@@ -102,6 +102,6 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 
 	@Override
 	public String toString() {
-		return "CallSign{" + "name='" + name + '\'' + '}';
+		return String.format("CallSign{name='%s'}", name);
 	}
 }

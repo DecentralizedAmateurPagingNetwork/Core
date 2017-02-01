@@ -135,6 +135,6 @@ public class Call implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Call{" + "ownerName='" + ownerName + '\'' + '}';
+		return String.format("CallSign{name='%s'}", ownerName);
 	}
 }

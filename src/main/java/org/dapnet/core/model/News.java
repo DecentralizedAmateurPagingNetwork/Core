@@ -121,6 +121,6 @@ public class News implements Serializable {
 
 	@Override
 	public String toString() {
-		return "News{" + "rubricName='" + rubricName + '\'' + ", number=" + number + '}';
+		return String.format("News{rubricName='%s', number=%d}", rubricName, number);
 	}
 }

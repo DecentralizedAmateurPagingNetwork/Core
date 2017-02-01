@@ -89,6 +89,6 @@ public class User implements Serializable, Searchable, RestAuthorizable {
 
 	@Override
 	public String toString() {
-		return "User{" + "name='" + name + '\'' + '}';
+		return String.format("User{name='%s'}", name);
 	}
 }

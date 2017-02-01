@@ -131,6 +131,6 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 
 	@Override
 	public String toString() {
-		return "TransmitterGroup{" + "name='" + name + '\'' + '}';
+		return String.format("TransmitterGroup{name='%s'}", name);
 	}
 }

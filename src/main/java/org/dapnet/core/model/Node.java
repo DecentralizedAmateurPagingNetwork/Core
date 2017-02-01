@@ -112,6 +112,6 @@ public class Node implements Serializable, Searchable {
 
 	@Override
 	public String toString() {
-		return "Node{" + "status=" + status + ", name='" + name + '\'' + '}';
+		return String.format("Node{status=%s, name='%s'}", status, name);
 	}
 }

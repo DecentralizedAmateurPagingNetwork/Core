@@ -51,7 +51,6 @@ public class Pager implements Serializable {
 
 	@Override
 	public String toString() {
-		// TODO Pad with zeros
-		return String.format("Pager{number=%d, name=\'%s\'}", number, name);
+		return String.format("Pager{number=%07d, name='%s'}", number, name);
 	}
 }

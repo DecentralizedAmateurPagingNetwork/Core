@@ -339,9 +339,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@Override
 	public String toString() {
-		return String.format("Transmitter{name=\'%s', status=%s}", name, status);
-		// return "Transmitter{" + "name='" + name + '\'' + ", status=" + status
-		// + '}';
+		return String.format("Transmitter{name='%s', status=%s}", name, status);
 	}
 
 }

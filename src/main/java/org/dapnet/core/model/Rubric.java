@@ -134,6 +134,6 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 
 	@Override
 	public String toString() {
-		return "Rubric{" + "name='" + name + '\'' + ", number=" + number + '}';
+		return String.format("Rubric{name='%s', number=%d}", name, number);
 	}
 }
