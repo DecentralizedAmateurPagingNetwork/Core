@@ -34,6 +34,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	protected String name;
 
 	@NotNull
+	@Size(min = 1, max = 64)
 	protected String authKey;
 
 	@NotNull
