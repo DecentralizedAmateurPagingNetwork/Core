@@ -27,7 +27,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	private static final Logger logger = LogManager.getLogger(ServerHandler.class);
 	// Ack message #04 +
-	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}+) (\\+)");
+	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
 	private static final Pattern authPattern = Pattern
 			.compile("\\[([/\\p{Alnum}]+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
@@ -124,11 +124,16 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			throw new TransmitterException("Invalid response received.");
 		}
 
-		int seq = Integer.parseInt(ackMatcher.group(1), 16);
+		// TODO Enable sequence numbers
+		// int seq = Integer.parseInt(ackMatcher.group(1), 16);
 		String ack = ackMatcher.group(2);
-		if (!ack.equals("+") || !client.ackSequenceNumber(seq)) {
+		if (!ack.equals("+")) {
 			throw new TransmitterException("Unexpected response received.");
 		}
+		// TODO Enable sequence numbers
+		// else if (!client.ackSequenceNumber(seq)) {
+		// throw new TransmitterException("Invalid sequence number received.");
+		// }
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {

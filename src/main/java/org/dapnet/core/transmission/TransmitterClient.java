@@ -68,14 +68,14 @@ class TransmitterClient {
 	 *            Message to send.
 	 */
 	public void sendMessage(Message msg) {
-		synchronized (channel) {
+		synchronized (pendingAcks) {
 			msg.setSequenceNumber(sequenceNumber);
-
-			pendingAcks.add(sequenceNumber + 1);
 			sequenceNumber = (sequenceNumber + 1) % 256;
-
-			channel.writeAndFlush(msg);
+			// TODO Enable sequence numbers
+			// pendingAcks.add(sequenceNumber);
 		}
+
+		channel.writeAndFlush(msg);
 	}
 
 	/**
@@ -86,12 +86,13 @@ class TransmitterClient {
 	 */
 	public void sendMessages(Collection<Message> messages) {
 		// TODO Sort messages?
-		synchronized (channel) {
+		synchronized (pendingAcks) {
 			messages.forEach(m -> {
 				m.setSequenceNumber(sequenceNumber);
 
-				pendingAcks.add(sequenceNumber + 1);
 				sequenceNumber = (sequenceNumber + 1) % 256;
+				// TODO Enable sequence numbers
+				// pendingAcks.add(sequenceNumber);
 
 				channel.write(m);
 			});
