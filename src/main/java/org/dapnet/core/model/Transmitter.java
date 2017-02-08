@@ -73,7 +73,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	protected String deviceVersion;
 
 	public enum Status {
-		ONLINE, OFFLINE, ERROR, DISABLED
+		OFFLINE, ONLINE, ERROR, DISABLED
 	}
 
 	@NotNull
@@ -313,19 +313,26 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
 	public ArrayList<User> getOwners() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		ArrayList<User> users = new ArrayList<>();
-		if (ownerNames == null)
-			return null;
-		for (String owner : ownerNames) {
-			if (state.getUsers().contains(owner))
-				users.add(state.getUsers().findByName(owner));
 		}
-		if (ownerNames.size() == users.size())
-			return users;
-		else
+
+		ArrayList<User> users = new ArrayList<>();
+		if (ownerNames == null) {
 			return null;
+		}
+
+		for (String owner : ownerNames) {
+			if (state.getUsers().contains(owner)) {
+				users.add(state.getUsers().findByName(owner));
+			}
+		}
+
+		if (ownerNames.size() == users.size()) {
+			return users;
+		} else {
+			return null;
+		}
 	}
 
 	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")

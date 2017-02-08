@@ -23,10 +23,9 @@ import java.io.Serializable;
 public class Pager implements Serializable {
 	private static final long serialVersionUID = -8518189973413053726L;
 
-	// No ID
 	@NotNull
 	@Min(value = 0)
-	@Max(value = 2097151)
+	@Max(value = 2097151, message = "pager number is limited to 21 bits")
 	int number;
 
 	@NotNull
