@@ -43,11 +43,11 @@ public class RestManager {
 
 	public void startServer() {
 		try {
+			RestSettings settings = Settings.getRestSettings();
+
 			ResourceConfig rc = new ResourceConfig().packages("org/dapnet/core/rest");
-			// URI endpoint = new URI("http://localhost:" +
-			// Settings.getRestSettings().getPort() + "/");
-			URI endpoint = new URI("http", null, Settings.getRestSettings().getHostname(),
-					Settings.getRestSettings().getPort(), "/", null, null);
+			URI endpoint = new URI("http", null, settings.getHostname(), settings.getPort(), settings.getPath(), null,
+					null);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
 			logger.info("RestApi successfully started");
 		} catch (Exception e) {

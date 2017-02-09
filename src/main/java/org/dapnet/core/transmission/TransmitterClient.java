@@ -68,13 +68,6 @@ class TransmitterClient {
 	 *            Message to send.
 	 */
 	public void sendMessage(Message msg) {
-		synchronized (pendingAcks) {
-			msg.setSequenceNumber(sequenceNumber);
-			sequenceNumber = (sequenceNumber + 1) % 256;
-			// TODO Enable sequence numbers
-			// pendingAcks.add(sequenceNumber);
-		}
-
 		channel.writeAndFlush(msg);
 	}
 
@@ -86,18 +79,26 @@ class TransmitterClient {
 	 */
 	public void sendMessages(Collection<Message> messages) {
 		// TODO Sort messages?
+		messages.forEach(m -> {
+			channel.write(m);
+		});
+
+		channel.flush();
+	}
+
+	/**
+	 * Returns the next sequence number.
+	 * 
+	 * @return Next sequence number.
+	 */
+	public int getSequenceNumber() {
 		synchronized (pendingAcks) {
-			messages.forEach(m -> {
-				m.setSequenceNumber(sequenceNumber);
+			int sn = sequenceNumber;
+			sequenceNumber = (sequenceNumber + 1) % 256;
+			// Add expected sequence number to pending list
+			pendingAcks.add(sequenceNumber);
 
-				sequenceNumber = (sequenceNumber + 1) % 256;
-				// TODO Enable sequence numbers
-				// pendingAcks.add(sequenceNumber);
-
-				channel.write(m);
-			});
-
-			channel.flush();
+			return sn;
 		}
 	}
 
@@ -108,11 +109,26 @@ class TransmitterClient {
 	 * @param sequenceNumber
 	 *            Sequence number to ack.
 	 * @return True if the sequence number was valid.
+	 * @see TransmitterClient#freeSequenceNumber(int)
 	 */
 	public boolean ackSequenceNumber(int sequenceNumber) {
 		synchronized (pendingAcks) {
 			return pendingAcks.remove(sequenceNumber);
 		}
+	}
+
+	/**
+	 * Frees an allocated sequence number. The number will be incremented as if
+	 * a client has sent a correct response. Use this method only to free a
+	 * sequence number that will never be ackd due to errors etc.
+	 * 
+	 * @param sequenceNumber
+	 *            Sequence number to free.
+	 * @see TransmitterClient#ackSequenceNumber(int)
+	 */
+	public void freeSequenceNumber(int sequenceNumber) {
+		sequenceNumber = (sequenceNumber + 1) % 256;
+		ackSequenceNumber(sequenceNumber);
 	}
 
 	/**

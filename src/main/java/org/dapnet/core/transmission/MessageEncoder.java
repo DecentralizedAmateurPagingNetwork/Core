@@ -36,6 +36,11 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
+		TransmitterClient client = ctx.channel().attr(ServerHandler.CLIENT_KEY).get();
+		if (client == null) {
+			return;
+		}
+
 		// Mostly adapted from Sven Jung
 		// See Diplomarbeit Jansen Page 30
 		PagingMessageType type = null;
@@ -54,10 +59,17 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 			break;
 		}
 
-		String encoded = String.format("#%02X %s:%X:%X:%s:%s\r\n", msg.getSequenceNumber(), type.getValue(),
-				settings.getSendSpeed(), msg.getAddress(), msg.getFunctionalBits().getValue(), msg.getText());
+		int sn = client.getSequenceNumber();
+		try {
+			String encoded = String.format("#%02X %s:%X:%X:%s:%s\r\n", sn, type.getValue(), settings.getSendSpeed(),
+					msg.getAddress(), msg.getFunctionalBits().getValue(), msg.getText());
 
-		out.add(encoded);
+			out.add(encoded);
+		} catch (Exception ex) {
+			client.ackSequenceNumber(sn);
+
+			throw ex;
+		}
 	}
 
 }

@@ -22,7 +22,6 @@ public class Message implements Comparable<Message> {
 	private final Date timestamp;
 	private final MessagePriority priority;
 	private final FunctionalBits functionalBits;
-	private int sequenceNumber;
 
 	public enum MessagePriority {
 		EMERGENCY, TIME, CALL, NEWS, ACTIVATION, RUBRIC
@@ -68,14 +67,6 @@ public class Message implements Comparable<Message> {
 
 	public FunctionalBits getFunctionalBits() {
 		return functionalBits;
-	}
-
-	public void setSequenceNumber(int sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
-	}
-
-	public int getSequenceNumber() {
-		return sequenceNumber;
 	}
 
 	@Override
