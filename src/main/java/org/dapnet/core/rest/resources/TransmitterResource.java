@@ -18,12 +18,24 @@ import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
+import java.security.NoSuchAlgorithmException;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 @Path("/transmitters")
 @Produces("application/json")
 public class TransmitterResource extends AbstractResource {
+	private final AuthKeyGenerator keyGenerator;
+
+	public TransmitterResource() {
+		try {
+			keyGenerator = new AuthKeyGenerator();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@GET
 	public Response getTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
@@ -73,5 +85,29 @@ public class TransmitterResource extends AbstractResource {
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);
+	}
+
+	@GET
+	@Path("/auth_key")
+	public Response getAuthKey() throws Exception {
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+
+		String key = null;
+		boolean foundUnique = false;
+
+		do {
+			key = keyGenerator.generateKey();
+
+			// TODO Use a map to look up used keys
+			for (Transmitter t : restListener.getState().getTransmitters()) {
+				if (key.equals(t.getAuthKey())) {
+					break;
+				}
+			}
+
+			foundUnique = true;
+		} while (!foundUnique);
+
+		return Response.status(Response.Status.OK).entity(getExclusionGson(status).toJson(key)).build();
 	}
 }

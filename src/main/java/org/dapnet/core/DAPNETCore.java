@@ -29,6 +29,11 @@ import org.dapnet.core.transmission.Server;
 import org.dapnet.core.transmission.TransmissionManager;
 
 public class DAPNETCore {
+
+	private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
+	private static final String CORE_VERSION = "1.1.0.0";
+	private static final String API_VERSION = "1.1.0";
+	private static volatile DAPNETCore dapnetCore;
 	private ClusterManager clusterManager;
 	private RestManager restManager;
 	private TransmissionManager transmissionManager;
@@ -93,12 +98,6 @@ public class DAPNETCore {
 		// System.exit(1);
 		// }
 	}
-
-	// Static
-	private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
-	private static final String CORE_VERSION = "0.9.3.2";
-	private static final String API_VERSION = "0.9.3";
-	private static volatile DAPNETCore dapnetCore;
 
 	public static void main(String[] args) throws Exception {
 		// Disable IPv6 for Java VM, creates sometimes LogMessages
