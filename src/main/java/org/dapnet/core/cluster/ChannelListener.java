@@ -47,7 +47,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 			printCreateClusterWarning();
 
 			// Node already existing in State?
-			if (clusterManager.getState().getNodes().contains(channel.getName())) {
+			if (clusterManager.getState().getNodes().containsKey(channel.getName())) {
 				updateFirstNode();
 			} else {
 				createFirstNode();
@@ -103,7 +103,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		IpAddress address = (IpAddress) clusterManager.getChannel()
 				.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
 
-		Node node = clusterManager.getState().getNodes().findByName(clusterManager.getChannel().getName());
+		Node node = clusterManager.getState().getNodes().get(clusterManager.getChannel().getName());
 		node.setAddress(address);
 		node.setStatus(Node.Status.ONLINE);
 		clusterManager.getState().writeToFile();

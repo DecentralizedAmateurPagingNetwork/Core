@@ -14,11 +14,15 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.list.Searchable;
-import org.jgroups.stack.IpAddress;
-
-import javax.validation.constraints.*;
 import java.io.Serializable;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.jgroups.stack.IpAddress;
 
 public class Node implements Serializable, Searchable {
 	private static final long serialVersionUID = -4104175163845286560L;

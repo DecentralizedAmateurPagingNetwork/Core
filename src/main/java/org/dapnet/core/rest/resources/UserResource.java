@@ -35,7 +35,7 @@ public class UserResource extends AbstractResource {
 	@Path("{user}")
 	public Response getUser(@PathParam("user") String userName) throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getUsers().findByName(userName), status);
+		return getObject(restListener.getState().getUsers().get(userName), status);
 	}
 
 	@PUT
@@ -48,9 +48,9 @@ public class UserResource extends AbstractResource {
 		// Create User from received data
 		User user = gson.fromJson(userJSON, User.class);
 		if (user != null) {
-			if (user.getHash().equals("") && restListener.getState().getUsers().contains(userName)) {
+			if (user.getHash().equals("") && restListener.getState().getUsers().containsKey(userName)) {
 				// keep existing hash
-				user.setHash(restListener.getState().getUsers().findByName(userName).getHash());
+				user.setHash(restListener.getState().getUsers().get(userName).getHash());
 			} else {
 				user.setHash(HashUtil.createHash(user.getHash()));
 			}
@@ -58,28 +58,32 @@ public class UserResource extends AbstractResource {
 		} else
 			throw new EmptyBodyException();
 
-		if (user.isAdmin())
+		if (user.isAdmin()) {
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		else {
-			if (restListener.getState().getUsers().contains(userName))
+		} else {
+			if (restListener.getState().getUsers().containsKey(userName)) {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-						restListener.getState().getUsers().findByName(userName));
-			else
+						restListener.getState().getUsers().get(userName));
+			} else {
 				checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			}
 		}
 
-		return handleObject(user, "putUser", !restListener.getState().getUsers().contains(userName), true);
+		return handleObject(user, "putUser", !restListener.getState().getUsers().containsKey(userName), true);
 	}
 
 	@DELETE
 	@Path("{user}")
 	public Response deleteUser(@PathParam("user") String user) throws Exception {
-		User oldUser = restListener.getState().getUsers().findByName(user);
+		User oldUser = restListener.getState().getUsers().get(user);
 
-		if (oldUser != null) // only owner can delete object
+		if (oldUser != null) {
+			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
-		else // only user will get message that object does not exist
+		} else {
+			// only user will get message that object does not exist
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		}
 
 		return deleteObject(oldUser, "deleteUser", true);
 	}

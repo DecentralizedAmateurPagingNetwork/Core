@@ -53,7 +53,7 @@ public class RestSecurity {
 			return checkAuthorization(minSecurityLevel, SecurityStatus.ANYBODY);
 		}
 		// Get User
-		User user = restListener.getState().getUsers().findByName(loginData.getUsername());
+		User user = restListener.getState().getUsers().get(loginData.getUsername());
 		if (user == null) {
 			logger.info("No User with such name");
 			return SecurityStatus.UNAUTHORIZED;

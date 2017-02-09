@@ -14,12 +14,7 @@
 
 package org.dapnet.core.rest.resources;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.dapnet.core.model.list.Searchable;
-import org.dapnet.core.rest.*;
-import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
-import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
+import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -33,7 +28,18 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.Set;
+
+import org.dapnet.core.model.Searchable;
+import org.dapnet.core.rest.GsonTypeAdapter;
+import org.dapnet.core.rest.RestAuthorizable;
+import org.dapnet.core.rest.RestListener;
+import org.dapnet.core.rest.RestSecurity;
+import org.dapnet.core.rest.UserExclusionStrategy;
+import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
+import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public abstract class AbstractResource {
 	@Context

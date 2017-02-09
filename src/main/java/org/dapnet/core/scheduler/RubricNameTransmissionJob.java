@@ -32,8 +32,9 @@ public class RubricNameTransmissionJob implements Job {
 			TransmissionManager transmissionManager = (TransmissionManager) schedulerContext.get("transmissionManager");
 			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-			for (Rubric rubric : clusterManager.getState().getRubrics())
+			for (Rubric rubric : clusterManager.getState().getRubrics().values()) {
 				transmissionManager.handleRubric(rubric);
+			}
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute RubricNameTransmissionJob", e);
 		}

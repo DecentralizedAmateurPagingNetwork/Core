@@ -46,7 +46,7 @@ public class TransmitterResource extends AbstractResource {
 	@Path("{transmitter}")
 	public Response getTransmitter(@PathParam("transmitter") String transmitterName) throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getTransmitters().findByName(transmitterName), status);
+		return getObject(restListener.getState().getTransmitters().get(transmitterName), status);
 	}
 
 	@PUT
@@ -54,10 +54,12 @@ public class TransmitterResource extends AbstractResource {
 	@Consumes("application/json")
 	public Response putTransmitter(@PathParam("transmitter") String transmitterName, String transmitterJSON)
 			throws Exception {
-		if (restListener.getState().getTransmitters().contains(transmitterName)) { // Overwrite
+		if (restListener.getState().getTransmitters().containsKey(transmitterName)) {
+			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getTransmitters().findByName(transmitterName));
-		} else { // Create
+					restListener.getState().getTransmitters().get(transmitterName));
+		} else {
+			// Create
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		}
 
@@ -68,21 +70,23 @@ public class TransmitterResource extends AbstractResource {
 			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED)
 				transmitter.setStatus(Transmitter.Status.OFFLINE);
 			transmitter.setName(transmitterName);
-		} else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		return handleObject(transmitter, "putTransmitter",
-				!restListener.getState().getTransmitters().contains(transmitterName), true);
+				!restListener.getState().getTransmitters().containsKey(transmitterName), true);
 	}
 
 	@DELETE
 	@Path("{transmitter}")
 	public Response deleteTransmitter(@PathParam("transmitter") String transmitter) throws Exception {
-		Transmitter oldTransmitter = restListener.getState().getTransmitters().findByName(transmitter);
-		if (oldTransmitter != null)
+		Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
+		if (oldTransmitter != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
-		else
+		} else {
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		}
 
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);
 	}
@@ -91,22 +95,7 @@ public class TransmitterResource extends AbstractResource {
 	@Path("/auth_key")
 	public Response getAuthKey() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-
-		String key = null;
-		boolean foundUnique = false;
-
-		do {
-			key = keyGenerator.generateKey();
-
-			// TODO Use a map to look up used keys
-			for (Transmitter t : restListener.getState().getTransmitters()) {
-				if (key.equals(t.getAuthKey())) {
-					break;
-				}
-			}
-
-			foundUnique = true;
-		} while (!foundUnique);
+		String key = keyGenerator.generateKey();
 
 		return Response.status(Response.Status.OK).entity(getExclusionGson(status).toJson(key)).build();
 	}

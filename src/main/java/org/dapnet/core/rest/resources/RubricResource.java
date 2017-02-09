@@ -34,40 +34,46 @@ public class RubricResource extends AbstractResource {
 	@Path("{rubric}")
 	public Response getRubric(@PathParam("rubric") String rubricName) throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getRubrics().findByName(rubricName), status);
+		return getObject(restListener.getState().getRubrics().get(rubricName), status);
 	}
 
 	@PUT
 	@Path("{rubric}")
 	@Consumes("application/json")
 	public Response putRubric(@PathParam("rubric") String rubricName, String rubricJSON) throws Exception {
-		if (restListener.getState().getRubrics().contains(rubricName)) { // Overwrite
+		if (restListener.getState().getRubrics().containsKey(rubricName)) {
+			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getRubrics().findByName(rubricName));
-		} else { // Create
+					restListener.getState().getRubrics().get(rubricName));
+		} else {
+			// Create
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		// Create Rubric
 		Rubric rubric = gson.fromJson(rubricJSON, Rubric.class);
-		if (rubric != null)
+		if (rubric != null) {
 			rubric.setName(rubricName);
-		else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		// TODO Validate that there is no conflict with other Rubrics
-		return handleObject(rubric, "putRubric", !restListener.getState().getRubrics().contains(rubricName), true);
+		return handleObject(rubric, "putRubric", !restListener.getState().getRubrics().containsKey(rubricName), true);
 	}
 
 	@DELETE
 	@Path("{rubric}")
 	public Response deleteRubric(@PathParam("rubric") String rubric) throws Exception {
-		Rubric oldRubric = restListener.getState().getRubrics().findByName(rubric);
+		Rubric oldRubric = restListener.getState().getRubrics().get(rubric);
 
-		if (oldRubric != null) // only owner can delete object
+		if (oldRubric != null) {
+			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
-		else // only user will get message that object does not exist
+		} else {
+			// only user will get message that object does not exist
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		}
 
 		return deleteObject(oldRubric, "deleteRubric", true);
 	}

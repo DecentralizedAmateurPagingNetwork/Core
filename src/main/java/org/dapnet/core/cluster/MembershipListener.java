@@ -74,10 +74,11 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			for (Address add : view.getMembers()) {
 				PhysicalAddress physicalAddress = (PhysicalAddress) clusterManager.getChannel()
 						.down(new Event(Event.GET_PHYSICAL_ADDRESS, add));
-				if (physicalAddress instanceof IpAddress
-						&& clusterManager.getState().getNodes().contains(add.toString())) {
-					clusterManager.getState().getNodes().findByName(add.toString())
-							.setAddress((IpAddress) physicalAddress);
+				if (physicalAddress instanceof IpAddress) {
+					Node n = clusterManager.getState().getNodes().get(add.toString());
+					if (n != null) {
+						n.setAddress((IpAddress) physicalAddress);
+					}
 				}
 			}
 
@@ -150,7 +151,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			// otherwise rejected while authorization
 			// (expect of first node, which might not be in the state, but will
 			// add itself immediately)
-			for (Node node : clusterManager.getState().getNodes()) {
+			for (Node node : clusterManager.getState().getNodes().values()) {
 				if (view.getMembers().stream().filter(m -> m.toString().equals(node.getName())).findFirst()
 						.isPresent()) {
 					if (node.getStatus() == Node.Status.SUSPENDED) {

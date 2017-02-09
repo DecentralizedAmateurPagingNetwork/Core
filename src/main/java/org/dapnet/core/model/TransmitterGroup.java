@@ -14,14 +14,14 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.list.Searchable;
-import org.dapnet.core.model.validator.ValidName;
-import org.dapnet.core.rest.RestAuthorizable;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.ArrayList;
+
+import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.rest.RestAuthorizable;
 
 public class TransmitterGroup implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 2641698714366327412L;
@@ -84,37 +84,51 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
 	public ArrayList<User> getOwners() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		ArrayList<User> users = new ArrayList<>();
-		if (ownerNames == null)
-			return null;
-		for (String owner : ownerNames) {
-			if (state.getUsers().contains(owner))
-				users.add(state.getUsers().findByName(owner));
 		}
-		if (ownerNames.size() == users.size())
-			return users;
-		else
+
+		if (ownerNames == null) {
 			return null;
+		}
+
+		ArrayList<User> users = new ArrayList<>();
+		for (String owner : ownerNames) {
+			User u = state.getUsers().get(owner);
+			if (u != null)
+				users.add(u);
+		}
+
+		if (ownerNames.size() == users.size()) {
+			return users;
+		} else {
+			return null;
+		}
 	}
 
 	@ValidName(message = "must contain names of existing transmitters", fieldName = "transmitterNames", constraintName = "ValidTransmitterNames")
 	public ArrayList<Transmitter> getTransmitter() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		ArrayList<Transmitter> transmitters = new ArrayList<>();
-		if (transmitterNames == null)
+		}
+
+		if (transmitterNames == null) {
 			return null;
+		}
+
+		ArrayList<Transmitter> transmitters = new ArrayList<>();
 		for (String transmitterName : transmitterNames) {
-			if (state.getTransmitters().contains(transmitterName)) {
-				transmitters.add(state.getTransmitters().findByName(transmitterName));
+			Transmitter t = state.getTransmitters().get(transmitterName);
+			if (t != null) {
+				transmitters.add(t);
 			}
 		}
-		if (transmitters.size() == transmitterNames.size())
+
+		if (transmitters.size() == transmitterNames.size()) {
 			return transmitters;
-		else
+		} else {
 			return null;
+		}
 	}
 
 	public boolean contains(String transmitter) {
@@ -122,6 +136,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 			if (transmitter.equals(transmitterName))
 				return true;
 		}
+
 		return false;
 	}
 

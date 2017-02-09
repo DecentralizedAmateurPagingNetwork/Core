@@ -35,7 +35,7 @@ public class CallResource extends AbstractResource {
 			return getObject(restListener.getState().getCalls(), status);
 		} else {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getUsers().findByName(ownerName));
+					restListener.getState().getUsers().get(ownerName));
 
 			List<Call> calls = new ArrayList<>();
 			for (Call call : restListener.getState().getCalls()) {

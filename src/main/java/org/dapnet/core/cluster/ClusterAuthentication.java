@@ -57,7 +57,7 @@ public class ClusterAuthentication extends AuthToken {
 			return false;
 		}
 
-		Node node = clusterManager.getState().getNodes().findByName(sender.toString());
+		Node node = clusterManager.getState().getNodes().get(sender.toString());
 		if (node == null) {
 			logger.warn("Authentication of Node " + sender.toString() + " failed: Unknown node");
 			return false;

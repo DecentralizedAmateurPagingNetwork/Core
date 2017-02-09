@@ -35,7 +35,7 @@ public class NodeResource extends AbstractResource {
 	@Path("{node}")
 	public Response getNode(@PathParam("node") String nodeName) throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getNodes().findByName(nodeName), status);
+		return getObject(restListener.getState().getNodes().get(nodeName), status);
 	}
 
 	@PUT
@@ -53,13 +53,13 @@ public class NodeResource extends AbstractResource {
 		} else
 			throw new EmptyBodyException();
 
-		return handleObject(node, "putNode", !restListener.getState().getNodes().contains(nodeName), true);
+		return handleObject(node, "putNode", !restListener.getState().getNodes().containsKey(nodeName), true);
 	}
 
 	@DELETE
 	@Path("{node}")
 	public Response deleteNode(@PathParam("node") String node) throws Exception {
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		return deleteObject(restListener.getState().getNodes().findByName(node), "deleteNode", true);
+		return deleteObject(restListener.getState().getNodes().get(node), "deleteNode", true);
 	}
 }

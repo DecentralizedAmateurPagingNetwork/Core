@@ -34,7 +34,7 @@ public class TransmitterGroupResource extends AbstractResource {
 	@Path("{transmitterGroup}")
 	public Response getTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName) throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getTransmitterGroups().findByName(transmitterGroupName), status);
+		return getObject(restListener.getState().getTransmitterGroups().get(transmitterGroupName), status);
 	}
 
 	@PUT
@@ -42,29 +42,31 @@ public class TransmitterGroupResource extends AbstractResource {
 	@Consumes("application/json")
 	public Response putTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName,
 			String transmitterGroupJSON) throws Exception {
-		if (restListener.getState().getTransmitterGroups().contains(transmitterGroupName)) { // Overwrite
+		if (restListener.getState().getTransmitterGroups().containsKey(transmitterGroupName)) {
+			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getTransmitterGroups().findByName(transmitterGroupName));
-		} else { // Create
+					restListener.getState().getTransmitterGroups().get(transmitterGroupName));
+		} else {
+			// Create
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		}
 
 		// Create TransmitterGroup
 		TransmitterGroup transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
-		if (transmitterGroup != null)
+		if (transmitterGroup != null) {
 			transmitterGroup.setName(transmitterGroupName);
-		else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		return handleObject(transmitterGroup, "putTransmitterGroup",
-				!restListener.getState().getTransmitterGroups().contains(transmitterGroupName), true);
+				!restListener.getState().getTransmitterGroups().containsKey(transmitterGroupName), true);
 	}
 
 	@DELETE
 	@Path("{transmitterGroup}")
 	public Response deleteTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroup) throws Exception {
-		TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups()
-				.findByName(transmitterGroup);
+		TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups().get(transmitterGroup);
 
 		if (oldTransmitterGroup != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);

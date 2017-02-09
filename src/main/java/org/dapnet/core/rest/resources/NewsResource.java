@@ -14,16 +14,22 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+
 import org.dapnet.core.model.News;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Path("/news")
 @Produces("application/json")
@@ -35,7 +41,7 @@ public class NewsResource extends AbstractResource {
 			return getObject(restListener.getState().getNews(), status);
 		} else {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getRubrics().findByName(rubricName));
+					restListener.getState().getRubrics().get(rubricName));
 
 			List<News> newsList = new ArrayList<>();
 			for (News news : restListener.getState().getNews()) {
@@ -63,7 +69,7 @@ public class NewsResource extends AbstractResource {
 
 		// Check whether OWNER of rubric
 		checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-				restListener.getState().getRubrics().findByName(news.getRubricName()));
+				restListener.getState().getRubrics().get(news.getRubricName()));
 
 		return handleObject(news, "postNews", true, false);
 	}

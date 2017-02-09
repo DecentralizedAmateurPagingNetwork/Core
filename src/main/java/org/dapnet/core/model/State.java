@@ -14,24 +14,28 @@
 
 package org.dapnet.core.model;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.dapnet.core.Settings;
-import org.dapnet.core.model.list.SearchableArrayList;
+import static org.jgroups.util.Util.readFile;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import static org.jgroups.util.Util.readFile;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class State implements Serializable {
 	private static final long serialVersionUID = 7604901183837032119L;
@@ -39,15 +43,15 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private SearchableArrayList<CallSign> callSigns;
+	private ConcurrentMap<String, CallSign> callSigns = new ConcurrentHashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private SearchableArrayList<Node> nodes;
+	private ConcurrentMap<String, Node> nodes = new ConcurrentHashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private SearchableArrayList<User> users;
+	private ConcurrentMap<String, User> users = new ConcurrentHashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
@@ -59,25 +63,19 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private SearchableArrayList<Transmitter> transmitters;
+	private ConcurrentMap<String, Transmitter> transmitters = new ConcurrentHashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private SearchableArrayList<TransmitterGroup> transmitterGroups;
+	private ConcurrentMap<String, TransmitterGroup> transmitterGroups = new ConcurrentHashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private SearchableArrayList<Rubric> rubrics;
+	private ConcurrentMap<String, Rubric> rubrics = new ConcurrentHashMap<>();
 
 	public State() {
-		callSigns = new SearchableArrayList<>();
-		nodes = new SearchableArrayList<>();
-		users = new SearchableArrayList<>();
-		calls = new ArrayList<>();
-		news = new ArrayList<>();
-		transmitters = new SearchableArrayList<>();
-		transmitterGroups = new SearchableArrayList<>();
-		rubrics = new SearchableArrayList<>();
+		calls = Collections.synchronizedList(new ArrayList<>());
+		news = Collections.synchronizedList(new ArrayList<>());
 
 		setModelReferences();
 	}
@@ -101,15 +99,15 @@ public class State implements Serializable {
 	public void writeToFile() {
 		File file = new File(Settings.getModelSettings().getStateFile());
 		try {
-			if (file.getParentFile() != null)
+			if (file.getParentFile() != null) {
 				file.getParentFile().mkdirs();
+			}
 
-			FileWriter writer = new FileWriter(file);
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			String state = gson.toJson(this);
-			writer.write(state);
-			writer.flush();
-			writer.close();
+			try (FileWriter writer = new FileWriter(file)) {
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				writer.write(gson.toJson(this));
+				writer.flush();
+			}
 
 			logger.info("Successfully wrote state to file");
 		} catch (Exception e) {
@@ -118,7 +116,8 @@ public class State implements Serializable {
 	}
 
 	public void clean() {
-		Date currentDate = new Date();
+		final Date currentDate = new Date();
+
 		{
 			// Clean Calls:
 			Iterator<Call> i = calls.iterator();
@@ -129,6 +128,7 @@ public class State implements Serializable {
 					i.remove();
 			}
 		}
+
 		{
 			// Clean News:
 			Iterator<News> i = news.iterator();
@@ -139,7 +139,9 @@ public class State implements Serializable {
 					i.remove();
 			}
 		}
+
 		writeToFile();
+
 		logger.info("Successfully finished cleaning operation");
 	}
 
@@ -151,27 +153,27 @@ public class State implements Serializable {
 		return news;
 	}
 
-	public SearchableArrayList<CallSign> getCallSigns() {
+	public ConcurrentMap<String, CallSign> getCallSigns() {
 		return callSigns;
 	}
 
-	public SearchableArrayList<Node> getNodes() {
+	public ConcurrentMap<String, Node> getNodes() {
 		return nodes;
 	}
 
-	public SearchableArrayList<User> getUsers() {
+	public ConcurrentMap<String, User> getUsers() {
 		return users;
 	}
 
-	public SearchableArrayList<Transmitter> getTransmitters() {
+	public ConcurrentMap<String, Transmitter> getTransmitters() {
 		return transmitters;
 	}
 
-	public SearchableArrayList<TransmitterGroup> getTransmitterGroups() {
+	public ConcurrentMap<String, TransmitterGroup> getTransmitterGroups() {
 		return transmitterGroups;
 	}
 
-	public SearchableArrayList<Rubric> getRubrics() {
+	public ConcurrentMap<String, Rubric> getRubrics() {
 		return rubrics;
 	}
 }

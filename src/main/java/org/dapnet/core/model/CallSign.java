@@ -14,15 +14,15 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.list.Searchable;
-import org.dapnet.core.model.validator.ValidName;
-import org.dapnet.core.rest.RestAuthorizable;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.ArrayList;
+
+import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.rest.RestAuthorizable;
 
 public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 1884808852367562476L;
@@ -86,18 +86,25 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
 	public ArrayList<User> getOwners() throws Exception {
-		if (state == null)
-			throw new Exception("StateNotSetException");
-		ArrayList<User> users = new ArrayList<>();
-		if (ownerNames == null)
+		if (ownerNames == null) {
 			return null;
-		for (String owner : ownerNames) {
-			if (state.getUsers().contains(owner))
-				users.add(state.getUsers().findByName(owner));
 		}
-		if (users.size() != ownerNames.size())
+		if (state == null) {
+			throw new Exception("StateNotSetException");
+		}
+
+		ArrayList<User> users = new ArrayList<>();
+		for (String owner : ownerNames) {
+			User u = state.getUsers().get(owner);
+			if (u != null)
+				users.add(u);
+		}
+
+		if (users.size() != ownerNames.size()) {
 			return null;
-		return users;
+		} else {
+			return users;
+		}
 	}
 
 	@Override

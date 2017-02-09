@@ -28,7 +28,6 @@ import java.util.List;
 public class Activation implements Serializable {
 	private static final long serialVersionUID = 2653692303199008619L;
 
-	// No ID
 	@NotNull
 	@Min(value = 0)
 	@Max(value = 2097151)
@@ -75,19 +74,27 @@ public class Activation implements Serializable {
 
 	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
 	public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
-		if (transmitterGroupNames == null)
-			return null;
-		for (String transmitterGroup : transmitterGroupNames) {
-			if (state.getTransmitterGroups().contains(transmitterGroup))
-				transmitterGroups.add(state.getTransmitterGroups().findByName(transmitterGroup));
 		}
-		if (transmitterGroups.size() == transmitterGroups.size())
-			return transmitterGroups;
-		else
+
+		if (transmitterGroupNames == null) {
 			return null;
+		}
+
+		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
+
+		for (String transmitterGroup : transmitterGroupNames) {
+			TransmitterGroup g = state.getTransmitterGroups().get(transmitterGroup);
+			if (g != null) {
+				transmitterGroups.add(g);
+			}
+		}
+		if (transmitterGroups.size() == transmitterGroups.size()) {
+			return transmitterGroups;
+		} else {
+			return null;
+		}
 	}
 
 	@Override

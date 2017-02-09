@@ -101,22 +101,26 @@ public class News implements Serializable {
 
 	@ValidName(message = "must contain the name of an existing rubric", fieldName = "rubricName", constraintName = "ValidRubricName")
 	public Rubric getRubric() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		if (rubricName == null)
+		}
+		if (rubricName == null) {
 			return null;
-		else
-			return state.getRubrics().findByName(rubricName);
+		} else {
+			return state.getRubrics().get(rubricName);
+		}
 	}
 
 	@ValidName(message = "must contain the name of an existing user", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
 	public User getOwner() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		if (ownerName == null)
+		}
+		if (ownerName == null) {
 			return null;
-		else
-			return state.getUsers().findByName(ownerName);
+		} else {
+			return state.getUsers().get(ownerName);
+		}
 	}
 
 	@Override

@@ -135,11 +135,12 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 	public List<Transmitter> getNodeTransmitter() {
 		ArrayList<Transmitter> myTransmitters = new ArrayList<>();
-		for (Transmitter transmitter : state.getTransmitters()) {
+		for (Transmitter transmitter : state.getTransmitters().values()) {
 			if (transmitter.getNodeName().equals(channel.getName())) {
 				myTransmitters.add(transmitter);
 			}
 		}
+
 		return myTransmitters;
 	}
 
@@ -181,7 +182,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		int activeNodeCount = 0; // Count of online and unknown Nodes
 		int onlineNodeCount = 0;
 
-		for (Node node : state.getNodes()) {
+		for (Node node : state.getNodes().values()) {
 			if (node.getStatus() != Node.Status.SUSPENDED)// Node is in UNKNOWN
 															// oder ONLINE state
 				activeNodeCount++;
@@ -255,7 +256,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// #############################################################################
 	@Override
 	public void handleTransmitterStatusChanged(String transmitterName, Transmitter.Status newStatus) {
-		if (state.getTransmitters().contains(transmitterName)) {
+		if (state.getTransmitters().containsKey(transmitterName)) {
 			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitterName, newStatus },
 					new Class[] { String.class, Transmitter.Status.class });
 		}

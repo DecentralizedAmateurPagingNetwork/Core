@@ -91,46 +91,62 @@ public class Call implements Serializable {
 
 	@ValidName(message = "must contain names of existing callSigns", fieldName = "callSignNames", constraintName = "ValidCallSignNames")
 	public ArrayList<CallSign> getCallSigns() throws Exception {
-		if (state == null)
-			throw new Exception("StateNotSetException");
-		ArrayList<CallSign> callSigns = new ArrayList<>();
-		if (callSignNames == null)
+		if (callSignNames == null) {
 			return null;
-		for (String callSign : callSignNames) {
-			if (state.getCallSigns().contains(callSign))
-				callSigns.add(state.getCallSigns().findByName(callSign));
 		}
-		if (callSigns.size() == callSignNames.size())
+
+		if (state == null) {
+			throw new Exception("StateNotSetException");
+		}
+
+		ArrayList<CallSign> callSigns = new ArrayList<>();
+		for (String callSign : callSignNames) {
+			CallSign s = state.getCallSigns().get(callSign);
+			if (s != null) {
+				callSigns.add(s);
+			}
+		}
+		if (callSigns.size() == callSignNames.size()) {
 			return callSigns;
-		else
+		} else {
 			return null;
+		}
 	}
 
 	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
 	public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
-		if (state == null)
-			throw new Exception("StateNotSetException");
-		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
-		if (transmitterGroupNames == null)
+		if (transmitterGroupNames == null) {
 			return null;
-		for (String transmitterGroup : transmitterGroupNames) {
-			if (state.getTransmitterGroups().contains(transmitterGroup))
-				transmitterGroups.add(state.getTransmitterGroups().findByName(transmitterGroup));
 		}
-		if (transmitterGroups.size() == transmitterGroups.size())
+
+		if (state == null) {
+			throw new Exception("StateNotSetException");
+		}
+
+		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
+		for (String transmitterGroup : transmitterGroupNames) {
+			TransmitterGroup g = state.getTransmitterGroups().get(transmitterGroup);
+			if (g != null) {
+				transmitterGroups.add(g);
+			}
+		}
+		if (transmitterGroups.size() == transmitterGroups.size()) {
 			return transmitterGroups;
-		else
+		} else {
 			return null;
+		}
 	}
 
 	@ValidName(message = "must be a name of an existing user", fieldName = "ownerName", constraintName = "ValidOwnerName")
 	public User getOwner() throws Exception {
-		if (state == null)
+		if (state == null) {
 			throw new Exception("StateNotSetException");
-		if (ownerName == null)
+		}
+		if (ownerName == null) {
 			return null;
-		else
-			return state.getUsers().findByName(ownerName);
+		} else {
+			return state.getUsers().get(ownerName);
+		}
 	}
 
 	@Override

@@ -124,11 +124,8 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Delete Object with same Name, if existing
-			clusterManager.getState().getCallSigns().removeByName(callSign.getName());
-
-			// Add new Object
-			clusterManager.getState().getCallSigns().add(callSign);
+			// Add new Object (will replace old one if present)
+			clusterManager.getState().getCallSigns().put(callSign.getName(), callSign);
 			if (Settings.getModelSettings().isSavingImmediately())
 				clusterManager.getState().writeToFile();
 			return response = RpcResponse.OK;
@@ -170,7 +167,7 @@ public class RpcListener {
 			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
 
 			// Delete Object with same Name, if existing
-			if (!clusterManager.getState().getCallSigns().removeByName(callSign)) {
+			if (clusterManager.getState().getCallSigns().remove(callSign) == null) {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
@@ -222,7 +219,7 @@ public class RpcListener {
 		RpcResponse response = null;
 		try {
 			// Check Arguments
-			Node node = clusterManager.getState().getNodes().findByName(nodeName);
+			Node node = clusterManager.getState().getNodes().get(nodeName);
 			if (node == null || status == null) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
@@ -259,11 +256,8 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Delete Object with same Name, if existing
-			clusterManager.getState().getNodes().removeByName(node.getName());
-
-			// Add new Object
-			clusterManager.getState().getNodes().add(node);
+			// Replace object
+			clusterManager.getState().getNodes().put(node.getName(), node);
 			if (Settings.getModelSettings().isSavingImmediately())
 				clusterManager.getState().writeToFile();
 			clusterManager.checkQuorum();
@@ -292,13 +286,13 @@ public class RpcListener {
 			// Delete depended Objects
 			// Delete Transmitters
 			ArrayList<String> deleteTransmitterNames = new ArrayList<>();
-			clusterManager.getState().getTransmitters().stream()
+			clusterManager.getState().getTransmitters().values().stream()
 					.filter(transmitter -> transmitter.getNodeName().equals(node))
 					.forEach(transmitter -> deleteTransmitterNames.add(transmitter.getName()));
 			deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
 
 			// Delete Object with same Name, if existing
-			if (!clusterManager.getState().getNodes().removeByName(node)) {
+			if (clusterManager.getState().getNodes().remove(node) == null) {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
@@ -335,11 +329,8 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Delete Object with same Name, if existing
-			clusterManager.getState().getRubrics().removeByName(rubric.getName());
-
-			// Add new Object
-			clusterManager.getState().getRubrics().add(rubric);
+			// Replace object
+			clusterManager.getState().getRubrics().put(rubric.getName(), rubric);
 			if (Settings.getModelSettings().isSavingImmediately())
 				clusterManager.getState().writeToFile();
 
@@ -376,7 +367,7 @@ public class RpcListener {
 			deleteNews.stream().forEach(news -> clusterManager.getState().getNews().remove(news));
 
 			// Delete Object with same Name, if existing
-			if (!clusterManager.getState().getRubrics().removeByName(rubric)) {
+			if (clusterManager.getState().getRubrics().remove(rubric) == null) {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
@@ -398,7 +389,7 @@ public class RpcListener {
 		RpcResponse response = null;
 		try {
 			// Check Arguments
-			Transmitter transmitter = clusterManager.getState().getTransmitters().findByName(transmitterName);
+			Transmitter transmitter = clusterManager.getState().getTransmitters().get(transmitterName);
 			if (transmitter == null || status == null) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
@@ -434,20 +425,17 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Delete Object with same Name, if existing
-			Transmitter oldTransmitter = clusterManager.getState().getTransmitters().findByName(transmitter.getName());
+			// Replace object
+			Transmitter oldTransmitter = clusterManager.getState().getTransmitters().put(transmitter.getName(),
+					transmitter);
 			if (oldTransmitter != null) {
-				clusterManager.getState().getTransmitters().remove(oldTransmitter);
-
-				// Disconnect from Transmitter if my Transmitter
+				// Disconnect from old transmitter if my Transmitter
 				String myNodeName = clusterManager.getChannel().getName();
 				if (oldTransmitter.getNodeName().equals(myNodeName)) {
 					clusterManager.getTransmitterManager().removeTransmitter(oldTransmitter);
 				}
 			}
 
-			// Add new Object
-			clusterManager.getState().getTransmitters().add(transmitter);
 			if (Settings.getModelSettings().isSavingImmediately())
 				clusterManager.getState().writeToFile();
 
@@ -482,7 +470,7 @@ public class RpcListener {
 			// Delete depended Objects
 			// Delete TransmitterGroups
 			ArrayList<String> deleteTransmitterGroupNames = new ArrayList<>();
-			clusterManager.getState().getTransmitterGroups().stream()
+			clusterManager.getState().getTransmitterGroups().values().stream()
 					.filter(transmitterGroup -> transmitterGroup.getTransmitterNames().contains(transmitterName))
 					.forEach(transmitterGroup -> {
 						if (transmitterGroup.getTransmitterNames().size() == 1) {
@@ -497,12 +485,11 @@ public class RpcListener {
 					});
 			deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
 
-			Transmitter transmitter = clusterManager.getState().getTransmitters().findByName(transmitterName);
+			Transmitter transmitter = clusterManager.getState().getTransmitters().remove(transmitterName);
 			if (transmitter == null) {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				clusterManager.getState().getTransmitters().removeByName(transmitterName);
 				if (Settings.getModelSettings().isSavingImmediately())
 					clusterManager.getState().writeToFile();
 
@@ -542,11 +529,8 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Delete Object with same Name, if existing
-			clusterManager.getState().getTransmitterGroups().removeByName(transmitterGroup.getName());
-
-			// Add new Object
-			clusterManager.getState().getTransmitterGroups().add(transmitterGroup);
+			// Replace object
+			clusterManager.getState().getTransmitterGroups().put(transmitterGroup.getName(), transmitterGroup);
 			if (Settings.getModelSettings().isSavingImmediately())
 				clusterManager.getState().writeToFile();
 			return response = RpcResponse.OK;
@@ -574,7 +558,7 @@ public class RpcListener {
 			// Delete depended Objects
 			// Delete Rubrics
 			ArrayList<String> deleteRubricNames = new ArrayList<>();
-			clusterManager.getState().getRubrics().stream()
+			clusterManager.getState().getRubrics().values().stream()
 					.filter(rubric -> rubric.getTransmitterGroupNames().contains(transmitterGroup)).forEach(rubric -> {
 						if (rubric.getTransmitterGroupNames().size() == 1) {
 							// Delete all Rubrics using only this
@@ -604,7 +588,7 @@ public class RpcListener {
 			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
 
 			// Delete Object with same Name, if existing
-			if (!clusterManager.getState().getTransmitterGroups().removeByName(transmitterGroup)) {
+			if (clusterManager.getState().getTransmitterGroups().remove(transmitterGroup) == null) {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
@@ -640,11 +624,8 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Delete Object with same Name, if existing
-			clusterManager.getState().getUsers().removeByName(user.getName());
-
 			// Add new Object
-			clusterManager.getState().getUsers().add(user);
+			clusterManager.getState().getUsers().put(user.getName(), user);
 			if (Settings.getModelSettings().isSavingImmediately())
 				clusterManager.getState().writeToFile();
 			return response = RpcResponse.OK;
@@ -672,7 +653,7 @@ public class RpcListener {
 			// Delete depended Objects
 			// Delete CallSigns
 			ArrayList<String> deleteCallSignNames = new ArrayList<>();
-			clusterManager.getState().getCallSigns().stream()
+			clusterManager.getState().getCallSigns().values().stream()
 					.filter(callSign -> callSign.getOwnerNames().contains(user)).forEach(callSign -> {
 						if (callSign.getOwnerNames().size() == 1) {
 							// Delete all CallSigns which have only this Owner
@@ -699,8 +680,8 @@ public class RpcListener {
 
 			// Delete Rubrics
 			ArrayList<String> deleteRubricNames = new ArrayList<>();
-			clusterManager.getState().getRubrics().stream().filter(rubric -> rubric.getOwnerNames().contains(user))
-					.forEach(rubric -> {
+			clusterManager.getState().getRubrics().values().stream()
+					.filter(rubric -> rubric.getOwnerNames().contains(user)).forEach(rubric -> {
 						if (rubric.getOwnerNames().size() == 1) {
 							// Delete all Rubrics which have only this Owner
 							deleteRubricNames.add(rubric.getName());
@@ -714,7 +695,7 @@ public class RpcListener {
 
 			// Delete TransmitterGroups
 			ArrayList<String> deleteTransmitterGroupNames = new ArrayList<>();
-			clusterManager.getState().getTransmitterGroups().stream()
+			clusterManager.getState().getTransmitterGroups().values().stream()
 					.filter(transmitterGroup -> transmitterGroup.getOwnerNames().contains(user))
 					.forEach(transmitterGroup -> {
 						if (transmitterGroup.getOwnerNames().size() == 1) {
@@ -731,7 +712,7 @@ public class RpcListener {
 
 			// Delete Transmitter
 			ArrayList<String> deleteTransmitterNames = new ArrayList<>();
-			clusterManager.getState().getTransmitters().stream()
+			clusterManager.getState().getTransmitters().values().stream()
 					.filter(transmitter -> transmitter.getOwnerNames().contains(user)).forEach(transmitter -> {
 						if (transmitter.getOwnerNames().size() == 1) {
 							// Delete all Transmitter which have only this Owner
@@ -745,7 +726,7 @@ public class RpcListener {
 			deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
 
 			// Delete Object with same Name, if existing
-			if (!clusterManager.getState().getUsers().removeByName(user)) {
+			if (clusterManager.getState().getUsers().remove(user) == null) {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {

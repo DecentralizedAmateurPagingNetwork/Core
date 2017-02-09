@@ -14,16 +14,16 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.list.Searchable;
-import org.dapnet.core.model.validator.EMail;
-import org.dapnet.core.rest.RestAuthorizable;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User implements Serializable, Searchable, RestAuthorizable {
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.dapnet.core.model.validator.EMail;
+import org.dapnet.core.rest.RestAuthorizable;
+
+public class User implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 8927103398113377284L;
 
 	// ID

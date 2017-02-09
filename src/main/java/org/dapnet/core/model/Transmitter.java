@@ -14,15 +14,19 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.list.Searchable;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.dapnet.core.model.validator.TimeSlot;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.jgroups.stack.IpAddress;
-
-import javax.validation.constraints.*;
-import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
@@ -317,14 +321,15 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 			throw new Exception("StateNotSetException");
 		}
 
-		ArrayList<User> users = new ArrayList<>();
 		if (ownerNames == null) {
 			return null;
 		}
 
+		ArrayList<User> users = new ArrayList<>();
 		for (String owner : ownerNames) {
-			if (state.getUsers().contains(owner)) {
-				users.add(state.getUsers().findByName(owner));
+			User u = state.getUsers().get(owner);
+			if (u != null) {
+				users.add(u);
 			}
 		}
 
@@ -338,7 +343,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")
 	public Node getNode() throws Exception {
 		if (state != null) {
-			return state.getNodes().findByName(nodeName);
+			return state.getNodes().get(nodeName);
 		} else {
 			throw new Exception("StateNotSetException");
 		}
