@@ -4,7 +4,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-class AuthKeyGenerator {
+/**
+ * Authentication key generator implementation.
+ * 
+ * @author Philipp Thiel
+ */
+final class AuthKeyGenerator {
 
 	private static final char[] CHARS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
 			'f' };
@@ -16,6 +21,11 @@ class AuthKeyGenerator {
 		sha = MessageDigest.getInstance("SHA-1");
 	}
 
+	/**
+	 * Generates a random authentication key.
+	 * 
+	 * @return New authentication key.
+	 */
 	public String generateKey() {
 		byte[] input = new byte[16];
 		rng.nextBytes(input);
