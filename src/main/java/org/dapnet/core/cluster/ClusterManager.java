@@ -122,9 +122,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 		// Validate
 		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(state);
-		for (ConstraintViolation<Object> violation : constraintViolations)
-
-		{
+		for (ConstraintViolation<Object> violation : constraintViolations) {
 			logger.error("Error validating State.json: " + violation.getPropertyPath() + " " + violation.getMessage());
 		}
 

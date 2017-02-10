@@ -26,7 +26,7 @@ import org.jgroups.stack.IpAddress;
 
 public class ChannelListener implements org.jgroups.ChannelListener {
 	private static final Logger logger = LogManager.getLogger(ChannelListener.class.getName());
-	private ClusterManager clusterManager;
+	private final ClusterManager clusterManager;
 
 	public ChannelListener(ClusterManager clusterManager) {
 		this.clusterManager = clusterManager;
@@ -67,14 +67,11 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 	}
 
 	public void channelDisconnected(Channel channel) {
-		// Nothing to do
 	}
 
 	public void channelClosed(Channel channel) {
-		// Nothing to do
 	}
 
-	// Helper
 	private void createFirstNode() {
 		logger.info("Creating first node");
 
@@ -124,7 +121,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		if (clusterManager.handleStateOperation(null, "putUser", new Object[] { user }, new Class[] { User.class })) {
 			logger.info("First user successfully updated");
 		} else {
-			logger.fatal("First user could not been created");
+			logger.fatal("First user could not be created");
 			DAPNETCore.stopDAPNETCore();
 		}
 	}
