@@ -32,7 +32,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
 	private static final Pattern authPattern = Pattern
-			.compile("\\[([/\\p{Alnum}]+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+)\\]");
+			.compile("\\[([/\\p{Alnum}]+) v(\\d+\\.\\d+[-#\\p{Alnum}]*) (\\p{Alnum}+) (\\p{Alnum}+)\\]");
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
@@ -148,11 +148,12 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		String type = authMatcher.group(1);
 		String version = authMatcher.group(2);
-		String key = authMatcher.group(3);
+		String name = authMatcher.group(3);
+		String key = authMatcher.group(4);
 
-		Transmitter t = manager.get(key);
+		Transmitter t = manager.get(name);
 		if (t == null) {
-			throw new TransmitterException("The received auth key is not registered.");
+			throw new TransmitterException("The transmitter name is not registered.");
 		} else if (t.getStatus() == Status.DISABLED) {
 			logger.error("Transmitter is disabled and not allowed to connect.");
 			ctx.close();
@@ -160,6 +161,13 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		} else if (t.getStatus() == Status.ONLINE) {
 			// TODO Close existing connection?
 			logger.error("Transmitter is already connected.");
+			ctx.close();
+			return;
+		}
+
+		// Test passwort
+		if (!t.getAuthKey().equals(key)) {
+			logger.error("Wrong passwort.");
 			ctx.close();
 			return;
 		}

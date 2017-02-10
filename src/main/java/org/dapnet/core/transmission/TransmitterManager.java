@@ -2,9 +2,9 @@ package org.dapnet.core.transmission;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,26 +15,20 @@ import org.dapnet.core.model.TransmitterGroup;
 public class TransmitterManager {
 
 	private static final Logger logger = LogManager.getLogger(TransmitterManager.class);
-	private final Map<String, Transmitter> registeredTranmsitters = new ConcurrentHashMap<>();
-	private final Map<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Transmitter> registeredTranmsitters = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
 	private TransmitterManagerListener listener;
 
 	public void addTransmitter(Transmitter transmitter) {
-		String key = transmitter.getAuthKey();
-		if (key != null && !key.isEmpty()) {
-			registeredTranmsitters.put(key, transmitter);
-			logger.info("Transmitter registered.");
-		}
+		registeredTranmsitters.put(transmitter.getName(), transmitter);
+		logger.info("Transmitter added: {}", transmitter.getName());
 	}
 
 	public void removeTransmitter(Transmitter transmitter) {
-		String key = transmitter.getAuthKey();
-		if (key != null && !key.isEmpty()) {
-			registeredTranmsitters.remove(key);
-			logger.info("Transmitter removed.");
+		registeredTranmsitters.remove(transmitter.getName());
+		logger.info("Transmitter removed: {}", transmitter.getName());
 
-			disconnectFrom(transmitter);
-		}
+		disconnectFrom(transmitter);
 	}
 
 	public void setListener(TransmitterManagerListener listener) {
@@ -50,11 +44,9 @@ public class TransmitterManager {
 	}
 
 	public void sendMessage(Message message) {
-		synchronized (connectedClients) {
-			connectedClients.values().forEach(c -> {
-				c.sendMessage(message);
-			});
-		}
+		connectedClients.values().forEach(c -> {
+			c.sendMessage(message);
+		});
 	}
 
 	public void sendMessage(Message message, Collection<TransmitterGroup> groups) {
@@ -123,9 +115,7 @@ public class TransmitterManager {
 	}
 
 	public void disconnectFromAll() {
-		synchronized (connectedClients) {
-			connectedClients.values().forEach(cl -> cl.close());
-		}
+		connectedClients.values().forEach(cl -> cl.close());
 
 		if (listener != null) {
 			listener.handleDisconnectedFromAllTransmitters();
