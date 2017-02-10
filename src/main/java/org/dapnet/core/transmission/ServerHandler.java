@@ -128,16 +128,13 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			throw new TransmitterException("Invalid response received.");
 		}
 
-		// TODO Enable sequence numbers
-		// int seq = Integer.parseInt(ackMatcher.group(1), 16);
+		int seq = Integer.parseInt(ackMatcher.group(1), 16);
 		String ack = ackMatcher.group(2);
 		if (!ack.equals("+")) {
 			throw new TransmitterException("Unexpected response received.");
+		} else if (!client.ackSequenceNumber(seq)) {
+			throw new TransmitterException("Invalid sequence number received.");
 		}
-		// TODO Enable sequence numbers
-		// else if (!client.ackSequenceNumber(seq)) {
-		// throw new TransmitterException("Invalid sequence number received.");
-		// }
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
