@@ -14,28 +14,22 @@
 
 package org.dapnet.core.rest.resources;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
-import java.security.NoSuchAlgorithmException;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-
 @Path("/transmitters")
 @Produces("application/json")
 public class TransmitterResource extends AbstractResource {
-	private final AuthKeyGenerator keyGenerator;
-
-	public TransmitterResource() {
-		try {
-			keyGenerator = new AuthKeyGenerator();
-		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@GET
 	public Response getTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
@@ -89,14 +83,5 @@ public class TransmitterResource extends AbstractResource {
 		}
 
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);
-	}
-
-	@GET
-	@Path("/auth_key")
-	public Response getAuthKey() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		String key = keyGenerator.generateKey();
-
-		return Response.status(Response.Status.OK).entity(getExclusionGson(status).toJson(key)).build();
 	}
 }
