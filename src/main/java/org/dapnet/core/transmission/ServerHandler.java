@@ -165,9 +165,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			return;
 		}
 
-		// Test passwort
+		// Test authentication key
 		if (!t.getAuthKey().equals(key)) {
-			logger.error("Wrong passwort.");
+			logger.error("Wrong authentication key supplied.");
 			ctx.close();
 			return;
 		}
