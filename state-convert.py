@@ -10,6 +10,35 @@ def parse_args(args):
 
     return ap.parse_args(args=args)
 
+def addMissingAttributes(data):
+    for v in data.values():
+        v["status"] = "OFFLINE"
+        v["antennaType"] = "OMNI"
+        v["usage"] = "WIDERANGE"
+        v["authKey"] = "test1234"
+
+def addData(data, newdata, key):
+    newdata[key] = {v["name"].lower(): v for v in data[key]}
+
+    for v in newdata[key].values():
+        v["name"] = v["name"].lower()
+
+        if "ownerNames" in v.keys():
+            v["ownerNames"] = [k.lower() for k in v["ownerNames"]]
+
+        if "rubricName" in v.keys():
+            v["rubricName"] = v["rubricName"].lower()
+
+        if "transmitterNames" in v.keys():
+            v["transmitterNames"] = [k.lower() for k in v["transmitterNames"]]
+
+        if "transmitterGroupNames" in v.keys():
+            v["transmitterGroupNames"] = [k.lower() for k in v["transmitterGroupNames"]]
+
+        if "callSignNames" in v.keys():
+            v["callSignNames"] = [k.lower() for k in v["callSignNames"]]
+
+
 def main(args):
     args = parse_args(args)
 
@@ -18,13 +47,23 @@ def main(args):
 
     newdata = {}
     newdata["calls"] = data["calls"]
+    for v in newdata["calls"]:
+        v["ownerName"] = v["ownerName"].lower()
+        v["callSignNames"] = [k.lower() for k in v["callSignNames"]]
+        v["transmitterGroupNames"] = [k.lower() for k in v["transmitterGroupNames"]]
+
     newdata["news"] = data["news"]
-    newdata["rubrics"] = {v["name"]: v for v in data["rubrics"]}
-    newdata["callSigns"] = {v["name"]: v for v in data["callSigns"]}
-    newdata["users"] = {v["name"]: v for v in data["users"]}
-    newdata["nodes"] = {v["name"]: v for v in data["nodes"]}
-    newdata["transmitters"] = {v["name"]: v for v in data["transmitters"]}
-    newdata["transmitterGroups"] = {v["name"]: v for v in data["transmitterGroups"]}
+    for v in newdata["news"]:
+        v["rubricName"] = v["rubricName"].lower()
+
+    addData(data, newdata, "rubrics")
+    addData(data, newdata, "callSigns")
+    addData(data, newdata, "users")
+    addData(data, newdata, "nodes")
+    addData(data, newdata, "transmitters")
+    addData(data, newdata, "transmitterGroups")
+
+    addMissingAttributes(newdata["transmitters"])
 
     with open("State_new.json", "w") as fout:
         json.dump(newdata, fout, indent=2)

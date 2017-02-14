@@ -163,9 +163,10 @@ public abstract class AbstractResource {
 
 		// Send to Cluster
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
-				new Class[] { String.class }))
+				new Class[] { String.class })) {
 			return Response.status(Response.Status.OK).entity(gson.toJson(object)).build();
-		else
+		} else {
 			throw new InternalServerErrorException();
+		}
 	}
 }

@@ -20,13 +20,20 @@ public class TransmitterManager {
 	private TransmitterManagerListener listener;
 
 	public void addTransmitter(Transmitter transmitter) {
-		registeredTranmsitters.put(transmitter.getName(), transmitter);
-		logger.info("Transmitter added: {}", transmitter.getName());
+		String name = transmitter.getName().toLowerCase();
+
+		registeredTranmsitters.put(name, transmitter);
+		logger.info("Transmitter added: {}", name);
 	}
 
 	public void removeTransmitter(Transmitter transmitter) {
-		registeredTranmsitters.remove(transmitter.getName());
-		logger.info("Transmitter removed: {}", transmitter.getName());
+		String name = transmitter.getName().toLowerCase();
+
+		if (registeredTranmsitters.remove(name) != null) {
+			logger.info("Transmitter removed: {}", name);
+		} else {
+			logger.warn("Transmitter is not registered: {}", name);
+		}
 
 		disconnectFrom(transmitter);
 	}
@@ -39,8 +46,12 @@ public class TransmitterManager {
 		transmitters.forEach(this::addTransmitter);
 	}
 
-	public Transmitter get(String key) {
-		return registeredTranmsitters.get(key);
+	public Transmitter get(String name) {
+		if (name != null) {
+			name = name.toLowerCase();
+		}
+
+		return registeredTranmsitters.get(name);
 	}
 
 	public void sendMessage(Message message) {
@@ -52,6 +63,7 @@ public class TransmitterManager {
 	public void sendMessage(Message message, Collection<TransmitterGroup> groups) {
 		Set<String> names = getTransmitterNames(groups);
 		for (String name : names) {
+			// name is already in lower case
 			TransmitterClient cl = connectedClients.get(name);
 			if (cl != null) {
 				cl.sendMessage(message);
@@ -78,9 +90,12 @@ public class TransmitterManager {
 
 		t.setStatus(Status.ONLINE);
 
-		connectedClients.put(t.getName(), client);
+		String name = t.getName().toLowerCase();
+		connectedClients.put(name, client);
 
-		notifyStatusChanged(t);
+		if (listener != null) {
+			listener.handleTransmitterStatusChanged(name, t.getStatus());
+		}
 	}
 
 	public void onDisconnect(TransmitterClient client) {
@@ -94,21 +109,18 @@ public class TransmitterManager {
 			t.setStatus(Status.OFFLINE);
 		}
 
-		connectedClients.remove(t.getName());
+		String name = t.getName().toLowerCase();
+		connectedClients.remove(name);
 
-		notifyStatusChanged(t);
-	}
-
-	private void notifyStatusChanged(Transmitter t) {
-		if (listener != null && t != null) {
-			listener.handleTransmitterStatusChanged(t.getName(), t.getStatus());
+		if (listener != null) {
+			listener.handleTransmitterStatusChanged(name, t.getStatus());
 		}
 	}
 
 	private Set<String> getTransmitterNames(Collection<TransmitterGroup> groups) {
 		Set<String> selected = new HashSet<>();
 		for (TransmitterGroup g : groups) {
-			selected.addAll(g.getTransmitterNames());
+			g.getTransmitterNames().forEach(t -> selected.add(t.toLowerCase()));
 		}
 
 		return selected;
@@ -123,7 +135,7 @@ public class TransmitterManager {
 	}
 
 	public void disconnectFrom(Transmitter t) {
-		TransmitterClient cl = connectedClients.remove(t.getName());
+		TransmitterClient cl = connectedClients.remove(t.getName().toLowerCase());
 		if (cl != null) {
 			cl.close();
 		}

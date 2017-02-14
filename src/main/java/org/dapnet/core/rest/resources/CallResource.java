@@ -34,14 +34,18 @@ public class CallResource extends AbstractResource {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			return getObject(restListener.getState().getCalls(), status);
 		} else {
+			ownerName = ownerName.toLowerCase();
+
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
 					restListener.getState().getUsers().get(ownerName));
 
 			List<Call> calls = new ArrayList<>();
 			for (Call call : restListener.getState().getCalls()) {
-				if (call.getOwnerName().equals(ownerName))
+				if (call.getOwnerName().equals(ownerName)) {
 					calls.add(call);
+				}
 			}
+
 			return getObject(calls, status);
 		}
 	}
@@ -56,8 +60,9 @@ public class CallResource extends AbstractResource {
 		if (call != null) {
 			call.setTimestamp(new Date());
 			call.setOwnerName(new LoginData(httpHeaders).getUsername());
-		} else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		return handleObject(call, "postCall", true, false);
 	}

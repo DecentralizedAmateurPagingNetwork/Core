@@ -40,14 +40,18 @@ public class NewsResource extends AbstractResource {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			return getObject(restListener.getState().getNews(), status);
 		} else {
+			rubricName = rubricName.toLowerCase();
+
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
 					restListener.getState().getRubrics().get(rubricName));
 
 			List<News> newsList = new ArrayList<>();
 			for (News news : restListener.getState().getNews()) {
-				if (news.getRubricName().equals(rubricName))
+				if (news.getRubricName().equals(rubricName)) {
 					newsList.add(news);
+				}
 			}
+
 			return getObject(newsList, status);
 		}
 
@@ -64,8 +68,9 @@ public class NewsResource extends AbstractResource {
 		if (news != null) {
 			news.setTimestamp(new Date());
 			news.setOwnerName(new LoginData(httpHeaders).getUsername());
-		} else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		// Check whether OWNER of rubric
 		checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,

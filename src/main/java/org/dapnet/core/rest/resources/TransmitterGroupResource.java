@@ -33,6 +33,10 @@ public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	@Path("{transmitterGroup}")
 	public Response getTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName) throws Exception {
+		if (transmitterGroupName != null) {
+			transmitterGroupName = transmitterGroupName.toLowerCase();
+		}
+
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		return getObject(restListener.getState().getTransmitterGroups().get(transmitterGroupName), status);
 	}
@@ -42,6 +46,10 @@ public class TransmitterGroupResource extends AbstractResource {
 	@Consumes("application/json")
 	public Response putTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName,
 			String transmitterGroupJSON) throws Exception {
+		if (transmitterGroupName != null) {
+			transmitterGroupName = transmitterGroupName.toLowerCase();
+		}
+
 		if (restListener.getState().getTransmitterGroups().containsKey(transmitterGroupName)) {
 			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
@@ -66,8 +74,11 @@ public class TransmitterGroupResource extends AbstractResource {
 	@DELETE
 	@Path("{transmitterGroup}")
 	public Response deleteTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroup) throws Exception {
-		TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups().get(transmitterGroup);
+		if (transmitterGroup != null) {
+			transmitterGroup = transmitterGroup.toLowerCase();
+		}
 
+		TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups().get(transmitterGroup);
 		if (oldTransmitterGroup != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
 			return deleteObject(oldTransmitterGroup, "deleteTransmitterGroup", true);

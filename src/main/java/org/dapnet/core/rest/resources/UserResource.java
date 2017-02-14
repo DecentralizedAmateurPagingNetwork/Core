@@ -34,6 +34,10 @@ public class UserResource extends AbstractResource {
 	@GET
 	@Path("{user}")
 	public Response getUser(@PathParam("user") String userName) throws Exception {
+		if (userName != null) {
+			userName = userName.toLowerCase();
+		}
+
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		return getObject(restListener.getState().getUsers().get(userName), status);
 	}
@@ -45,6 +49,10 @@ public class UserResource extends AbstractResource {
 		// Start request processing only if at least USER
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
+		if (userName != null) {
+			userName = userName.toLowerCase();
+		}
+
 		// Create User from received data
 		User user = gson.fromJson(userJSON, User.class);
 		if (user != null) {
@@ -55,8 +63,9 @@ public class UserResource extends AbstractResource {
 				user.setHash(HashUtil.createHash(user.getHash()));
 			}
 			user.setName(userName);
-		} else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		if (user.isAdmin()) {
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
@@ -75,6 +84,10 @@ public class UserResource extends AbstractResource {
 	@DELETE
 	@Path("{user}")
 	public Response deleteUser(@PathParam("user") String user) throws Exception {
+		if (user != null) {
+			user = user.toLowerCase();
+		}
+
 		User oldUser = restListener.getState().getUsers().get(user);
 
 		if (oldUser != null) {

@@ -33,6 +33,10 @@ public class CallSignResource extends AbstractResource {
 	@GET
 	@Path("{callSign}")
 	public Response getCallSign(@PathParam("callSign") String callSignName) throws Exception {
+		if (callSignName != null) {
+			callSignName = callSignName.toLowerCase();
+		}
+
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		return getObject(restListener.getState().getCallSigns().get(callSignName), status);
 	}
@@ -41,6 +45,10 @@ public class CallSignResource extends AbstractResource {
 	@Path("{callSign}")
 	@Consumes("application/json")
 	public Response putCallSign(@PathParam("callSign") String callSignName, String callSignJSON) throws Exception {
+		if (callSignName != null) {
+			callSignName = callSignName.toLowerCase();
+		}
+
 		if (restListener.getState().getCallSigns().containsKey(callSignName)) {
 			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
@@ -51,10 +59,11 @@ public class CallSignResource extends AbstractResource {
 		}
 
 		CallSign callSign = gson.fromJson(callSignJSON, CallSign.class);
-		if (callSign != null)
+		if (callSign != null) {
 			callSign.setName(callSignName);
-		else // gson couldnt create an object
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		return handleObject(callSign, "putCallSign", !restListener.getState().getCallSigns().containsKey(callSignName),
 				true);
@@ -63,8 +72,11 @@ public class CallSignResource extends AbstractResource {
 	@DELETE
 	@Path("{callSign}")
 	public Response deleteCallSign(@PathParam("callSign") String callSign) throws Exception {
-		CallSign oldCallSign = restListener.getState().getCallSigns().get(callSign);
+		if (callSign != null) {
+			callSign = callSign.toLowerCase();
+		}
 
+		CallSign oldCallSign = restListener.getState().getCallSigns().get(callSign);
 		if (oldCallSign != null) {
 			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);

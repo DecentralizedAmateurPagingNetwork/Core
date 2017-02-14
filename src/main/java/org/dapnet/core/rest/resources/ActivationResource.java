@@ -37,8 +37,9 @@ public class ActivationResource extends AbstractResource {
 		Activation activation = gson.fromJson(activationJSON, Activation.class);
 		if (activation != null) {
 			activation.setTimestamp(new Date());
-		} else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		return handleObject(activation, "postActivation", false, true);
 	}

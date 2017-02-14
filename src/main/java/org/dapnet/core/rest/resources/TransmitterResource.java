@@ -39,6 +39,10 @@ public class TransmitterResource extends AbstractResource {
 	@GET
 	@Path("{transmitter}")
 	public Response getTransmitter(@PathParam("transmitter") String transmitterName) throws Exception {
+		if (transmitterName != null) {
+			transmitterName = transmitterName.toLowerCase();
+		}
+
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		return getObject(restListener.getState().getTransmitters().get(transmitterName), status);
 	}
@@ -48,6 +52,10 @@ public class TransmitterResource extends AbstractResource {
 	@Consumes("application/json")
 	public Response putTransmitter(@PathParam("transmitter") String transmitterName, String transmitterJSON)
 			throws Exception {
+		if (transmitterName != null) {
+			transmitterName = transmitterName.toLowerCase();
+		}
+
 		if (restListener.getState().getTransmitters().containsKey(transmitterName)) {
 			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
@@ -61,8 +69,10 @@ public class TransmitterResource extends AbstractResource {
 		Transmitter transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
 		if (transmitter != null) {
 			// Only Status OFFLINE or DISABLED is accepted:
-			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED)
+			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
 				transmitter.setStatus(Transmitter.Status.OFFLINE);
+			}
+
 			transmitter.setName(transmitterName);
 		} else {
 			throw new EmptyBodyException();
@@ -75,6 +85,10 @@ public class TransmitterResource extends AbstractResource {
 	@DELETE
 	@Path("{transmitter}")
 	public Response deleteTransmitter(@PathParam("transmitter") String transmitter) throws Exception {
+		if (transmitter != null) {
+			transmitter = transmitter.toLowerCase();
+		}
+
 		Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
 		if (oldTransmitter != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);

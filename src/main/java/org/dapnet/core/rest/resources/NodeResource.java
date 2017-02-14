@@ -34,6 +34,10 @@ public class NodeResource extends AbstractResource {
 	@GET
 	@Path("{node}")
 	public Response getNode(@PathParam("node") String nodeName) throws Exception {
+		if (nodeName != null) {
+			nodeName = nodeName.toLowerCase();
+		}
+
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		return getObject(restListener.getState().getNodes().get(nodeName), status);
 	}
@@ -42,6 +46,10 @@ public class NodeResource extends AbstractResource {
 	@Path("{node}")
 	@Consumes("application/json")
 	public Response putNode(@PathParam("node") String nodeName, String nodeJSON) throws Exception {
+		if (nodeName != null) {
+			nodeName = nodeName.toLowerCase();
+		}
+
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 
 		// Create Node
@@ -50,8 +58,9 @@ public class NodeResource extends AbstractResource {
 			node.setName(nodeName);
 			node.setKey(HashUtil.createHash(node.getKey()));
 			node.setStatus(Node.Status.SUSPENDED);
-		} else
+		} else {
 			throw new EmptyBodyException();
+		}
 
 		return handleObject(node, "putNode", !restListener.getState().getNodes().containsKey(nodeName), true);
 	}
@@ -59,6 +68,10 @@ public class NodeResource extends AbstractResource {
 	@DELETE
 	@Path("{node}")
 	public Response deleteNode(@PathParam("node") String node) throws Exception {
+		if (node != null) {
+			node = node.toLowerCase();
+		}
+
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		return deleteObject(restListener.getState().getNodes().get(node), "deleteNode", true);
 	}

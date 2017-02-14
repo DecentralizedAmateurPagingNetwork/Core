@@ -33,6 +33,10 @@ public class RubricResource extends AbstractResource {
 	@GET
 	@Path("{rubric}")
 	public Response getRubric(@PathParam("rubric") String rubricName) throws Exception {
+		if (rubricName != null) {
+			rubricName = rubricName.toLowerCase();
+		}
+
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 		return getObject(restListener.getState().getRubrics().get(rubricName), status);
 	}
@@ -41,6 +45,10 @@ public class RubricResource extends AbstractResource {
 	@Path("{rubric}")
 	@Consumes("application/json")
 	public Response putRubric(@PathParam("rubric") String rubricName, String rubricJSON) throws Exception {
+		if (rubricName != null) {
+			rubricName = rubricName.toLowerCase();
+		}
+
 		if (restListener.getState().getRubrics().containsKey(rubricName)) {
 			// Overwrite
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
@@ -65,8 +73,11 @@ public class RubricResource extends AbstractResource {
 	@DELETE
 	@Path("{rubric}")
 	public Response deleteRubric(@PathParam("rubric") String rubric) throws Exception {
-		Rubric oldRubric = restListener.getState().getRubrics().get(rubric);
+		if (rubric != null) {
+			rubric = rubric.toLowerCase();
+		}
 
+		Rubric oldRubric = restListener.getState().getRubrics().get(rubric);
 		if (oldRubric != null) {
 			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
