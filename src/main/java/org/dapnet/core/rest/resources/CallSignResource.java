@@ -27,7 +27,7 @@ public class CallSignResource extends AbstractResource {
 	@GET
 	public Response getCallSigns() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getCallSigns(), status);
+		return getObject(restListener.getState().getCallSigns().values(), status);
 	}
 
 	@GET

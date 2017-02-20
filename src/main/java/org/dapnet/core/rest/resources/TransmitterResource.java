@@ -33,7 +33,7 @@ public class TransmitterResource extends AbstractResource {
 	@GET
 	public Response getTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getTransmitters(), status);
+		return getObject(restListener.getState().getTransmitters().values(), status);
 	}
 
 	@GET

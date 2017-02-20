@@ -27,7 +27,7 @@ public class RubricResource extends AbstractResource {
 	@GET
 	public Response getRubrics() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getRubrics(), status);
+		return getObject(restListener.getState().getRubrics().values(), status);
 	}
 
 	@GET

@@ -47,7 +47,7 @@ public class NewsResource extends AbstractResource {
 
 			List<News> newsList = new ArrayList<>();
 			for (News news : restListener.getState().getNews()) {
-				if (news.getRubricName().equals(rubricName)) {
+				if (news.getRubricName().equalsIgnoreCase(rubricName)) {
 					newsList.add(news);
 				}
 			}

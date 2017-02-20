@@ -28,7 +28,7 @@ public class NodeResource extends AbstractResource {
 	@GET
 	public Response getNodes() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getNodes(), status);
+		return getObject(restListener.getState().getNodes().values(), status);
 	}
 
 	@GET

@@ -28,7 +28,7 @@ public class UserResource extends AbstractResource {
 	@GET
 	public Response getUsers() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getUsers(), status);
+		return getObject(restListener.getState().getUsers().values(), status);
 	}
 
 	@GET

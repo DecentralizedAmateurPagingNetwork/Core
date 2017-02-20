@@ -41,7 +41,7 @@ public class CallResource extends AbstractResource {
 
 			List<Call> calls = new ArrayList<>();
 			for (Call call : restListener.getState().getCalls()) {
-				if (call.getOwnerName().equals(ownerName)) {
+				if (call.getOwnerName().equalsIgnoreCase(ownerName)) {
 					calls.add(call);
 				}
 			}

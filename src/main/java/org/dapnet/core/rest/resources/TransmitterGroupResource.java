@@ -27,7 +27,7 @@ public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	public Response getTransmitterGroups() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getTransmitterGroups(), status);
+		return getObject(restListener.getState().getTransmitterGroups().values(), status);
 	}
 
 	@GET
