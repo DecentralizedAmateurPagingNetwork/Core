@@ -14,10 +14,11 @@
 
 package org.dapnet.core.model;
 
-import static org.jgroups.util.Util.readFile;
-
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +94,10 @@ public class State implements Serializable {
 	}
 
 	public static State readFromFile() throws Exception {
-		return new Gson().fromJson(readFile(Settings.getModelSettings().getStateFile()), State.class);
+		try (InputStreamReader reader = new InputStreamReader(
+				new FileInputStream(Settings.getModelSettings().getStateFile()), "UTF-8")) {
+			return new Gson().fromJson(reader, State.class);
+		}
 	}
 
 	public void writeToFile() {
@@ -103,7 +107,7 @@ public class State implements Serializable {
 				file.getParentFile().mkdirs();
 			}
 
-			try (FileWriter writer = new FileWriter(file)) {
+			try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8")) {
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				writer.write(gson.toJson(this));
 				writer.flush();
