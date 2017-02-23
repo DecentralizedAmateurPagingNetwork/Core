@@ -32,7 +32,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
 	private static final Pattern authPattern = Pattern
-			.compile("\\[([/\\-\\p{Alnum}]+) v(\\d+(.\\d)*) (\\p{Alnum}+) (\\p{Graph}+)\\]");
+			.compile("\\[([/\\-\\p{Alnum}]+) v(\\d[\\d+\\.]+[\\-#\\p{Alnum}]*) (\\p{Alnum}+) (\\p{Graph}+)\\]");
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
@@ -145,8 +145,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		String type = authMatcher.group(1);
 		String version = authMatcher.group(2);
-		String name = authMatcher.group(4);
-		String key = authMatcher.group(5);
+		String name = authMatcher.group(3);
+		String key = authMatcher.group(4);
 
 		Transmitter t = manager.get(name);
 		if (t == null) {
