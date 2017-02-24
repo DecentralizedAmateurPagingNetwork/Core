@@ -62,8 +62,9 @@ public class RpcListener {
 
 			// Add new Object
 			clusterManager.getState().getCalls().add(call);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
 
 			// Transmit new Call
 			clusterManager.getTransmissionManager().handleCall(call);
@@ -126,8 +127,10 @@ public class RpcListener {
 
 			// Add new Object (will replace old one if present)
 			clusterManager.getState().getCallSigns().put(callSign.getName(), callSign);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
@@ -171,8 +174,10 @@ public class RpcListener {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				if (Settings.getModelSettings().isSavingImmediately())
+				if (Settings.getModelSettings().isSavingImmediately()) {
 					clusterManager.getState().writeToFile();
+				}
+
 				return response = RpcResponse.OK;
 			}
 		} catch (Exception e) {
@@ -200,9 +205,12 @@ public class RpcListener {
 
 			// Add new Object
 			clusterManager.getState().getNews().add(news);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			clusterManager.getTransmissionManager().handleNews(news);
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
@@ -226,9 +234,12 @@ public class RpcListener {
 
 			// Set Status
 			node.setStatus(status);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			clusterManager.checkQuorum();
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
@@ -258,9 +269,12 @@ public class RpcListener {
 
 			// Replace object
 			clusterManager.getState().getNodes().put(node.getName(), node);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			clusterManager.checkQuorum();
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
@@ -296,9 +310,12 @@ public class RpcListener {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				if (Settings.getModelSettings().isSavingImmediately())
+				if (Settings.getModelSettings().isSavingImmediately()) {
 					clusterManager.getState().writeToFile();
+				}
+
 				clusterManager.checkQuorum();
+
 				return response = RpcResponse.OK;
 			}
 		} catch (Exception e) {
@@ -331,8 +348,9 @@ public class RpcListener {
 
 			// Replace object
 			clusterManager.getState().getRubrics().put(rubric.getName(), rubric);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
 
 			// Transmit new Rubric
 			clusterManager.getTransmissionManager().handleRubric(rubric);
@@ -371,8 +389,10 @@ public class RpcListener {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				if (Settings.getModelSettings().isSavingImmediately())
+				if (Settings.getModelSettings().isSavingImmediately()) {
 					clusterManager.getState().writeToFile();
+				}
+
 				return response = RpcResponse.OK;
 			}
 		} catch (Exception e) {
@@ -436,8 +456,9 @@ public class RpcListener {
 				}
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
 
 			// Connect to Transmitter if my Transmitter
 			String myNodeName = clusterManager.getChannel().getName();
@@ -490,8 +511,9 @@ public class RpcListener {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				if (Settings.getModelSettings().isSavingImmediately())
+				if (Settings.getModelSettings().isSavingImmediately()) {
 					clusterManager.getState().writeToFile();
+				}
 
 				// Disconnect from Transmitter if my Transmitter
 				String myNodeName = clusterManager.getChannel().getName();
@@ -531,8 +553,10 @@ public class RpcListener {
 
 			// Replace object
 			clusterManager.getState().getTransmitterGroups().put(transmitterGroup.getName(), transmitterGroup);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
@@ -592,8 +616,10 @@ public class RpcListener {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				if (Settings.getModelSettings().isSavingImmediately())
+				if (Settings.getModelSettings().isSavingImmediately()) {
 					clusterManager.getState().writeToFile();
+				}
+
 				return response = RpcResponse.OK;
 			}
 		} catch (Exception e) {
@@ -626,8 +652,10 @@ public class RpcListener {
 
 			// Add new Object
 			clusterManager.getState().getUsers().put(user.getName(), user);
-			if (Settings.getModelSettings().isSavingImmediately())
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
@@ -730,8 +758,10 @@ public class RpcListener {
 				// Object not found
 				return response = RpcResponse.BAD_REQUEST;
 			} else {
-				if (Settings.getModelSettings().isSavingImmediately())
+				if (Settings.getModelSettings().isSavingImmediately()) {
 					clusterManager.getState().writeToFile();
+				}
+
 				return response = RpcResponse.OK;
 			}
 		} catch (Exception e) {

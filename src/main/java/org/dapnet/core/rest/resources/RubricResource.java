@@ -66,7 +66,6 @@ public class RubricResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		// TODO Validate that there is no conflict with other Rubrics
 		return handleObject(rubric, "putRubric", !restListener.getState().getRubrics().containsKey(rubricName), true);
 	}
 
