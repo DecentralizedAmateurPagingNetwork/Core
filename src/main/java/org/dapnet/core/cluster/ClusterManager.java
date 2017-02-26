@@ -32,15 +32,14 @@ import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.transmission.TransmissionManager;
-import org.dapnet.core.transmission.TransmitterManagerListener;
 import org.dapnet.core.transmission.TransmitterManager;
+import org.dapnet.core.transmission.TransmitterManagerListener;
 import org.jgroups.Address;
 import org.jgroups.JChannel;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.protocols.AUTH;
-import org.jgroups.stack.IpAddress;
 import org.jgroups.util.RspList;
 
 public class ClusterManager implements TransmitterManagerListener, RestListener {
@@ -257,9 +256,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	public void handleTransmitterStatusChanged(Transmitter transmitter) {
 		String name = transmitter.getName();
 		if (state.getTransmitters().containsKey(name)) {
-			handleStateOperation(null, "updateTransmitterStatus",
-					new Object[] { name, transmitter.getStatus(), transmitter.getAddress() },
-					new Class[] { String.class, Transmitter.Status.class, IpAddress.class });
+			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },
+					new Class[] { Transmitter.class });
 		}
 	}
 

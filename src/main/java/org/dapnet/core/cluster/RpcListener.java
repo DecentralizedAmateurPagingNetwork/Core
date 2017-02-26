@@ -14,15 +14,23 @@
 
 package org.dapnet.core.cluster;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.dapnet.core.Settings;
-import org.dapnet.core.model.*;
-import org.jgroups.stack.IpAddress;
+import java.util.ArrayList;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.ArrayList;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
+import org.dapnet.core.model.Activation;
+import org.dapnet.core.model.Call;
+import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.News;
+import org.dapnet.core.model.Node;
+import org.dapnet.core.model.Rubric;
+import org.dapnet.core.model.Transmitter;
+import org.dapnet.core.model.TransmitterGroup;
+import org.dapnet.core.model.User;
 
 public class RpcListener {
 	private static final Logger logger = LogManager.getLogger(RpcListener.class.getName());
@@ -406,16 +414,20 @@ public class RpcListener {
 
 	// ### Transmitter
 	// ##################################################################################################
-	public synchronized RpcResponse updateTransmitterStatus(String name, Transmitter.Status status, IpAddress address) {
+	public synchronized RpcResponse updateTransmitterStatus(Transmitter updated) {
 		RpcResponse response = null;
+		String name = updated != null ? updated.getName() : null;
+
 		try {
 			Transmitter transmitter = clusterManager.getState().getTransmitters().get(name);
-			if (transmitter == null || status == null) {
+			if (transmitter == null) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			transmitter.setStatus(status);
-			transmitter.setAddress(address);
+			transmitter.setStatus(updated.getStatus());
+			transmitter.setAddress(updated.getAddress());
+			transmitter.setDeviceType(updated.getDeviceType());
+			transmitter.setDeviceVersion(updated.getDeviceVersion());
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
@@ -426,7 +438,7 @@ public class RpcListener {
 			logger.error("Exception : ", e);
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
-			logResponse("UpdateTransmitterStatus", name + " to " + status, response);
+			logResponse("UpdateTransmitterStatus", name, response);
 		}
 	}
 
