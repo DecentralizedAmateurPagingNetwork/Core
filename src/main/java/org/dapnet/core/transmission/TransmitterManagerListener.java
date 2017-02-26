@@ -14,10 +14,10 @@
 
 package org.dapnet.core.transmission;
 
-import org.dapnet.core.model.Transmitter.Status;
+import org.dapnet.core.model.Transmitter;
 
 public interface TransmitterManagerListener {
-	void handleTransmitterStatusChanged(String transmitterName, Status newStatus);
+	void handleTransmitterStatusChanged(Transmitter transmitter);
 
 	void handleDisconnectedFromAllTransmitters();
 }

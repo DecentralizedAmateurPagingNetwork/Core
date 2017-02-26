@@ -90,11 +90,10 @@ public class TransmitterManager {
 
 		t.setStatus(Status.ONLINE);
 
-		String name = t.getName().toLowerCase();
-		connectedClients.put(name, client);
+		connectedClients.put(t.getName(), client);
 
 		if (listener != null) {
-			listener.handleTransmitterStatusChanged(name, t.getStatus());
+			listener.handleTransmitterStatusChanged(t);
 		}
 	}
 
@@ -109,11 +108,10 @@ public class TransmitterManager {
 			t.setStatus(Status.OFFLINE);
 		}
 
-		String name = t.getName().toLowerCase();
-		connectedClients.remove(name);
+		connectedClients.remove(t.getName());
 
 		if (listener != null) {
-			listener.handleTransmitterStatusChanged(name, t.getStatus());
+			listener.handleTransmitterStatusChanged(t);
 		}
 	}
 

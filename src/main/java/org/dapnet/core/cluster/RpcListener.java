@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.*;
+import org.jgroups.stack.IpAddress;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -405,25 +406,27 @@ public class RpcListener {
 
 	// ### Transmitter
 	// ##################################################################################################
-	public synchronized RpcResponse updateTransmitterStatus(String transmitterName, Transmitter.Status status) {
+	public synchronized RpcResponse updateTransmitterStatus(String name, Transmitter.Status status, IpAddress address) {
 		RpcResponse response = null;
 		try {
-			// Check Arguments
-			Transmitter transmitter = clusterManager.getState().getTransmitters().get(transmitterName);
+			Transmitter transmitter = clusterManager.getState().getTransmitters().get(name);
 			if (transmitter == null || status == null) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Set Status
 			transmitter.setStatus(status);
-			if (Settings.getModelSettings().isSavingImmediately())
+			transmitter.setAddress(address);
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
+			}
+
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
-			logResponse("UpdateTransmitterStatus", transmitterName + " to " + status, response);
+			logResponse("UpdateTransmitterStatus", name + " to " + status, response);
 		}
 	}
 

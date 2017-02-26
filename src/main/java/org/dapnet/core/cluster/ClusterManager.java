@@ -40,6 +40,7 @@ import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.protocols.AUTH;
+import org.jgroups.stack.IpAddress;
 import org.jgroups.util.RspList;
 
 public class ClusterManager implements TransmitterManagerListener, RestListener {
@@ -253,10 +254,12 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// ### TransmitterDeviceManagerListener
 	// #############################################################################
 	@Override
-	public void handleTransmitterStatusChanged(String transmitterName, Transmitter.Status newStatus) {
-		if (state.getTransmitters().containsKey(transmitterName)) {
-			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitterName, newStatus },
-					new Class[] { String.class, Transmitter.Status.class });
+	public void handleTransmitterStatusChanged(Transmitter transmitter) {
+		String name = transmitter.getName();
+		if (state.getTransmitters().containsKey(name)) {
+			handleStateOperation(null, "updateTransmitterStatus",
+					new Object[] { name, transmitter.getStatus(), transmitter.getAddress() },
+					new Class[] { String.class, Transmitter.Status.class, IpAddress.class });
 		}
 	}
 
