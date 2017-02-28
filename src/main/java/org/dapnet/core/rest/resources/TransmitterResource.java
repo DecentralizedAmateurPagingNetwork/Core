@@ -14,9 +14,13 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotAcceptableException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -30,6 +34,8 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 @Path("/transmitters")
 @Produces("application/json")
 public class TransmitterResource extends AbstractResource {
+	private static final Pattern authKeyPattern = Pattern.compile("\\p{Alnum}");
+
 	@GET
 	public Response getTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
@@ -76,6 +82,12 @@ public class TransmitterResource extends AbstractResource {
 			transmitter.setName(transmitterName);
 		} else {
 			throw new EmptyBodyException();
+		}
+
+		// Test auth key
+		Matcher m = authKeyPattern.matcher(transmitter.getAuthKey());
+		if (!m.matches()) {
+			throw new NotAcceptableException("Auth key contains invalid characters.");
 		}
 
 		return handleObject(transmitter, "putTransmitter",
