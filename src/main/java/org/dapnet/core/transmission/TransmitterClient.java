@@ -143,11 +143,12 @@ class TransmitterClient {
 	}
 
 	/**
-	 * Closes the connection.
+	 * Closes the connection. This call will block until the connection is
+	 * closed.
 	 */
 	public void close() {
 		if (channel != null) {
-			channel.close();
+			channel.close().syncUninterruptibly();
 		}
 	}
 

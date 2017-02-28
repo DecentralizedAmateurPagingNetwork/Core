@@ -155,11 +155,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			logger.error("Transmitter is disabled and not allowed to connect.");
 			ctx.close();
 			return;
-		} else if (t.getStatus() == Status.ONLINE) {
-			// TODO Close existing connection?
-			logger.error("Transmitter is already connected.");
-			ctx.close();
-			return;
 		}
 
 		// Test authentication key
@@ -168,6 +163,10 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			ctx.close();
 			return;
 		}
+
+		// Close existing connection if necessary. This is a no-op if the
+		// transmitter is not connected.
+		manager.disconnectFrom(t);
 
 		t.setDeviceType(type);
 		t.setDeviceVersion(version);
