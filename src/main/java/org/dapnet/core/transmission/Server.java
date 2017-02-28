@@ -6,6 +6,7 @@ import org.dapnet.core.Settings;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -32,7 +33,7 @@ public class Server implements Runnable, AutoCloseable {
 			b.group(bossGroup, workerGroup);
 			b.channel(NioServerSocketChannel.class);
 			b.childHandler(new ServerInitializer(manager));
-
+			b.childOption(ChannelOption.SO_KEEPALIVE, true);
 			serverFuture = b.bind(port).sync();
 
 			LOGGER.info("Server started on port: {}", port);
