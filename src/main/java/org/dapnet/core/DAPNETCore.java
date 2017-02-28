@@ -33,11 +33,11 @@ public class DAPNETCore {
 	private static final String CORE_VERSION = "1.1.0.0";
 	private static final String API_VERSION = "1.1.0";
 	private static volatile DAPNETCore dapnetCore;
-	private ClusterManager clusterManager;
-	private RestManager restManager;
-	private TransmissionManager transmissionManager;
-	private SchedulerManager schedulerManager;
-	private Server deviceServer;
+	private volatile ClusterManager clusterManager;
+	private volatile RestManager restManager;
+	private volatile TransmissionManager transmissionManager;
+	private volatile SchedulerManager schedulerManager;
+	private volatile Server deviceServer;
 
 	private void start() {
 		try {
@@ -90,12 +90,6 @@ public class DAPNETCore {
 		} catch (Exception ex) {
 			logger.error("Failed to close the device server.", ex);
 		}
-
-		// if (clusterManager == null || restManager == null || schedulerManager
-		// == null) {
-		// // Used for stopping DAPNET while startup
-		// System.exit(1);
-		// }
 	}
 
 	public static void main(String[] args) throws Exception {
