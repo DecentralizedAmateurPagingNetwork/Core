@@ -140,7 +140,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
 		Matcher authMatcher = authPattern.matcher(msg);
 		if (!authMatcher.matches()) {
-			throw new TransmitterException("Invalid welcome message format.");
+			throw new TransmitterException(String.format("Invalid welcome message format: %s", msg));
 		}
 
 		String type = authMatcher.group(1);
