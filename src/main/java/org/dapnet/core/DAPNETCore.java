@@ -21,7 +21,6 @@ import java.util.logging.Level;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.Configurator;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.scheduler.SchedulerManager;
@@ -102,12 +101,15 @@ public class DAPNETCore {
 	public static void main(String[] args) throws Exception {
 		// Disable IPv6 for Java VM, creates sometimes LogMessages
 		System.setProperty("java.net.preferIPv4Stack", "true");
+
 		// Jersey and Hibernate do not support log4j2, so setting additionally
 		// Java Logger to warn level
 		setJavaLogLevelToWarn();
+
 		// Set Path to LogSettings
-		Configurator.initialize(null, "config/LogSettings.xml");
-		System.setProperty("Dlogging.config", "LogSettings.xml");
+		// FIXME This won't work...
+		// System.setProperty("Dlogging.config", "LogSettings.xml");
+
 		// Set language to English
 		Locale.setDefault(Locale.ENGLISH);
 

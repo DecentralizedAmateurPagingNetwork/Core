@@ -155,6 +155,9 @@
 		</plugins>
 		<resources>
 			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
 				<directory>${project.basedir}</directory>
 				<targetPath>${project.build.directory}</targetPath>
 				<includes>
