@@ -34,7 +34,7 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 @Path("/transmitters")
 @Produces("application/json")
 public class TransmitterResource extends AbstractResource {
-	private static final Pattern authKeyPattern = Pattern.compile("\\p{Alnum}");
+	private static final Pattern authKeyPattern = Pattern.compile("\\p{Alnum}+");
 
 	@GET
 	public Response getTransmitters() throws Exception {
