@@ -46,20 +46,20 @@ public class DAPNETCore {
 			logger.info("Starting TransmissionManager");
 			transmissionManager = new TransmissionManager();
 
-			logger.info("Starting device server");
-			deviceServer = new Server(transmissionManager.getTransmitterManager());
-			Thread serverThread = new Thread(deviceServer);
-			serverThread.start();
-
 			logger.info("Starting Cluster");
 			clusterManager = new ClusterManager(transmissionManager);
+
+			logger.info("Starting SchedulerManager");
+			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
 
 			logger.info("Starting RestManager");
 			restManager = new RestManager(clusterManager);
 			restManager.startServer();
 
-			logger.info("Starting SchedulerManager");
-			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
+			logger.info("Starting device server");
+			deviceServer = new Server(transmissionManager.getTransmitterManager());
+			Thread serverThread = new Thread(deviceServer);
+			serverThread.start();
 
 			logger.info("DAPNETCore started");
 		} catch (Exception e) {
@@ -71,8 +71,12 @@ public class DAPNETCore {
 	private void stop() {
 		logger.info("Stopping DAPNET_CORE...");
 
-		if (clusterManager != null) {
-			clusterManager.stop();
+		try {
+			if (deviceServer != null) {
+				deviceServer.close();
+			}
+		} catch (Exception ex) {
+			logger.error("Failed to close the device server.", ex);
 		}
 
 		if (restManager != null) {
@@ -83,12 +87,8 @@ public class DAPNETCore {
 			schedulerManager.stop();
 		}
 
-		try {
-			if (deviceServer != null) {
-				deviceServer.close();
-			}
-		} catch (Exception ex) {
-			logger.error("Failed to close the device server.", ex);
+		if (clusterManager != null) {
+			clusterManager.stop();
 		}
 	}
 
