@@ -50,7 +50,7 @@ public abstract class AbstractResource {
 	// Gson Helper
 	protected static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls()
 			.registerTypeAdapterFactory(new GsonTypeAdapter()).create();
-	protected static final Gson userGson = new GsonBuilder().setPrettyPrinting()
+	protected static final Gson userGson = new GsonBuilder().setPrettyPrinting().serializeNulls()
 			.registerTypeAdapterFactory(new GsonTypeAdapter()).setExclusionStrategies(new UserExclusionStrategy())
 			.create();
 
@@ -121,8 +121,9 @@ public abstract class AbstractResource {
 
 	// Operation Helper
 	protected Response getObject(Object object, RestSecurity.SecurityStatus status) throws Exception {
-		if (object == null)
+		if (object == null) {
 			throw new NotFoundException();
+		}
 
 		return Response.status(Response.Status.OK).entity(getExclusionGson(status).toJson(object)).build();
 	}
@@ -130,12 +131,15 @@ public abstract class AbstractResource {
 	public Response handleObject(Object object, String methodName, boolean creation, boolean quorumNeeded)
 			throws Exception {
 		// Check Quorum
-		if (quorumNeeded && !restListener.isQuorum())
+		if (quorumNeeded && !restListener.isQuorum()) {
 			throw new NoQuorumException();
+		}
 
 		// Validation
-		if (object == null)
+		if (object == null) {
 			throw new EmptyBodyException();
+		}
+
 		validateObject(object);
 
 		// Send to Cluster
@@ -146,8 +150,9 @@ public abstract class AbstractResource {
 			} else {
 				return Response.ok(gson.toJson(object)).build();
 			}
-		} else
+		} else {
 			throw new InternalServerErrorException();
+		}
 	}
 
 	protected Response deleteObject(Searchable object, String methodName, boolean quorumNeeded) throws Exception {
