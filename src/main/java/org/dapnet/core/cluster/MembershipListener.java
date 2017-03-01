@@ -64,8 +64,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 				try {
 					handleMerge((MergeView) view);
 				} catch (Exception e) {
-					logger.fatal("Could not get State from majority");
-					logger.fatal(e);
+					logger.fatal("Could not get State from majority", e);
 					DAPNETCore.stopDAPNETCore();
 					return;
 				}
@@ -120,16 +119,13 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 					} catch (Exception e) {
 						logger.warn("Failed to receive State");
 						logger.warn(e);
-						if (numberOfAttempts++ > 5)
+						if (numberOfAttempts++ > 5) {
 							throw e;
+						}
 					}
 				}
-
-				// Reconnect to transmitters (transmitters might have been
-				// edited in major subgroup)
-				// clusterManager.getTransmitterManager().performReconnect(clusterManager.getNodeTransmitter());
-				// }
 			}
+
 			logger.info("Finished merge process");
 		}
 
@@ -143,6 +139,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 					majorSubgroup = subgroup;
 				}
 			}
+
 			return majorSubgroup;
 		}
 
