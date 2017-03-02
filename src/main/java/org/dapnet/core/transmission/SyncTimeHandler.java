@@ -156,7 +156,7 @@ final class SyncTimeHandler {
 			sign = "-";
 		}
 
-		String msg = String.format("%d:%s:%04x\r\n", PagingMessageType.SYNCORDER.getValue(), sign, abs);
+		String msg = String.format("%d:%s%04x\r\n", PagingMessageType.SYNCORDER.getValue(), sign, abs);
 		ctx.writeAndFlush(msg);
 
 		state = SyncState.READ_TIME_ADJUST_ACK;
