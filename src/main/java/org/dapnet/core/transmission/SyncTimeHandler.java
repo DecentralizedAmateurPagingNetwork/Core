@@ -139,7 +139,7 @@ final class SyncTimeHandler {
 
 		++loopCounter;
 		if (loopCounter < maxLoops) {
-			state = SyncState.READ_TIME;
+			writeTime(ctx);
 		} else {
 			sendTimeAdjust(ctx);
 		}
