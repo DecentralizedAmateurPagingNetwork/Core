@@ -61,6 +61,7 @@ final class SyncTimeHandler {
 			break;
 		case READ_TIME_ACK:
 			readTimeAck(ctx, message);
+			break;
 		case READ_TIME_ADJUST_ACK:
 			if (message.equals("+")) {
 				state = SyncState.DONE;

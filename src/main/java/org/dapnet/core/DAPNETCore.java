@@ -69,7 +69,7 @@ public class DAPNETCore {
 	}
 
 	private void stop() {
-		logger.info("Stopping DAPNET_CORE...");
+		logger.info("Stopping DAPNETCore...");
 
 		try {
 			if (deviceServer != null) {
