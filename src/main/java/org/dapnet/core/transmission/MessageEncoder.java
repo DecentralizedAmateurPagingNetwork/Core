@@ -61,7 +61,7 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 
 		int sn = client.getSequenceNumber();
 		try {
-			String encoded = String.format("#%02X %s:%X:%X:%s:%s\r\n", sn, type.getValue(), settings.getSendSpeed(),
+			String encoded = String.format("#%02X %s:%X:%X:%s:%s\n", sn, type.getValue(), settings.getSendSpeed(),
 					msg.getAddress(), msg.getFunctionalBits().getValue(), msg.getText());
 
 			out.add(encoded);

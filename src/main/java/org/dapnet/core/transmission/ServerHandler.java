@@ -188,7 +188,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 			// Send timeslots to client
 			Transmitter t = client.getTransmitter();
-			String msg = String.format("%d:%s\r\n", PagingMessageType.SLOTS.getValue(), t.getTimeSlot());
+			String msg = String.format("%d:%s\n", PagingMessageType.SLOTS.getValue(), t.getTimeSlot());
 			ctx.writeAndFlush(msg);
 
 			state = ConnectionState.TIMESLOTS_SENT;
