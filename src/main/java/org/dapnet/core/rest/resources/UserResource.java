@@ -56,12 +56,14 @@ public class UserResource extends AbstractResource {
 		// Create User from received data
 		User user = gson.fromJson(userJSON, User.class);
 		if (user != null) {
-			if (user.getHash().equals("") && restListener.getState().getUsers().containsKey(userName)) {
-				// keep existing hash
-				user.setHash(restListener.getState().getUsers().get(userName).getHash());
+			String hash = user.getHash();
+			User oldUser = restListener.getState().getUsers().get(userName);
+			if ((hash == null || hash.isEmpty()) && oldUser != null) {
+				user.setHash(oldUser.getHash());
 			} else {
 				user.setHash(HashUtil.createHash(user.getHash()));
 			}
+
 			user.setName(userName);
 		} else {
 			throw new EmptyBodyException();
@@ -74,7 +76,7 @@ public class UserResource extends AbstractResource {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
 						restListener.getState().getUsers().get(userName));
 			} else {
-				checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			}
 		}
 
@@ -95,7 +97,7 @@ public class UserResource extends AbstractResource {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
 		} else {
 			// only user will get message that object does not exist
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		return deleteObject(oldUser, "deleteUser", true);

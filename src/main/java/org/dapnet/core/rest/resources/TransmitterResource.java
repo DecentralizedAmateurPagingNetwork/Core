@@ -68,7 +68,7 @@ public class TransmitterResource extends AbstractResource {
 					restListener.getState().getTransmitters().get(transmitterName));
 		} else {
 			// Create
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		// Create Transmitter
@@ -105,7 +105,7 @@ public class TransmitterResource extends AbstractResource {
 		if (oldTransmitter != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
 		} else {
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);

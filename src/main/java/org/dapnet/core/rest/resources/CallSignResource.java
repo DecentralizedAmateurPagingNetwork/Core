@@ -55,7 +55,7 @@ public class CallSignResource extends AbstractResource {
 					restListener.getState().getCallSigns().get(callSignName));
 		} else {
 			// Create
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		CallSign callSign = gson.fromJson(callSignJSON, CallSign.class);
@@ -82,7 +82,7 @@ public class CallSignResource extends AbstractResource {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
 		} else {
 			// only user will get message that object does not exist
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		return deleteObject(oldCallSign, "deleteCallSign", true);
