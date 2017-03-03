@@ -62,17 +62,17 @@ public class TransmitterResource extends AbstractResource {
 			transmitterName = transmitterName.toLowerCase();
 		}
 
-		if (restListener.getState().getTransmitters().containsKey(transmitterName)) {
+		final Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitterName);
+		if (oldTransmitter != null) {
 			// Overwrite
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getTransmitters().get(transmitterName));
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
 		} else {
 			// Create
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		// Create Transmitter
-		Transmitter transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
+		final Transmitter transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
 		if (transmitter != null) {
 			// Only Status OFFLINE or DISABLED is accepted:
 			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
@@ -90,8 +90,7 @@ public class TransmitterResource extends AbstractResource {
 			throw new NotAcceptableException("Auth key contains invalid characters.");
 		}
 
-		return handleObject(transmitter, "putTransmitter",
-				!restListener.getState().getTransmitters().containsKey(transmitterName), true);
+		return handleObject(transmitter, "putTransmitter", oldTransmitter == null, true);
 	}
 
 	@DELETE
@@ -101,7 +100,7 @@ public class TransmitterResource extends AbstractResource {
 			transmitter = transmitter.toLowerCase();
 		}
 
-		Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
+		final Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
 		if (oldTransmitter != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
 		} else {

@@ -50,25 +50,24 @@ public class TransmitterGroupResource extends AbstractResource {
 			transmitterGroupName = transmitterGroupName.toLowerCase();
 		}
 
-		if (restListener.getState().getTransmitterGroups().containsKey(transmitterGroupName)) {
+		final TransmitterGroup oldGroup = restListener.getState().getTransmitterGroups().get(transmitterGroupName);
+		if (oldGroup != null) {
 			// Overwrite
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getTransmitterGroups().get(transmitterGroupName));
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldGroup);
 		} else {
 			// Create
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		// Create TransmitterGroup
-		TransmitterGroup transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
+		final TransmitterGroup transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
 		if (transmitterGroup != null) {
 			transmitterGroup.setName(transmitterGroupName);
 		} else {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(transmitterGroup, "putTransmitterGroup",
-				!restListener.getState().getTransmitterGroups().containsKey(transmitterGroupName), true);
+		return handleObject(transmitterGroup, "putTransmitterGroup", oldGroup == null, true);
 	}
 
 	@DELETE
@@ -78,12 +77,13 @@ public class TransmitterGroupResource extends AbstractResource {
 			transmitterGroup = transmitterGroup.toLowerCase();
 		}
 
-		TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups().get(transmitterGroup);
+		final TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups()
+				.get(transmitterGroup);
 		if (oldTransmitterGroup != null) {
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
 			return deleteObject(oldTransmitterGroup, "deleteTransmitterGroup", true);
 		} else {
-			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			throw new NotFoundException();
 		}
 	}

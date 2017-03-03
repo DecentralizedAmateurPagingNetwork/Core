@@ -49,24 +49,24 @@ public class RubricResource extends AbstractResource {
 			rubricName = rubricName.toLowerCase();
 		}
 
-		if (restListener.getState().getRubrics().containsKey(rubricName)) {
+		final Rubric oldRubric = restListener.getState().getRubrics().get(rubricName);
+		if (oldRubric != null) {
 			// Overwrite
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getRubrics().get(rubricName));
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldRubric);
 		} else {
 			// Create
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
 		// Create Rubric
-		Rubric rubric = gson.fromJson(rubricJSON, Rubric.class);
+		final Rubric rubric = gson.fromJson(rubricJSON, Rubric.class);
 		if (rubric != null) {
 			rubric.setName(rubricName);
 		} else {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(rubric, "putRubric", !restListener.getState().getRubrics().containsKey(rubricName), true);
+		return handleObject(rubric, "putRubric", oldRubric == null, true);
 	}
 
 	@DELETE
@@ -76,7 +76,7 @@ public class RubricResource extends AbstractResource {
 			rubric = rubric.toLowerCase();
 		}
 
-		Rubric oldRubric = restListener.getState().getRubrics().get(rubric);
+		final Rubric oldRubric = restListener.getState().getRubrics().get(rubric);
 		if (oldRubric != null) {
 			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);

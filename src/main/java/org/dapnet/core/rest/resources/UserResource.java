@@ -53,11 +53,12 @@ public class UserResource extends AbstractResource {
 			userName = userName.toLowerCase();
 		}
 
+		final User oldUser = restListener.getState().getUsers().get(userName);
+
 		// Create User from received data
-		User user = gson.fromJson(userJSON, User.class);
+		final User user = gson.fromJson(userJSON, User.class);
 		if (user != null) {
 			String hash = user.getHash();
-			User oldUser = restListener.getState().getUsers().get(userName);
 			if ((hash == null || hash.isEmpty()) && oldUser != null) {
 				user.setHash(oldUser.getHash());
 			} else {
@@ -72,15 +73,14 @@ public class UserResource extends AbstractResource {
 		if (user.isAdmin()) {
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		} else {
-			if (restListener.getState().getUsers().containsKey(userName)) {
-				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-						restListener.getState().getUsers().get(userName));
+			if (oldUser != null) {
+				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);
 			} else {
 				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			}
 		}
 
-		return handleObject(user, "putUser", !restListener.getState().getUsers().containsKey(userName), true);
+		return handleObject(user, "putUser", oldUser == null, true);
 	}
 
 	@DELETE
@@ -90,8 +90,7 @@ public class UserResource extends AbstractResource {
 			user = user.toLowerCase();
 		}
 
-		User oldUser = restListener.getState().getUsers().get(user);
-
+		final User oldUser = restListener.getState().getUsers().get(user);
 		if (oldUser != null) {
 			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);

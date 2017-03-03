@@ -53,7 +53,7 @@ public class NodeResource extends AbstractResource {
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 
 		// Create Node
-		Node node = gson.fromJson(nodeJSON, Node.class);
+		final Node node = gson.fromJson(nodeJSON, Node.class);
 		if (node != null) {
 			node.setName(nodeName);
 			node.setKey(HashUtil.createHash(node.getKey()));

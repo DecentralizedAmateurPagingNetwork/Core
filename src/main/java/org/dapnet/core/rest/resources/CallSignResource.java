@@ -49,24 +49,23 @@ public class CallSignResource extends AbstractResource {
 			callSignName = callSignName.toLowerCase();
 		}
 
-		if (restListener.getState().getCallSigns().containsKey(callSignName)) {
+		final CallSign oldCallSign = restListener.getState().getCallSigns().get(callSignName);
+		if (oldCallSign != null) {
 			// Overwrite
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getCallSigns().get(callSignName));
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
 		} else {
 			// Create
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}
 
-		CallSign callSign = gson.fromJson(callSignJSON, CallSign.class);
+		final CallSign callSign = gson.fromJson(callSignJSON, CallSign.class);
 		if (callSign != null) {
 			callSign.setName(callSignName);
 		} else {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(callSign, "putCallSign", !restListener.getState().getCallSigns().containsKey(callSignName),
-				true);
+		return handleObject(callSign, "putCallSign", oldCallSign == null, true);
 	}
 
 	@DELETE
@@ -76,7 +75,7 @@ public class CallSignResource extends AbstractResource {
 			callSign = callSign.toLowerCase();
 		}
 
-		CallSign oldCallSign = restListener.getState().getCallSigns().get(callSign);
+		final CallSign oldCallSign = restListener.getState().getCallSigns().get(callSign);
 		if (oldCallSign != null) {
 			// only owner can delete object
 			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
