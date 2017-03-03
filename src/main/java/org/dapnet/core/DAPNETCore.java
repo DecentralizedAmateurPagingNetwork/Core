@@ -30,8 +30,8 @@ import org.dapnet.core.transmission.TransmissionManager;
 public class DAPNETCore {
 
 	private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
-	private static final String CORE_VERSION = "1.1.0.0";
-	private static final String API_VERSION = "1.1.0";
+	private static final String CORE_VERSION = "1.1.1.0";
+	private static final String API_VERSION = "1.1.1";
 	private static volatile DAPNETCore dapnetCore;
 	private volatile ClusterManager clusterManager;
 	private volatile RestManager restManager;
