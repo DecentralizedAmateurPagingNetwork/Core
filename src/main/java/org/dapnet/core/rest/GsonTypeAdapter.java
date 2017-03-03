@@ -14,15 +14,19 @@
 
 package org.dapnet.core.rest;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import java.io.IOException;
+import java.net.UnknownHostException;
+
 import org.dapnet.core.rest.exceptionHandling.InvalidAddressException;
 import org.jgroups.stack.IpAddress;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 public class GsonTypeAdapter implements TypeAdapterFactory {
 	@Override
@@ -45,9 +49,10 @@ public class GsonTypeAdapter implements TypeAdapterFactory {
 				// Check Port
 				if (returnValue instanceof IpAddress) {
 					int port = ((IpAddress) returnValue).getPort();
-					if (port > 65535 || port < 1) // Valid ports are between 1
-													// and 65535
+					if (port > 65535 || port < 1) {
+						// Valid ports are between 1 and 65535
 						throw new InvalidAddressException();
+					}
 				}
 				return returnValue;
 			}
@@ -57,11 +62,12 @@ public class GsonTypeAdapter implements TypeAdapterFactory {
 				JsonElement tree = adapter.toJsonTree(value);
 
 				// Add hostname to json output of IpAddress
-				if (value instanceof IpAddress) {
-					String host = ((IpAddress) value).getIpAddress().getHostName();
-					JsonObject jo = (JsonObject) tree;
-					jo.addProperty("hostname", host);
-				}
+				// if (value instanceof IpAddress) {
+				// String host = ((IpAddress)
+				// value).getIpAddress().getHostName();
+				// JsonObject jo = (JsonObject) tree;
+				// jo.addProperty("hostname", host);
+				// }
 
 				gson.getAdapter(JsonElement.class).write(writer, tree);
 			}
