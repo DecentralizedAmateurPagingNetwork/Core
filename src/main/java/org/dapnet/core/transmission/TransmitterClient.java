@@ -15,7 +15,7 @@ import io.netty.channel.Channel;
  * 
  * @author Philipp Thiel
  */
-class TransmitterClient {
+final class TransmitterClient {
 
 	private final Set<Integer> pendingAcks = new HashSet<>();
 	private final Channel channel;

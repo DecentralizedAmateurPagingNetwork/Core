@@ -31,7 +31,7 @@ import java.io.OutputStream;
 import java.util.Set;
 
 public class MessageListener implements org.jgroups.MessageListener {
-	private static final Logger logger = LogManager.getLogger(MessageListener.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 	private ClusterManager clusterManager;
 

@@ -33,7 +33,7 @@ import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
 
 public class RpcListener {
-	private static final Logger logger = LogManager.getLogger(RpcListener.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 	private ClusterManager clusterManager;
 

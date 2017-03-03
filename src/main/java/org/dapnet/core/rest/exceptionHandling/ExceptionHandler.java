@@ -14,13 +14,16 @@
 
 package org.dapnet.core.rest.exceptionHandling;
 
-import com.google.gson.JsonSyntaxException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.spi.ExtendedExceptionMapper;
-
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.NotAllowedException;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.NotSupportedException;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -28,9 +31,14 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.gson.JsonSyntaxException;
+
 @Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {
-	private static final Logger logger = LogManager.getLogger(ExtendedExceptionMapper.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 
 	@Context
 	UriInfo uri;

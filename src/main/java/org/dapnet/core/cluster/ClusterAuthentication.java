@@ -29,7 +29,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 
 public class ClusterAuthentication extends AuthToken {
-	private static final Logger logger = LogManager.getLogger(ClusterAuthentication.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private static ClusterManager clusterManager;
 
 	@Property(exposeAsManagedAttribute = false)

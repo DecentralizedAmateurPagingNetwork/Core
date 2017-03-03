@@ -14,7 +14,7 @@ import org.dapnet.core.model.TransmitterGroup;
 
 public class TransmitterManager {
 
-	private static final Logger logger = LogManager.getLogger(TransmitterManager.class);
+	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, Transmitter> registeredTranmsitters = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
 	private TransmitterManagerListener listener;

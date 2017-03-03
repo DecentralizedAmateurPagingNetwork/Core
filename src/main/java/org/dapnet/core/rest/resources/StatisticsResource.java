@@ -1,3 +1,8 @@
+/*
+ * DAPNET CORE PROJECT
+ * Copyright (C) 2017
+ */
+
 package org.dapnet.core.rest.resources;
 
 import javax.ws.rs.GET;
@@ -18,35 +23,70 @@ public class StatisticsResource extends AbstractResource {
 	@GET
 	public Response get() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-
-		State state = restListener.getState();
-		Data data = new Data();
-		data.users = state.getUsers().size();
-		data.calls = state.getCalls().size();
-		data.callSigns = state.getCallSigns().size();
-		data.news = state.getNews().size();
-		data.rubrics = state.getRubrics().size();
-		data.nodesTotal = state.getNodes().size();
-		data.nodesOnline = (int) state.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)
-				.count();
-		data.transmittersTotal = state.getTransmitters().size();
-		data.transmittersOnline = (int) state.getTransmitters().values().stream()
-				.filter(t -> t.getStatus() == Transmitter.Status.ONLINE).count();
-
-		return getObject(data, status);
+		return getObject(new ObjectCounts(restListener.getState()), status);
 	}
 
-	@SuppressWarnings("unused")
-	private final class Data {
-		public int users;
-		public int calls;
-		public int callSigns;
-		public int news;
-		public int rubrics;
-		public int nodesTotal;
-		public int nodesOnline;
-		public int transmittersTotal;
-		public int transmittersOnline;
+	public static final class ObjectCounts {
+		private final int users;
+		private final int calls;
+		private final int callSigns;
+		private final int news;
+		private final int rubrics;
+		private final int nodesTotal;
+		private final int nodesOnline;
+		private final int transmittersTotal;
+		private final int transmittersOnline;
+
+		public ObjectCounts(State state) {
+			users = state.getUsers().size();
+			calls = state.getCalls().size();
+			callSigns = state.getCallSigns().size();
+			news = state.getNews().size();
+			rubrics = state.getRubrics().size();
+			nodesTotal = state.getNodes().size();
+			nodesOnline = (int) state.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)
+					.count();
+			transmittersTotal = state.getTransmitters().size();
+			transmittersOnline = (int) state.getTransmitters().values().stream()
+					.filter(t -> t.getStatus() == Transmitter.Status.ONLINE).count();
+		}
+
+		public int getUsers() {
+			return users;
+		}
+
+		public int getCalls() {
+			return calls;
+		}
+
+		public int getCallSigns() {
+			return callSigns;
+		}
+
+		public int getNews() {
+			return news;
+		}
+
+		public int getRubrics() {
+			return rubrics;
+		}
+
+		public int getNodesTotal() {
+			return nodesTotal;
+		}
+
+		public int getNodesOnline() {
+			return nodesOnline;
+		}
+
+		public int getTransmittersTotal() {
+			return transmittersTotal;
+		}
+
+		public int getTransmittersOnline() {
+			return transmittersOnline;
+		}
+
 	}
 
 }

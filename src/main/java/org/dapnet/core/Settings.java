@@ -14,8 +14,15 @@
 
 package org.dapnet.core;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import static org.jgroups.util.Util.readFile;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterSettings;
@@ -24,18 +31,13 @@ import org.dapnet.core.rest.RestSettings;
 import org.dapnet.core.scheduler.SchedulerSettings;
 import org.dapnet.core.transmission.TransmissionSettings;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-
-import static org.jgroups.util.Util.readFile;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @XmlRootElement
 public class Settings implements Serializable {
 	private static final long serialVersionUID = 937400690804047335L;
-	private static final Logger logger = LogManager.getLogger(Settings.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private static Settings settings;
 
 	private TransmissionSettings transmissionSettings;

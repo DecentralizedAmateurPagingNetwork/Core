@@ -27,7 +27,7 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 public class RestManager {
-	private static final Logger logger = LogManager.getLogger(RestManager.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 
 	private HttpServer server;
 	private RestListener restListener;

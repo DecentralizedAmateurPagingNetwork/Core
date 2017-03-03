@@ -29,7 +29,7 @@ import org.dapnet.core.transmission.TransmissionManager;
 
 public class DAPNETCore {
 
-	private static final Logger logger = LogManager.getLogger(DAPNETCore.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private static final String CORE_VERSION = "1.1.1.0";
 	private static final String API_VERSION = "1.1.1";
 	private static volatile DAPNETCore dapnetCore;
@@ -41,7 +41,7 @@ public class DAPNETCore {
 
 	private void start() {
 		try {
-			logger.info("Starting DAPNET_CORE Version " + CORE_VERSION + "...");
+			logger.info("Starting DAPNETCore Version {} ...", CORE_VERSION);
 
 			logger.info("Starting TransmissionManager");
 			transmissionManager = new TransmissionManager();
@@ -56,7 +56,7 @@ public class DAPNETCore {
 			restManager = new RestManager(clusterManager);
 			restManager.startServer();
 
-			logger.info("Starting device server");
+			logger.info("Starting Transmitter Server");
 			deviceServer = new Server(transmissionManager.getTransmitterManager());
 			Thread serverThread = new Thread(deviceServer);
 			serverThread.start();
@@ -69,7 +69,7 @@ public class DAPNETCore {
 	}
 
 	private void stop() {
-		logger.info("Stopping DAPNETCore...");
+		logger.info("Stopping DAPNETCore ...");
 
 		try {
 			if (deviceServer != null) {
@@ -91,6 +91,7 @@ public class DAPNETCore {
 			clusterManager.stop();
 		}
 
+		logger.info("DAPNETCore stopped");
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -117,7 +118,7 @@ public class DAPNETCore {
 						dapnetCore.stop();
 					}
 				} catch (Exception ex) {
-					logger.fatal("Exception : ", ex);
+					logger.fatal("Exception while stopping the Core.", ex);
 				}
 			}
 		});

@@ -13,7 +13,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class Server implements Runnable, AutoCloseable {
 
-	private static final Logger LOGGER = LogManager.getLogger(Server.class);
+	private static final Logger LOGGER = LogManager.getLogger();
 	private final int port;
 	private final TransmitterManager manager;
 	private volatile ChannelFuture serverFuture;

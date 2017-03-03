@@ -40,7 +40,7 @@ import com.google.gson.GsonBuilder;
 
 public class State implements Serializable {
 	private static final long serialVersionUID = 7604901183837032119L;
-	private static final Logger logger = LogManager.getLogger(State.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid

@@ -30,7 +30,7 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
 public class SchedulerManager {
-	private static final Logger logger = LogManager.getLogger(SchedulerManager.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private Scheduler scheduler;
 
 	public SchedulerManager(TransmissionManager transmissionManager, ClusterManager clusterManager)

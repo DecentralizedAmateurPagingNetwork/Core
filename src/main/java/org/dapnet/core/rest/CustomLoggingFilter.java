@@ -33,7 +33,7 @@ import org.glassfish.jersey.message.internal.ReaderWriter;
 
 @Provider
 public class CustomLoggingFilter extends LoggingFeature implements ContainerRequestFilter, ContainerResponseFilter {
-	private static final Logger logger = LogManager.getLogger(CustomLoggingFilter.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {

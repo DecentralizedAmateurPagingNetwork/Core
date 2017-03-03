@@ -43,7 +43,7 @@ import org.jgroups.protocols.AUTH;
 import org.jgroups.util.RspList;
 
 public class ClusterManager implements TransmitterManagerListener, RestListener {
-	private static final Logger logger = LogManager.getLogger(ClusterManager.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 	private JChannel channel;

@@ -25,7 +25,7 @@ import org.jgroups.Event;
 import org.jgroups.stack.IpAddress;
 
 public class ChannelListener implements org.jgroups.ChannelListener {
-	private static final Logger logger = LogManager.getLogger(ChannelListener.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private final ClusterManager clusterManager;
 
 	public ChannelListener(ClusterManager clusterManager) {

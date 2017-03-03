@@ -25,7 +25,7 @@ import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
 
 public class TransmissionManager {
-	private static final Logger logger = LogManager.getLogger(TransmissionManager.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 	private final PagerProtocol protocol = new SkyperProtocol();
 	private final TransmitterManager transmitterManager = new TransmitterManager();
 

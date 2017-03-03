@@ -34,7 +34,7 @@ import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 public class SkyperProtocol implements PagerProtocol {
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
-	private static final Logger logger = LogManager.getLogger(SkyperProtocol.class);
+	private static final Logger logger = LogManager.getLogger();
 
 	@Override
 	public List<Message> createMessagesFromCall(Call call) {

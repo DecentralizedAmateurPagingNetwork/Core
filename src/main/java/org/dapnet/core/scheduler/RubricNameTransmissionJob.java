@@ -22,7 +22,7 @@ import org.dapnet.core.transmission.TransmissionManager;
 import org.quartz.*;
 
 public class RubricNameTransmissionJob implements Job {
-	private static final Logger logger = LogManager.getLogger(RubricNameTransmissionJob.class.getName());
+	private static final Logger logger = LogManager.getLogger();
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {

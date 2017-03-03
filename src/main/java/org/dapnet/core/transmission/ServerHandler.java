@@ -27,7 +27,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	static final AttributeKey<TransmitterClient> CLIENT_KEY = AttributeKey.valueOf("client");
-	private static final Logger logger = LogManager.getLogger(ServerHandler.class);
+	private static final Logger logger = LogManager.getLogger();
 	// Ack message #04 +
 	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
