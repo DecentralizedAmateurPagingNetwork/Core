@@ -3,7 +3,7 @@
 	daniel.sialkowski@rwth-aachen.de ~ ~ Institute of High Frequency Technology 
 	~ RWTH AACHEN UNIVERSITY ~ Melatener Str. 25 ~ 52074 Aachen -->
 
-<Configuration monitorInterval="30">
+<Configuration monitorInterval="30" shutdownHook="disable">
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />

@@ -90,6 +90,7 @@ public class DAPNETCore {
 		if (clusterManager != null) {
 			clusterManager.stop();
 		}
+
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -118,6 +119,14 @@ public class DAPNETCore {
 				} catch (Exception ex) {
 					logger.fatal("Exception : ", ex);
 				}
+			}
+		});
+
+		// Shutdown log4j
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				LogManager.shutdown();
 			}
 		});
 
