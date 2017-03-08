@@ -19,10 +19,11 @@ import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/transmitterGroups")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	public Response getTransmitterGroups() throws Exception {
@@ -43,7 +44,7 @@ public class TransmitterGroupResource extends AbstractResource {
 
 	@PUT
 	@Path("{transmitterGroup}")
-	@Consumes("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName,
 			String transmitterGroupJSON) throws Exception {
 		if (transmitterGroupName != null) {

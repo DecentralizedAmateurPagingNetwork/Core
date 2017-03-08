@@ -20,10 +20,11 @@ import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/users")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class UserResource extends AbstractResource {
 	@GET
 	public Response getUsers() throws Exception {
@@ -44,7 +45,7 @@ public class UserResource extends AbstractResource {
 
 	@PUT
 	@Path("{user}")
-	@Consumes("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putUser(@PathParam("user") String userName, String userJSON) throws Exception {
 		// Start request processing only if at least USER
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);

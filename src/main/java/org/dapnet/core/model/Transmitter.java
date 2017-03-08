@@ -15,6 +15,7 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 
 import javax.validation.constraints.Digits;
@@ -35,83 +36,86 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@NotNull
 	@Size(min = 3, max = 20)
-	protected String name;
+	private String name;
 
 	@NotNull
 	@Size(min = 1, max = 64)
-	protected String authKey;
+	private String authKey;
 
 	@NotNull
 	@Digits(integer = 3, fraction = 8)
 	@Min(-180)
 	@Max(+180)
-	protected String longitude;
+	private String longitude;
 
 	@NotNull
 	@Digits(integer = 3, fraction = 8)
 	@Min(-90)
 	@Max(+90)
-	protected String latitude;
+	private String latitude;
 
 	@NotNull
 	@Digits(integer = 3, fraction = 3)
 	@Min(0)
 	@Max(200)
-	protected String power;
+	private String power;
 
 	@NotNull
-	protected String nodeName;
+	private String nodeName;
 
-	protected IpAddress address;
+	private IpAddress address;
 
 	@NotNull
 	@TimeSlot()
-	protected String timeSlot;
+	private String timeSlot;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	protected ArrayList<String> ownerNames;
+	private ArrayList<String> ownerNames;
 
-	protected String deviceType;
+	private String deviceType;
 
-	protected String deviceVersion;
+	private String deviceVersion;
 
 	public enum Status {
 		OFFLINE, ONLINE, ERROR, DISABLED
 	}
 
 	@NotNull
-	protected Status status;
+	private Status status;
 
 	@Min(0)
 	@Max(1000)
-	protected int antennaAboveGroundLevel;
+	private int antennaAboveGroundLevel;
 
 	public enum AntennaType {
 		OMNI, DIRECTIONAL
 	}
 
 	@NotNull
-	protected AntennaType antennaType;
+	private AntennaType antennaType;
 
 	@Min(0)
 	@Max(359)
-	protected int antennaDirection;
+	private int antennaDirection;
 
 	@Min(-50)
 	@Max(80)
-	protected float antennaGainDbi;
+	private float antennaGainDbi;
 
 	public enum Usage {
 		WIDERANGE, PERSONAL
 	}
 
 	@NotNull
-	protected Usage usage;
+	private Usage usage;
 
+	@Override
 	public String getName() {
 		return name;
 	}
+
+	private Instant connectedSince;
 
 	public void setName(String name) {
 		this.name = name;
@@ -189,6 +193,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		this.timeSlot = timeSlot;
 	}
 
+	@Override
 	public ArrayList<String> getOwnerNames() {
 		return ownerNames;
 	}
@@ -311,8 +316,33 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		this.status = status;
 	}
 
+	/**
+	 * Sets the Core state instance.
+	 * 
+	 * @param statePar
+	 *            Core state.
+	 */
 	public static void setState(State statePar) {
 		state = statePar;
+	}
+
+	/**
+	 * Gets the timepoint since when the transmitter is connected.
+	 * 
+	 * @return Timepoint
+	 */
+	public Instant getConnectedSince() {
+		return connectedSince;
+	}
+
+	/**
+	 * Sets the timepoint since when the transmitter is connected.
+	 * 
+	 * @param since
+	 *            Timepoint
+	 */
+	public void setConnectedSince(Instant since) {
+		this.connectedSince = since;
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")

@@ -1,5 +1,6 @@
 package org.dapnet.core.transmission;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -89,6 +90,7 @@ public class TransmitterManager {
 		}
 
 		t.setStatus(Status.ONLINE);
+		t.setConnectedSince(Instant.now());
 
 		connectedClients.put(t.getName(), client);
 
@@ -107,6 +109,8 @@ public class TransmitterManager {
 		if (t.getStatus() != Status.ERROR) {
 			t.setStatus(Status.OFFLINE);
 		}
+
+		t.setConnectedSince(null);
 
 		connectedClients.remove(t.getName());
 

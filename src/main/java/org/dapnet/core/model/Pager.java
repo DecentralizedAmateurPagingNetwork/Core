@@ -26,11 +26,11 @@ public class Pager implements Serializable {
 	@NotNull
 	@Min(value = 0)
 	@Max(value = 2097151, message = "pager number is limited to 21 bits")
-	int number;
+	private int number;
 
 	@NotNull
 	@Size(min = 3, max = 20)
-	String name;
+	private String name;
 
 	public int getNumber() {
 		return number;

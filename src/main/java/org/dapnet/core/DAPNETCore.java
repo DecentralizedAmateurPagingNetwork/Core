@@ -18,6 +18,8 @@ import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,14 +32,26 @@ import org.dapnet.core.transmission.TransmissionManager;
 public class DAPNETCore {
 
 	private static final Logger logger = LogManager.getLogger();
-	private static final String CORE_VERSION = "1.1.2.0";
-	private static final String API_VERSION = "1.1.2";
+	private static final String CORE_VERSION;
+	private static final String API_VERSION;
 	private static volatile DAPNETCore dapnetCore;
 	private volatile ClusterManager clusterManager;
 	private volatile RestManager restManager;
 	private volatile TransmissionManager transmissionManager;
 	private volatile SchedulerManager schedulerManager;
 	private volatile Server deviceServer;
+
+	static {
+		CORE_VERSION = DAPNETCore.class.getPackage().getImplementationVersion();
+		// TODO Use getSpecificationVersion?
+		Pattern versionPattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+)\\p{Graph}*");
+		Matcher m = versionPattern.matcher(CORE_VERSION);
+		if (m.matches()) {
+			API_VERSION = m.group(1);
+		} else {
+			API_VERSION = CORE_VERSION;
+		}
+	}
 
 	private void start() {
 		try {
@@ -102,10 +116,6 @@ public class DAPNETCore {
 		// Java Logger to warn level
 		setJavaLogLevelToWarn();
 
-		// Set Path to LogSettings
-		// FIXME This won't work...
-		// System.setProperty("Dlogging.config", "LogSettings.xml");
-
 		// Set language to English
 		Locale.setDefault(Locale.ENGLISH);
 
@@ -123,7 +133,7 @@ public class DAPNETCore {
 			}
 		});
 
-		// Shutdown log4j
+		// Shutdown hook for log4j
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {

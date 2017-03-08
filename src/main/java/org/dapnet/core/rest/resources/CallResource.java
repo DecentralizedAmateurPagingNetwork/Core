@@ -20,13 +20,14 @@ import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Path("/calls")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class CallResource extends AbstractResource {
 	@GET
 	public Response getCalls(@QueryParam("ownerName") String ownerName) throws Exception {
@@ -51,7 +52,7 @@ public class CallResource extends AbstractResource {
 	}
 
 	@POST
-	@Consumes("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postCall(String callJSON) throws Exception {
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 

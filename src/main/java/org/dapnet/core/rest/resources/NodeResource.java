@@ -20,10 +20,11 @@ import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/nodes")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class NodeResource extends AbstractResource {
 	@GET
 	public Response getNodes() throws Exception {
@@ -44,7 +45,7 @@ public class NodeResource extends AbstractResource {
 
 	@PUT
 	@Path("{node}")
-	@Consumes("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putNode(@PathParam("node") String nodeName, String nodeJSON) throws Exception {
 		if (nodeName != null) {
 			nodeName = nodeName.toLowerCase();

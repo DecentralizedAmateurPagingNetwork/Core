@@ -19,10 +19,11 @@ import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/callsigns")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class CallSignResource extends AbstractResource {
 	@GET
 	public Response getCallSigns() throws Exception {
@@ -43,7 +44,7 @@ public class CallSignResource extends AbstractResource {
 
 	@PUT
 	@Path("{callSign}")
-	@Consumes("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putCallSign(@PathParam("callSign") String callSignName, String callSignJSON) throws Exception {
 		if (callSignName != null) {
 			callSignName = callSignName.toLowerCase();

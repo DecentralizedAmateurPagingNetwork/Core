@@ -24,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.News;
@@ -32,7 +33,7 @@ import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 @Path("/news")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class NewsResource extends AbstractResource {
 	@GET
 	public Response getNews(@QueryParam("rubricName") String rubricName) throws Exception {
@@ -58,7 +59,7 @@ public class NewsResource extends AbstractResource {
 	}
 
 	@POST
-	@Consumes("application/json")
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postNews(String newsJSON) throws Exception {
 		// Start request processing only if at least USER
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
