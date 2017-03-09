@@ -36,7 +36,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 
 	@NotNull
 	@Min(value = 1)
-	@Max(value = 95)
+	@Max(value = 99)
 	private int number;
 
 	@NotNull
