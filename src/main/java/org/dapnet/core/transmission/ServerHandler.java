@@ -23,7 +23,7 @@ import io.netty.util.concurrent.ScheduledFuture;
 class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	private enum ConnectionState {
-		AUTH_PENDING, SYNC_TIME, TIMESLOTS_SENT, ONLINE, OFFLINE
+		AUTH_PENDING, SYNC_TIME, TIMESLOTS_SENT, ONLINE, OFFLINE, EXCEPTION_CAUGHT
 	}
 
 	static final AttributeKey<TransmitterClient> CLIENT_KEY = AttributeKey.valueOf("client");
@@ -106,6 +106,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		state = ConnectionState.EXCEPTION_CAUGHT;
+
 		if (cause instanceof TransmitterException) {
 			logger.error("Closing connection: {}", cause.getMessage());
 		} else {
