@@ -86,7 +86,7 @@ public class TransmitterManager {
 		Transmitter t = client.getTransmitter();
 		if (t == null) {
 			logger.warn("Client has no associated transmitter object.");
-			// TODO Close connection?
+			client.close();
 			return;
 		}
 

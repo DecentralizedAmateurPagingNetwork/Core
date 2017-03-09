@@ -35,7 +35,8 @@ public class GsonTypeAdapter implements TypeAdapterFactory {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> tokenType) {
-		if (Instant.class.isAssignableFrom(tokenType.getRawType())) {
+		Class<?> rawType = tokenType.getRawType();
+		if (Instant.class.isAssignableFrom(rawType)) {
 			return (TypeAdapter<T>) new InstantTypeAdapter();
 		} else {
 			TypeAdapter<T> adapter = gson.getDelegateAdapter(this, tokenType);
