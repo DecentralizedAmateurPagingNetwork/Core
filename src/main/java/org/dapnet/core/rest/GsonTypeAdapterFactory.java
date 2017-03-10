@@ -22,7 +22,6 @@ import org.dapnet.core.rest.exceptionHandling.InvalidAddressException;
 import org.jgroups.stack.IpAddress;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -30,7 +29,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
-public class GsonTypeAdapter implements TypeAdapterFactory {
+public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -40,17 +39,15 @@ public class GsonTypeAdapter implements TypeAdapterFactory {
 			return (TypeAdapter<T>) new InstantTypeAdapter();
 		} else {
 			TypeAdapter<T> adapter = gson.getDelegateAdapter(this, tokenType);
-			return new GenericTypeAdapter<T>(adapter, gson);
+			return new GenericTypeAdapter<T>(adapter);
 		}
 	}
 
 	private static class GenericTypeAdapter<T> extends TypeAdapter<T> {
 		private final TypeAdapter<T> adapter;
-		private final Gson gson;
 
-		public GenericTypeAdapter(TypeAdapter<T> adapter, Gson gson) {
+		public GenericTypeAdapter(TypeAdapter<T> adapter) {
 			this.adapter = adapter;
-			this.gson = gson;
 		}
 
 		// Validation Workaround because IpAddress is already validated
@@ -79,17 +76,7 @@ public class GsonTypeAdapter implements TypeAdapterFactory {
 
 		@Override
 		public void write(JsonWriter writer, T value) throws IOException {
-			JsonElement tree = adapter.toJsonTree(value);
-
-			// Add hostname to json output of IpAddress
-			// if (value instanceof IpAddress) {
-			// String host = ((IpAddress)
-			// value).getIpAddress().getHostName();
-			// JsonObject jo = (JsonObject) tree;
-			// jo.addProperty("hostname", host);
-			// }
-
-			gson.getAdapter(JsonElement.class).write(writer, tree);
+			adapter.write(writer, value);
 		}
 	}
 

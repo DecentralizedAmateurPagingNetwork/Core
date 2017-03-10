@@ -30,11 +30,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.dapnet.core.model.Searchable;
-import org.dapnet.core.rest.GsonTypeAdapter;
+import org.dapnet.core.rest.ExclusionStrategies;
+import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.UserExclusionStrategy;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 
@@ -47,15 +47,18 @@ public abstract class AbstractResource {
 	@Context
 	HttpHeaders httpHeaders;
 
-	// Gson Helper
-	protected static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls()
-			.registerTypeAdapterFactory(new GsonTypeAdapter()).create();
-	protected static final Gson userGson = new GsonBuilder().setPrettyPrinting().serializeNulls()
-			.registerTypeAdapterFactory(new GsonTypeAdapter()).setExclusionStrategies(new UserExclusionStrategy())
-			.create();
+	protected static final Gson gson;
+	protected static final Gson userGson;
+
+	static {
+		GsonBuilder build = new GsonBuilder();
+		build.serializeNulls().setPrettyPrinting().registerTypeAdapterFactory(new GsonTypeAdapterFactory());
+
+		gson = build.addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
+		userGson = build.setExclusionStrategies(ExclusionStrategies.USER).create();
+	}
 
 	protected Gson getExclusionGson(RestSecurity.SecurityStatus status) {
-		// Add here other Exclusion Strategies
 		switch (status) {
 		case ADMIN:
 			return gson;
@@ -64,6 +67,7 @@ public abstract class AbstractResource {
 		case USER:
 			return userGson;
 		case ANYBODY:
+			// TODO Why not userGson?
 			return gson;
 		default:
 			return gson;
