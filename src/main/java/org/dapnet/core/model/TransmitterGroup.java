@@ -16,6 +16,8 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -37,12 +39,13 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterName")
-	private ArrayList<String> transmitterNames;
+	private Collection<String> transmitterNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private ArrayList<String> ownerNames;
+	private Collection<String> ownerNames;
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -59,19 +62,20 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 		this.description = description;
 	}
 
-	public ArrayList<String> getTransmitterNames() {
+	public Collection<String> getTransmitterNames() {
 		return transmitterNames;
 	}
 
-	public void setTransmitterNames(ArrayList<String> transmitterNames) {
+	public void setTransmitterNames(Collection<String> transmitterNames) {
 		this.transmitterNames = transmitterNames;
 	}
 
-	public ArrayList<String> getOwnerNames() {
+	@Override
+	public Collection<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(ArrayList<String> owners) {
+	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
 	}
 
@@ -83,7 +87,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public ArrayList<User> getOwners() throws Exception {
+	public Collection<User> getOwners() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
@@ -92,22 +96,23 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 			return null;
 		}
 
-		ArrayList<User> users = new ArrayList<>();
+		ConcurrentMap<String, User> users = state.getUsers();
+		ArrayList<User> result = new ArrayList<>();
 		for (String owner : ownerNames) {
-			User u = state.getUsers().get(owner);
+			User u = users.get(owner.toLowerCase());
 			if (u != null)
-				users.add(u);
+				result.add(u);
 		}
 
-		if (ownerNames.size() == users.size()) {
-			return users;
+		if (ownerNames.size() == result.size()) {
+			return result;
 		} else {
 			return null;
 		}
 	}
 
 	@ValidName(message = "must contain names of existing transmitters", fieldName = "transmitterNames", constraintName = "ValidTransmitterNames")
-	public ArrayList<Transmitter> getTransmitter() throws Exception {
+	public Collection<Transmitter> getTransmitter() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
@@ -116,16 +121,17 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 			return null;
 		}
 
-		ArrayList<Transmitter> transmitters = new ArrayList<>();
+		ConcurrentMap<String, Transmitter> transmitters = state.getTransmitters();
+		ArrayList<Transmitter> result = new ArrayList<>();
 		for (String transmitterName : transmitterNames) {
-			Transmitter t = state.getTransmitters().get(transmitterName);
+			Transmitter t = transmitters.get(transmitterName.toLowerCase());
 			if (t != null) {
-				transmitters.add(t);
+				result.add(t);
 			}
 		}
 
-		if (transmitters.size() == transmitterNames.size()) {
-			return transmitters;
+		if (result.size() == transmitterNames.size()) {
+			return result;
 		} else {
 			return null;
 		}
@@ -133,8 +139,9 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 
 	public boolean contains(String transmitter) {
 		for (String transmitterName : transmitterNames) {
-			if (transmitter.equals(transmitterName))
+			if (transmitter.equals(transmitterName)) {
 				return true;
+			}
 		}
 
 		return false;

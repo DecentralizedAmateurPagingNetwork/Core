@@ -14,8 +14,8 @@
 
 package org.dapnet.core.rest;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 public interface RestAuthorizable {
-	ArrayList<String> getOwnerNames();
+	Collection<String> getOwnerNames();
 }

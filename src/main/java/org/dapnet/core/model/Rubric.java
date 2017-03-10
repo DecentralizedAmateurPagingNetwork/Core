@@ -16,7 +16,8 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -41,7 +42,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	private List<String> transmitterGroupNames;
+	private Collection<String> transmitterGroupNames;
 
 	@NotNull
 	@Size(min = 1, max = 11)
@@ -49,7 +50,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private ArrayList<String> ownerNames;
+	private Collection<String> ownerNames;
 
 	public int getNumber() {
 		return number;
@@ -59,14 +60,15 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 		this.number = number;
 	}
 
-	public List<String> getTransmitterGroupNames() {
+	public Collection<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}
 
-	public void setTransmitterGroupNames(List<String> transmitterGroupNames) {
+	public void setTransmitterGroupNames(Collection<String> transmitterGroupNames) {
 		this.transmitterGroupNames = transmitterGroupNames;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -83,11 +85,12 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 		this.label = label;
 	}
 
-	public ArrayList<String> getOwnerNames() {
+	@Override
+	public Collection<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(ArrayList<String> owners) {
+	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
 	}
 
@@ -99,7 +102,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 	}
 
 	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
+	public Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
@@ -107,23 +110,24 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 			return null;
 		}
 
-		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
+		ConcurrentMap<String, TransmitterGroup> groups = state.getTransmitterGroups();
+		ArrayList<TransmitterGroup> result = new ArrayList<>();
 		for (String transmitterGroup : transmitterGroupNames) {
-			TransmitterGroup g = state.getTransmitterGroups().get(transmitterGroup);
+			TransmitterGroup g = groups.get(transmitterGroup.toLowerCase());
 			if (g != null) {
-				transmitterGroups.add(g);
+				result.add(g);
 			}
 		}
 
-		if (transmitterGroups.size() == transmitterGroups.size()) {
-			return transmitterGroups;
+		if (result.size() == result.size()) {
+			return result;
 		} else {
 			return null;
 		}
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public ArrayList<User> getOwners() throws Exception {
+	public Collection<User> getOwners() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
@@ -132,16 +136,17 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 			return null;
 		}
 
-		ArrayList<User> users = new ArrayList<>();
+		ConcurrentMap<String, User> users = state.getUsers();
+		ArrayList<User> results = new ArrayList<>();
 		for (String owner : ownerNames) {
-			User u = state.getUsers().get(owner);
+			User u = users.get(owner.toLowerCase());
 			if (u != null) {
-				users.add(u);
+				results.add(u);
 			}
 		}
 
-		if (ownerNames.size() == users.size()) {
-			return users;
+		if (ownerNames.size() == results.size()) {
+			return results;
 		} else {
 			return null;
 		}

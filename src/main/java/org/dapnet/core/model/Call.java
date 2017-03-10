@@ -14,14 +14,16 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.validator.ValidName;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import org.dapnet.core.model.validator.ValidName;
 
 public class Call implements Serializable {
 	private static final long serialVersionUID = -2897439698777438292L;
@@ -33,11 +35,11 @@ public class Call implements Serializable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one callSignName")
-	private List<String> callSignNames;
+	private Collection<String> callSignNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	private List<String> transmitterGroupNames;
+	private Collection<String> transmitterGroupNames;
 
 	// No Validation necessary
 	private boolean emergency;
@@ -70,11 +72,11 @@ public class Call implements Serializable {
 		return text;
 	}
 
-	public List<String> getCallSignNames() {
+	public Collection<String> getCallSignNames() {
 		return callSignNames;
 	}
 
-	public List<String> getTransmitterGroupNames() {
+	public Collection<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}
 
@@ -90,7 +92,7 @@ public class Call implements Serializable {
 	}
 
 	@ValidName(message = "must contain names of existing callSigns", fieldName = "callSignNames", constraintName = "ValidCallSignNames")
-	public ArrayList<CallSign> getCallSigns() throws Exception {
+	public Collection<CallSign> getCallSigns() throws Exception {
 		if (callSignNames == null) {
 			return null;
 		}
@@ -99,22 +101,23 @@ public class Call implements Serializable {
 			throw new Exception("StateNotSetException");
 		}
 
-		ArrayList<CallSign> callSigns = new ArrayList<>();
+		ConcurrentMap<String, CallSign> callSigns = state.getCallSigns();
+		ArrayList<CallSign> result = new ArrayList<>();
 		for (String callSign : callSignNames) {
-			CallSign s = state.getCallSigns().get(callSign);
+			CallSign s = callSigns.get(callSign.toLowerCase());
 			if (s != null) {
-				callSigns.add(s);
+				result.add(s);
 			}
 		}
-		if (callSigns.size() == callSignNames.size()) {
-			return callSigns;
+		if (result.size() == callSignNames.size()) {
+			return result;
 		} else {
 			return null;
 		}
 	}
 
 	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
+	public Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
 		if (transmitterGroupNames == null) {
 			return null;
 		}
@@ -123,15 +126,16 @@ public class Call implements Serializable {
 			throw new Exception("StateNotSetException");
 		}
 
-		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
+		ConcurrentMap<String, TransmitterGroup> groups = state.getTransmitterGroups();
+		ArrayList<TransmitterGroup> result = new ArrayList<>();
 		for (String transmitterGroup : transmitterGroupNames) {
-			TransmitterGroup g = state.getTransmitterGroups().get(transmitterGroup);
+			TransmitterGroup g = groups.get(transmitterGroup.toLowerCase());
 			if (g != null) {
-				transmitterGroups.add(g);
+				result.add(g);
 			}
 		}
-		if (transmitterGroups.size() == transmitterGroups.size()) {
-			return transmitterGroups;
+		if (result.size() == result.size()) {
+			return result;
 		} else {
 			return null;
 		}
@@ -142,10 +146,10 @@ public class Call implements Serializable {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
-		if (ownerName == null) {
-			return null;
+		if (ownerName != null) {
+			return state.getUsers().get(ownerName.toLowerCase());
 		} else {
-			return state.getUsers().get(ownerName);
+			return null;
 		}
 	}
 

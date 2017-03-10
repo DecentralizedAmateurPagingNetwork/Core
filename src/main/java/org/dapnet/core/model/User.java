@@ -16,6 +16,7 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -49,6 +50,7 @@ public class User implements Serializable, RestAuthorizable, Searchable {
 		this.admin = admin;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -81,7 +83,8 @@ public class User implements Serializable, RestAuthorizable, Searchable {
 		this.admin = admin;
 	}
 
-	public ArrayList<String> getOwnerNames() {
+	@Override
+	public Collection<String> getOwnerNames() {
 		ArrayList<String> list = new ArrayList<>();
 		list.add(name);
 		return list;

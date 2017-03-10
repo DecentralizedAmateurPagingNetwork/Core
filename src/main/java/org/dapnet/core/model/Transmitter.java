@@ -17,6 +17,8 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -71,7 +73,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private ArrayList<String> ownerNames;
+	private Collection<String> ownerNames;
 
 	private String deviceType;
 
@@ -194,11 +196,11 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	}
 
 	@Override
-	public ArrayList<String> getOwnerNames() {
+	public Collection<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(ArrayList<String> owners) {
+	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
 	}
 
@@ -346,7 +348,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public ArrayList<User> getOwners() throws Exception {
+	public Collection<User> getOwners() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
@@ -355,16 +357,17 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 			return null;
 		}
 
-		ArrayList<User> users = new ArrayList<>();
+		ConcurrentMap<String, User> users = state.getUsers();
+		ArrayList<User> result = new ArrayList<>();
 		for (String owner : ownerNames) {
-			User u = state.getUsers().get(owner);
+			User u = users.get(owner);
 			if (u != null) {
-				users.add(u);
+				result.add(u);
 			}
 		}
 
-		if (ownerNames.size() == users.size()) {
-			return users;
+		if (ownerNames.size() == result.size()) {
+			return result;
 		} else {
 			return null;
 		}
@@ -373,7 +376,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")
 	public Node getNode() throws Exception {
 		if (state != null) {
-			return state.getNodes().get(nodeName);
+			return state.getNodes().get(nodeName.toLowerCase());
 		} else {
 			throw new Exception("StateNotSetException");
 		}

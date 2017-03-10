@@ -14,14 +14,15 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.validator.ValidName;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Date;
+
+import org.dapnet.core.model.validator.ValidName;
 
 public class News implements Serializable {
 	private static final long serialVersionUID = 255218965991641092L;
@@ -104,10 +105,10 @@ public class News implements Serializable {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
-		if (rubricName == null) {
-			return null;
+		if (rubricName != null) {
+			return state.getRubrics().get(rubricName.toLowerCase());
 		} else {
-			return state.getRubrics().get(rubricName);
+			return null;
 		}
 	}
 
@@ -116,10 +117,10 @@ public class News implements Serializable {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
-		if (ownerName == null) {
-			return null;
+		if (ownerName != null) {
+			return state.getUsers().get(ownerName.toLowerCase());
 		} else {
-			return state.getUsers().get(ownerName);
+			return null;
 		}
 	}
 

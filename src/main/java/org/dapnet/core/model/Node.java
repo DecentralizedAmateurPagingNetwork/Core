@@ -74,6 +74,7 @@ public class Node implements Serializable, Searchable {
 		this.status = status;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}

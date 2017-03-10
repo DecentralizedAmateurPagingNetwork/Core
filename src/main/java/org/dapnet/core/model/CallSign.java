@@ -16,6 +16,8 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -39,12 +41,13 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	@NotNull
 	@Valid
 	@Size(min = 1, message = "must contain at least one pager")
-	private ArrayList<Pager> pagers;
+	private Collection<Pager> pagers;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private ArrayList<String> ownerNames;
+	private Collection<String> ownerNames;
 
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -61,19 +64,20 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 		this.description = description;
 	}
 
-	public ArrayList<Pager> getPagers() {
+	public Collection<Pager> getPagers() {
 		return pagers;
 	}
 
-	public void setPagers(ArrayList<Pager> pagers) {
+	public void setPagers(Collection<Pager> pagers) {
 		this.pagers = pagers;
 	}
 
-	public ArrayList<String> getOwnerNames() {
+	@Override
+	public Collection<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(ArrayList<String> owners) {
+	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
 	}
 
@@ -85,7 +89,7 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public ArrayList<User> getOwners() throws Exception {
+	public Collection<User> getOwners() throws Exception {
 		if (ownerNames == null) {
 			return null;
 		}
@@ -93,17 +97,18 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 			throw new Exception("StateNotSetException");
 		}
 
-		ArrayList<User> users = new ArrayList<>();
+		ConcurrentMap<String, User> users = state.getUsers();
+		ArrayList<User> results = new ArrayList<>();
 		for (String owner : ownerNames) {
-			User u = state.getUsers().get(owner);
+			User u = users.get(owner.toLowerCase());
 			if (u != null)
-				users.add(u);
+				results.add(u);
 		}
 
-		if (users.size() != ownerNames.size()) {
-			return null;
+		if (results.size() == ownerNames.size()) {
+			return results;
 		} else {
-			return users;
+			return null;
 		}
 	}
 

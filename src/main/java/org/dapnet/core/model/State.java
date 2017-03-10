@@ -21,10 +21,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -56,11 +56,11 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private List<Call> calls;
+	private Collection<Call> calls;
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private List<News> news;
+	private Collection<News> news;
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
@@ -149,11 +149,11 @@ public class State implements Serializable {
 		logger.info("Successfully finished cleaning operation");
 	}
 
-	public List<Call> getCalls() {
+	public Collection<Call> getCalls() {
 		return calls;
 	}
 
-	public List<News> getNews() {
+	public Collection<News> getNews() {
 		return news;
 	}
 
