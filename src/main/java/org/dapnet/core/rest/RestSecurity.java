@@ -53,7 +53,7 @@ public class RestSecurity {
 			return checkAuthorization(minSecurityLevel, SecurityStatus.ANYBODY);
 		}
 		// Get User
-		User user = restListener.getState().getUsers().get(loginData.getUsername());
+		User user = restListener.getState().getUsers().get(loginData.getUsername().toLowerCase());
 		if (user == null) {
 			logger.info("No User with such name");
 			return SecurityStatus.UNAUTHORIZED;
@@ -89,11 +89,13 @@ public class RestSecurity {
 		if (restAuthorizable == null) {
 			return false;
 		}
+
 		for (String ownerName : restAuthorizable.getOwnerNames()) {
-			if (name.equals(ownerName)) {
+			if (name.equalsIgnoreCase(ownerName)) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
