@@ -25,6 +25,7 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -102,6 +103,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 			logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage(), e);
 		}
 
-		return Response.status(descriptor.getCode() / 10).entity(descriptor.toJson()).build();
+		return Response.status(descriptor.getCode() / 10).entity(descriptor.toJson()).type(MediaType.APPLICATION_JSON)
+				.build();
 	}
 }
