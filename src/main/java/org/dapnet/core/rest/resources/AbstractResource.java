@@ -51,11 +51,15 @@ public abstract class AbstractResource {
 	protected static final Gson userGson;
 
 	static {
+		gson = createBuilder().addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
+		userGson = createBuilder().setExclusionStrategies(ExclusionStrategies.USER).create();
+	}
+
+	private static GsonBuilder createBuilder() {
 		GsonBuilder build = new GsonBuilder();
 		build.serializeNulls().setPrettyPrinting().registerTypeAdapterFactory(new GsonTypeAdapterFactory());
 
-		gson = build.addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
-		userGson = build.setExclusionStrategies(ExclusionStrategies.USER).create();
+		return build;
 	}
 
 	protected Gson getExclusionGson(RestSecurity.SecurityStatus status) {
@@ -173,6 +177,7 @@ public abstract class AbstractResource {
 		// Send to Cluster
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
 				new Class[] { String.class })) {
+			// TODO Why do we return the deleted object here?
 			return Response.status(Response.Status.OK).entity(gson.toJson(object)).build();
 		} else {
 			throw new InternalServerErrorException();
