@@ -46,6 +46,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 	@Context
 	Request request;
 
+	@Override
 	public Response toResponse(Exception e) {
 		ExceptionDescriptor descriptor;
 
