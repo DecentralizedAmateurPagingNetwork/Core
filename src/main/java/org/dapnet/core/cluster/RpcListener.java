@@ -310,7 +310,7 @@ public class RpcListener {
 			// Delete Transmitters
 			ArrayList<String> deleteTransmitterNames = new ArrayList<>();
 			clusterManager.getState().getTransmitters().values().stream()
-					.filter(transmitter -> transmitter.getNodeName().equals(node))
+					.filter(transmitter -> transmitter.getNodeName().equalsIgnoreCase(node))
 					.forEach(transmitter -> deleteTransmitterNames.add(transmitter.getName()));
 			deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
 
@@ -389,7 +389,7 @@ public class RpcListener {
 			// Delete depended Objects
 			// Delete News
 			ArrayList<News> deleteNews = new ArrayList<>();
-			clusterManager.getState().getNews().stream().filter(news -> news.getRubricName().equals(rubric))
+			clusterManager.getState().getNews().stream().filter(news -> news.getRubricName().equalsIgnoreCase(rubric))
 					.forEach(news -> deleteNews.add(news));
 			deleteNews.stream().forEach(news -> clusterManager.getState().getNews().remove(news));
 
@@ -467,7 +467,7 @@ public class RpcListener {
 			if (oldTransmitter != null) {
 				// Disconnect from old transmitter if my Transmitter
 				String myNodeName = clusterManager.getChannel().getName();
-				if (oldTransmitter.getNodeName().equals(myNodeName)) {
+				if (oldTransmitter.getNodeName().equalsIgnoreCase(myNodeName)) {
 					clusterManager.getTransmitterManager().removeTransmitter(oldTransmitter);
 				}
 			}
@@ -478,7 +478,7 @@ public class RpcListener {
 
 			// Connect to Transmitter if my Transmitter
 			String myNodeName = clusterManager.getChannel().getName();
-			if (transmitter.getNodeName().equals(myNodeName)) {
+			if (transmitter.getNodeName().equalsIgnoreCase(myNodeName)) {
 				clusterManager.getTransmitterManager().addTransmitter(transmitter);
 			}
 
@@ -533,7 +533,7 @@ public class RpcListener {
 
 				// Disconnect from Transmitter if my Transmitter
 				String myNodeName = clusterManager.getChannel().getName();
-				if (transmitter.getNodeName().equals(myNodeName)) {
+				if (transmitter.getNodeName().equalsIgnoreCase(myNodeName)) {
 					clusterManager.getTransmitterManager().removeTransmitter(transmitter);
 				}
 
@@ -712,13 +712,13 @@ public class RpcListener {
 
 			// Delete Calls
 			ArrayList<Call> deleteCalls = new ArrayList<>();
-			clusterManager.getState().getCalls().stream().filter(call -> call.getOwnerName().equals(user))
+			clusterManager.getState().getCalls().stream().filter(call -> call.getOwnerName().equalsIgnoreCase(user))
 					.forEach(call -> deleteCalls.add(call));
 			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
 
 			// Delete News
 			ArrayList<News> deleteNews = new ArrayList<>();
-			clusterManager.getState().getNews().stream().filter(news -> news.getOwnerName().equals(user))
+			clusterManager.getState().getNews().stream().filter(news -> news.getOwnerName().equalsIgnoreCase(user))
 					.forEach(news -> deleteNews.add(news));
 			deleteNews.stream().forEach(news -> clusterManager.getState().getNews().remove(news));
 

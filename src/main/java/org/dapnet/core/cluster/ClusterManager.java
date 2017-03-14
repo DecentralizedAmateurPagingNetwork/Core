@@ -202,6 +202,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 	}
 
+	@Override
 	public boolean isQuorum() {
 		checkQuorum();// Should be unnecessary, but added ensure QuorumCheck
 		return quorum;
@@ -284,6 +285,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		return channel;
 	}
 
+	@Override
 	public State getState() {
 		return state;
 	}
