@@ -127,7 +127,7 @@ final class SyncTimeHandler {
 		String timeStringClient = syncMatcher.group(3);
 		long timeLongClient = Long.parseLong(timeStringClient, 16);
 
-		if (id != PagingMessageType.SYNCREQUEST.getValue() || !timeTxMsg.equals(timeStringResp)) {
+		if (id != PagingMessageType.SYNCREQUEST.getValue() || !timeTxMsg.equalsIgnoreCase(timeStringResp)) {
 			throw new TransmitterException("Wrong sync response received.");
 		}
 

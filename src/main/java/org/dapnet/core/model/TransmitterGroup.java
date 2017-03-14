@@ -139,7 +139,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 
 	public boolean contains(String transmitter) {
 		for (String transmitterName : transmitterNames) {
-			if (transmitter.equals(transmitterName)) {
+			if (transmitter.equalsIgnoreCase(transmitterName)) {
 				return true;
 			}
 		}

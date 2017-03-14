@@ -32,6 +32,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		this.clusterManager = clusterManager;
 	}
 
+	@Override
 	public void channelConnected(Channel channel) {
 		// Get State
 		try {
@@ -66,9 +67,11 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		}
 	}
 
+	@Override
 	public void channelDisconnected(Channel channel) {
 	}
 
+	@Override
 	public void channelClosed(Channel channel) {
 	}
 

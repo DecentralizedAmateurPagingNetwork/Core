@@ -134,7 +134,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	public List<Transmitter> getNodeTransmitter() {
 		ArrayList<Transmitter> myTransmitters = new ArrayList<>();
 		for (Transmitter transmitter : state.getTransmitters().values()) {
-			if (transmitter.getNodeName().equals(channel.getName())) {
+			if (transmitter.getNodeName().equalsIgnoreCase(channel.getName())) {
 				myTransmitters.add(transmitter);
 			}
 		}

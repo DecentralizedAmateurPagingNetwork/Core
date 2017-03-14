@@ -57,6 +57,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			this.view = view;
 		}
 
+		@Override
 		public void run() {
 			logger.info("New View: " + view);
 			// Check whether merge is taking place
@@ -149,7 +150,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			// (expect of first node, which might not be in the state, but will
 			// add itself immediately)
 			for (Node node : clusterManager.getState().getNodes().values()) {
-				if (view.getMembers().stream().filter(m -> m.toString().equals(node.getName())).findFirst()
+				if (view.getMembers().stream().filter(m -> m.toString().equalsIgnoreCase(node.getName())).findFirst()
 						.isPresent()) {
 					if (node.getStatus() == Node.Status.SUSPENDED) {
 						node.setStatus(Node.Status.ONLINE);

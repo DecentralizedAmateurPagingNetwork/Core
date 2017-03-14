@@ -45,8 +45,7 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 			user = new LoginData(requestContext.getHeaders().get("Authorization").get(0)).getUsername();
 		} catch (Exception e) {
 		}
-		if (user != null && user.equals(""))
-			user = "";
+
 		sb.append("User: ").append(user);
 
 		sb.append(" - Path: ").append(requestContext.getUriInfo().getPath());
@@ -55,8 +54,9 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		// Append entity shortened to 10000 chars
 		String entity = getEntityBody(requestContext);
 		entity = entity.replace("\n", "").replace("\r", "");
-		if (entity.length() > 10001)
+		if (entity.length() > 10001) {
 			entity.substring(0, 9999);
+		}
 		sb.append(" - Entity: ").append(entity);
 
 		logger.info("REST " + requestContext.getMethod() + " Request : " + sb.toString());
@@ -69,14 +69,16 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		try {
 			ReaderWriter.writeTo(in, out);
 			byte[] requestEntity = out.toByteArray();
-			if (requestEntity.length == 0)
+			if (requestEntity.length == 0) {
 				b.append("");
-			else
+			} else {
 				b.append(new String(requestEntity));
+			}
 			requestContext.setEntityStream(new ByteArrayInputStream(requestEntity));
 		} catch (Exception ex) {
 			return "";
 		}
+
 		return b.toString();
 	}
 
@@ -88,16 +90,18 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		StringBuilder sb = new StringBuilder();
 		sb.append("Header: ").append(responseContext.getHeaders());
 		sb.append(" - Entity: ");
-		if (responseContext != null && responseContext.getEntity() != null)
+		if (responseContext != null && responseContext.getEntity() != null) {
 			sb.append(responseContext.getEntity().toString().replace("\n", "").replace("\r", ""));
-		else
+		} else {
 			sb.append("null");
+		}
 
 		if (responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
-				|| responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR)
+				|| responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR) {
 			logger.info("REST " + requestContext.getMethod() + " Response : " + sb.toString());
-		else
+		} else {
 			logger.error("REST " + requestContext.getMethod() + " Response : " + sb.toString());
+		}
 	}
 
 	// Add Header to allow Web Module running on other server than DAPNET Core

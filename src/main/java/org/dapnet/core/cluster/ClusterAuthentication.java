@@ -14,6 +14,9 @@
 
 package org.dapnet.core.cluster;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
@@ -24,9 +27,6 @@ import org.jgroups.annotations.Property;
 import org.jgroups.auth.AuthToken;
 import org.jgroups.util.Bits;
 import org.jgroups.util.Util;
-
-import java.io.DataInput;
-import java.io.DataOutput;
 
 public class ClusterAuthentication extends AuthToken {
 	private static final Logger logger = LogManager.getLogger();
@@ -42,10 +42,12 @@ public class ClusterAuthentication extends AuthToken {
 		this.auth_value = authvalue;
 	}
 
+	@Override
 	public String getName() {
 		return "org.dpnet.core.cluster.ClusterAuthentication";
 	}
 
+	@Override
 	public boolean authenticate(AuthToken token, Message msg) {
 		Address sender = msg.getSrc();
 		/*
@@ -82,14 +84,17 @@ public class ClusterAuthentication extends AuthToken {
 		return true;
 	}
 
+	@Override
 	public void writeTo(DataOutput out) throws Exception {
 		Bits.writeString(this.auth_value, out);
 	}
 
+	@Override
 	public void readFrom(DataInput in) throws Exception {
 		this.auth_value = Bits.readString(in);
 	}
 
+	@Override
 	public int size() {
 		return Util.size(auth_value);
 	}
