@@ -37,10 +37,6 @@ public class RestSecurity {
 		this.restListener = restListener;
 	}
 
-	public SecurityStatus getStatus(HttpHeaders httpHeaders, SecurityLevel minSecurityLevel) {
-		return getStatus(httpHeaders, minSecurityLevel, null);
-	}
-
 	public SecurityStatus getStatus(HttpHeaders httpHeaders, SecurityLevel minSecurityLevel,
 			RestAuthorizable restAuthorizable) {
 		// Get LoginData

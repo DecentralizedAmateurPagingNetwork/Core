@@ -14,13 +14,19 @@
 
 package org.dapnet.core.rest.resources;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 @Path("/callsigns")
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,8 +44,9 @@ public class CallSignResource extends AbstractResource {
 			callSignName = callSignName.toLowerCase();
 		}
 
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getCallSigns().get(callSignName), status);
+		CallSign obj = restListener.getState().getCallSigns().get(callSignName);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
+		return getObject(obj, status);
 	}
 
 	@PUT
@@ -79,7 +86,7 @@ public class CallSignResource extends AbstractResource {
 		final CallSign oldCallSign = restListener.getState().getCallSigns().get(callSign);
 		if (oldCallSign != null) {
 			// only owner can delete object
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
 		} else {
 			// only user will get message that object does not exist
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);

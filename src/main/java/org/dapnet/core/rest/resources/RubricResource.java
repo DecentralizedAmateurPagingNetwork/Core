@@ -37,8 +37,9 @@ public class RubricResource extends AbstractResource {
 			rubricName = rubricName.toLowerCase();
 		}
 
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getRubrics().get(rubricName), status);
+		Rubric obj = restListener.getState().getRubrics().get(rubricName);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
+		return getObject(obj, status);
 	}
 
 	@PUT
@@ -79,7 +80,7 @@ public class RubricResource extends AbstractResource {
 		final Rubric oldRubric = restListener.getState().getRubrics().get(rubric);
 		if (oldRubric != null) {
 			// only owner can delete object
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldRubric);
 		} else {
 			// only user will get message that object does not exist
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);

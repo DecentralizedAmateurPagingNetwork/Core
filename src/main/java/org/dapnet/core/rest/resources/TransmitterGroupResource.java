@@ -38,8 +38,9 @@ public class TransmitterGroupResource extends AbstractResource {
 			transmitterGroupName = transmitterGroupName.toLowerCase();
 		}
 
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getTransmitterGroups().get(transmitterGroupName), status);
+		TransmitterGroup obj = restListener.getState().getTransmitterGroups().get(transmitterGroupName);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
+		return getObject(obj, status);
 	}
 
 	@PUT
@@ -81,7 +82,7 @@ public class TransmitterGroupResource extends AbstractResource {
 		final TransmitterGroup oldTransmitterGroup = restListener.getState().getTransmitterGroups()
 				.get(transmitterGroup);
 		if (oldTransmitterGroup != null) {
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitterGroup);
 			return deleteObject(oldTransmitterGroup, "deleteTransmitterGroup", true);
 		} else {
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);

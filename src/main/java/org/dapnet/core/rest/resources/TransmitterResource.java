@@ -50,8 +50,9 @@ public class TransmitterResource extends AbstractResource {
 			transmitterName = transmitterName.toLowerCase();
 		}
 
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getTransmitters().get(transmitterName), status);
+		Transmitter obj = restListener.getState().getTransmitters().get(transmitterName);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
+		return getObject(obj, status);
 	}
 
 	@PUT
@@ -103,7 +104,7 @@ public class TransmitterResource extends AbstractResource {
 
 		final Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
 		if (oldTransmitter != null) {
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
 		} else {
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 		}

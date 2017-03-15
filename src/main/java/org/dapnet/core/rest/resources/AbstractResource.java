@@ -94,12 +94,7 @@ public abstract class AbstractResource {
 	// Authorization Helper
 	protected RestSecurity.SecurityStatus checkAuthorization(RestSecurity.SecurityLevel level,
 			RestAuthorizable restAuthorizable) throws Exception {
-		RestSecurity.SecurityStatus status = null;
-		if (level != RestSecurity.SecurityLevel.OWNER_ONLY) {
-			status = restSecurity.getStatus(httpHeaders, level);
-		} else {
-			status = restSecurity.getStatus(httpHeaders, level, restAuthorizable);
-		}
+		RestSecurity.SecurityStatus status = restSecurity.getStatus(httpHeaders, level, restAuthorizable);
 
 		switch (status) {
 		case INTERNAL_ERROR:

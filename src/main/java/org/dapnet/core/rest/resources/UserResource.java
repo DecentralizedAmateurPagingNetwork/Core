@@ -100,7 +100,7 @@ public class UserResource extends AbstractResource {
 		final User oldUser = restListener.getState().getUsers().get(user);
 		if (oldUser != null) {
 			// only owner can delete object
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY);
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);
 		} else {
 			// only user will get message that object does not exist
 			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
