@@ -38,7 +38,7 @@ import com.google.gson.GsonBuilder;
 public class Settings implements Serializable {
 	private static final long serialVersionUID = 937400690804047335L;
 	private static final Logger logger = LogManager.getLogger();
-	private static Settings settings;
+	private static volatile Settings settings;
 
 	private TransmissionSettings transmissionSettings;
 	private ModelSettings modelSettings;
@@ -77,7 +77,8 @@ public class Settings implements Serializable {
 	private static Settings getSettings() {
 		if (settings == null) {
 			try {
-				settings = new Gson().fromJson(readFile("config/Settings.json"), Settings.class);
+				String filename = System.getProperty("dapnet.core.settings", "config/Settings.json");
+				settings = new Gson().fromJson(readFile(filename), Settings.class);
 			} catch (Exception e) {
 				logger.warn("Creating new settings file");
 				settings = createDefaultSettings();
