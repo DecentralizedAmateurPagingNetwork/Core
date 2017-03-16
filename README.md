@@ -37,7 +37,7 @@ port of the REST API.
 
 ### First Start ###
 1. Make sure you performed the basic configuration as described above.
-2. Start the application with `java -jar DAPNET_CORE.jar`
+2. Start the application with `java -Dlog4j.configurationFile=../local/config/LogSettings_REST.xml -jar dapnet-core-x.x.x.jar`
 3. In case you connect to an existing cluster all current data will be automatically
    downloaded. If you create a new cluster and no `date/state.json` is found the
    parameters of your node will be set to default values. Additionally, a default user
