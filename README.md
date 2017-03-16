@@ -14,7 +14,7 @@ included. Just make sure a JAVA 8+ runtime environment is available.
 If you would like to join an existing cluster contact an admin. He will register your
 DAPNET Core instance and inform you about the configuration. If you want to create a new
 cluster feel free to set your own configuration. In each case set the following parameters
-in the `config/ClusterConfig.xml`:
+in the `local/config/ClusterConfig.xml`:
 
 * Node name (name of your DAPNET Core instance) at
   `<pbcast.GMS name="NodeName@ClusterName"/>`
@@ -58,7 +58,7 @@ TODO
 ## More Information ##
 TODO
 
-**DAPNET CORE PROJECT | Copyright (C) 2016**
+**DAPNET CORE PROJECT | Copyright (C) 2017**
 
 **Institut für Hochfrequenztechnik | RWTH AACHEN UNIVERSITY**
 
@@ -67,6 +67,8 @@ Melatener Str. 25 | 52074 Aachen
 Daniel Sialkowski | daniel.sialkowski@rwth-aachen.de
 
 Ralf Wilke | wilke@ihf.rwth-aachen.de
+
+Philipp Thiel
 
 ## License ##
 This software may be distributed free of charge. It may be only used for non-commercial
