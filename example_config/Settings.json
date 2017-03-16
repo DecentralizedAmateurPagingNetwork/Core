@@ -1,0 +1,36 @@
+{
+  "transmissionSettings": {
+    "pagingProtocolSettings": {
+      "numberOfSyncLoops": 5,
+      "sendSpeed": 1,
+      "activationCode": "0 7 50,0 7 34,0 7 53,0 7 51,0 7 51,0 7 52,0 7 52,0 7 52"
+    },
+    "raspagerSettings": {
+      "maxNumberOfReconnects": -1,
+      "reconnectWaitTime": 20000,
+      "connectionTimeout": 20000,
+      "maxMessageCount": 4,
+      "transmissionDelay": 500
+    }
+  },
+  "modelSettings": {
+    "stateFile": "../local/data/State.json",
+    "savingImmediately": false,
+    "callExpirationTimeInMinutes": 1440,
+    "newsExpirationTimeInMinutes": 1440
+  },
+  "restSettings": {
+    "port": 8080,
+    "hostname": "0.0.0.0"
+  },
+  "clusterSettings": {
+    "responseTimeout": 10000,
+    "clusterConfigurationFile": "../local/config/ClusterConfig.xml"
+  },
+  "schedulerSettings": {
+    "timeTransmissionCron": "0 0/1 * * * ?",
+    "rubricNameTransmissionCron": "15 0/5 * * * ?",
+    "stateSavingCron": "30 0/10 * * * ?",
+    "stateCleaningCron": "0 0 0 * * ?"
+  }
+}
