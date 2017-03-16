@@ -163,6 +163,7 @@
 				<targetPath>${project.build.directory}</targetPath>
 				<includes>
 					<include>Licences.txt</include>
+					<include>example_config/</include>
 				</includes>
 			</resource>
 		</resources>
