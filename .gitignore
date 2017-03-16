@@ -3,6 +3,7 @@
 /config/LogSettings.xml
 /config/ClusterConfig.xml
 /data/State.json
+/local/
 
 # Eclipse specific
 .classpath
