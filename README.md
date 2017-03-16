@@ -8,6 +8,8 @@ controls connected paging transmitter. All functions can be accessed via the RES
 Using the packed release version no installation is required. All external libraries are
 included. Just make sure a JAVA 8+ runtime environment is available.
 
+Detailed installation instructions are avaiable here https://www.afu.rwth-aachen.de/projekte/funkruf-pager-pocsag/funkrufmaster-2-0-dapnet/anleitung-zum-installieren-neuer-knoten (for now just in German)
+
 ## Usage ##
 ### Basic Configuration ###
 #### Cluster Configuration ####
