@@ -21,7 +21,23 @@
 			<includes>
 				<include>${project.build.finalName}.${project.packaging}</include>
 				<include>Licences.txt</include>
-				<include>example_config/</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}</directory>
+			<outputDirectory></outputDirectory>
+			<includes>
+				<include>Licences.txt</include>
+				<include>README.md</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}/example_config</directory>
+			<outputDirectory>example_config</outputDirectory>
+			<includes>
+				<include>ClusterConfig.xml</include>
+				<include>LogSettings_REST.xml</include>
+				<include>Settings.json</include>
 			</includes>
 		</fileSet>
 	</fileSets>

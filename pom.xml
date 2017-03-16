@@ -154,19 +154,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-			<resource>
-				<directory>${project.basedir}</directory>
-				<targetPath>${project.build.directory}</targetPath>
-				<includes>
-					<include>Licences.txt</include>
-					<include>example_config/</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 	<scm>
 		<url>https://github.com/DecentralizedAmateurPagingNetwork/Core</url>
