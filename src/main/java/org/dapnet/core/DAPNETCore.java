@@ -42,7 +42,13 @@ public class DAPNETCore {
 	private volatile Server deviceServer;
 
 	static {
-		CORE_VERSION = DAPNETCore.class.getPackage().getImplementationVersion();
+		String implVer = DAPNETCore.class.getPackage().getImplementationVersion();
+		if (implVer != null) {
+			CORE_VERSION = implVer;
+		} else {
+			CORE_VERSION = "UNKNOWN";
+		}
+
 		// TODO Use getSpecificationVersion?
 		Pattern versionPattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+)\\p{Graph}*");
 		Matcher m = versionPattern.matcher(CORE_VERSION);
