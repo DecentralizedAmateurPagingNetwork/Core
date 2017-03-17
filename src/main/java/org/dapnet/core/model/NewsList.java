@@ -12,8 +12,16 @@ import java.util.function.Consumer;
 public class NewsList implements Serializable, Iterable<News> {
 
 	private static final long serialVersionUID = 8878795787181440875L;
-	private LinkedList<News> slots = new LinkedList<>();
+	private final LinkedList<News> slots;
 	private transient volatile Consumer<News> handler;
+
+	public NewsList() {
+		this(new LinkedList<>());
+	}
+
+	public NewsList(LinkedList<News> slots) {
+		this.slots = slots;
+	}
 
 	public void setHandler(Consumer<News> handler) {
 		this.handler = handler;

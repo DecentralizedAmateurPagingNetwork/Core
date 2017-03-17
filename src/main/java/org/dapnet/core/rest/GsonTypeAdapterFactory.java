@@ -19,7 +19,10 @@ import java.net.UnknownHostException;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.LinkedList;
 
+import org.dapnet.core.model.News;
+import org.dapnet.core.model.NewsList;
 import org.dapnet.core.rest.exceptionHandling.InvalidAddressException;
 import org.jgroups.stack.IpAddress;
 
@@ -39,6 +42,8 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 		Class<?> rawType = tokenType.getRawType();
 		if (Instant.class.isAssignableFrom(rawType)) {
 			return (TypeAdapter<T>) new InstantTypeAdapter();
+		} else if (NewsList.class.isAssignableFrom(rawType)) {
+			return (TypeAdapter<T>) new NewListTypeAdapter(gson);
 		} else {
 			TypeAdapter<T> adapter = gson.getDelegateAdapter(this, tokenType);
 			return new GenericTypeAdapter<T>(adapter);
@@ -111,5 +116,45 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 
 			return ts;
 		}
+	}
+
+	private static class NewListTypeAdapter extends TypeAdapter<NewsList> {
+
+		private final Gson context;
+
+		public NewListTypeAdapter(Gson context) {
+			this.context = context;
+		}
+
+		@Override
+		public void write(JsonWriter out, NewsList value) throws IOException {
+			TypeAdapter<News> adapter = context.getAdapter(News.class);
+			out.beginArray();
+			for (News n : value) {
+				adapter.write(out, n);
+			}
+			out.endArray();
+		}
+
+		@Override
+		public NewsList read(JsonReader in) throws IOException {
+			if (in.peek() == JsonToken.NULL) {
+				in.nextNull();
+				return null;
+			}
+
+			TypeAdapter<News> adapter = context.getAdapter(News.class);
+			LinkedList<News> slots = new LinkedList<>();
+
+			in.beginArray();
+			while (in.hasNext()) {
+				News n = adapter.read(in);
+				slots.addLast(n);
+			}
+			in.endArray();
+
+			return new NewsList(slots);
+		}
+
 	}
 }
