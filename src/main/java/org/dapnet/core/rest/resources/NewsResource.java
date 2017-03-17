@@ -14,9 +14,7 @@
 
 package org.dapnet.core.rest.resources;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.Instant;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -42,18 +40,9 @@ public class NewsResource extends AbstractResource {
 			return getObject(restListener.getState().getNews(), status);
 		} else {
 			rubricName = rubricName.toLowerCase();
-
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
 					restListener.getState().getRubrics().get(rubricName));
-
-			List<News> newsList = new ArrayList<>();
-			for (News news : restListener.getState().getNews()) {
-				if (news.getRubricName().equalsIgnoreCase(rubricName)) {
-					newsList.add(news);
-				}
-			}
-
-			return getObject(newsList, status);
+			return getObject(restListener.getState().getNews().get(rubricName), status);
 		}
 
 	}
@@ -67,7 +56,7 @@ public class NewsResource extends AbstractResource {
 		// Create News
 		final News news = gson.fromJson(newsJSON, News.class);
 		if (news != null) {
-			news.setTimestamp(new Date());
+			news.setTimestamp(Instant.now());
 			news.setOwnerName(new LoginData(httpHeaders).getUsername());
 		} else {
 			throw new EmptyBodyException();

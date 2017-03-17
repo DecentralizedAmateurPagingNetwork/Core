@@ -78,7 +78,6 @@ final class TransmitterClient {
 	 *            Messages to send.
 	 */
 	public void sendMessages(Collection<Message> messages) {
-		// TODO Sort messages?
 		messages.forEach(m -> {
 			channel.write(m);
 		});

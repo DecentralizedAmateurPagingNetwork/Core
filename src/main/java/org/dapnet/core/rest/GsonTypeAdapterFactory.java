@@ -16,7 +16,9 @@ package org.dapnet.core.rest;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.time.DateTimeException;
 import java.time.Instant;
+import java.util.Date;
 
 import org.dapnet.core.rest.exceptionHandling.InvalidAddressException;
 import org.jgroups.stack.IpAddress;
@@ -99,7 +101,15 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 			}
 
 			String raw = in.nextString();
-			return Instant.parse(raw);
+			Instant ts = null;
+			try {
+				ts = Instant.parse(raw);
+			} catch (DateTimeException ex) {
+				// TODO Remove once all states have been converted
+				ts = Instant.ofEpochMilli(Date.parse(raw));
+			}
+
+			return ts;
 		}
 	}
 }

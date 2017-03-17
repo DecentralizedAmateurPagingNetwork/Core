@@ -20,10 +20,11 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -34,6 +35,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
+import org.dapnet.core.rest.GsonTypeAdapterFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,6 +43,14 @@ import com.google.gson.GsonBuilder;
 public class State implements Serializable {
 	private static final long serialVersionUID = 7604901183837032119L;
 	private static final Logger logger = LogManager.getLogger();
+	private static final Gson gson;
+
+	static {
+		GsonBuilder builder = new GsonBuilder();
+		builder.setPrettyPrinting();
+		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
+		gson = builder.create();
+	}
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
@@ -60,10 +70,6 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Collection<News> news;
-
-	@NotNull(message = "nicht vorhanden")
-	@Valid
 	private ConcurrentMap<String, Transmitter> transmitters = new ConcurrentHashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
@@ -74,9 +80,12 @@ public class State implements Serializable {
 	@Valid
 	private ConcurrentMap<String, Rubric> rubrics = new ConcurrentHashMap<>();
 
+	@NotNull(message = "nicht vorhande")
+	@Valid
+	private ConcurrentMap<String, NewsList> news = new ConcurrentHashMap<>();
+
 	public State() {
 		calls = Collections.synchronizedList(new ArrayList<>());
-		news = Collections.synchronizedList(new ArrayList<>());
 
 		setModelReferences();
 	}
@@ -96,7 +105,7 @@ public class State implements Serializable {
 	public static State readFromFile() throws Exception {
 		try (InputStreamReader reader = new InputStreamReader(
 				new FileInputStream(Settings.getModelSettings().getStateFile()), "UTF-8")) {
-			return new Gson().fromJson(reader, State.class);
+			return gson.fromJson(reader, State.class);
 		}
 	}
 
@@ -108,7 +117,6 @@ public class State implements Serializable {
 			}
 
 			try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8")) {
-				Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				writer.write(gson.toJson(this));
 				writer.flush();
 			}
@@ -120,29 +128,29 @@ public class State implements Serializable {
 	}
 
 	public void clean() {
-		final Date currentDate = new Date();
-
 		{
-			// Clean Calls:
-			Iterator<Call> i = calls.iterator();
-			while (i.hasNext()) {
-				Call call = i.next();
-				if (currentDate.after(new Date(call.getTimestamp().getTime()
-						+ Settings.getModelSettings().getCallExpirationTimeInMinutes() * 60 * 1000)))
-					i.remove();
+			Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
+			Instant now = Instant.now();
+			Iterator<Call> it = calls.iterator();
+			while (it.hasNext()) {
+				Call call = it.next();
+				if (call.getTimestamp().plus(exp).isAfter(now)) {
+					it.remove();
+				}
 			}
 		}
 
-		{
-			// Clean News:
-			Iterator<News> i = news.iterator();
-			while (i.hasNext()) {
-				News news = i.next();
-				if (currentDate.after(new Date(news.getTimestamp().getTime()
-						+ Settings.getModelSettings().getNewsExpirationTimeInMinutes() * 60 * 1000)))
-					i.remove();
-			}
-		}
+		// {
+		// Iterator<News> i = news.iterator();
+		// while (i.hasNext()) {
+		// News news = i.next();
+		// if (currentDate.after(new Date(news.getTimestamp().getTime()
+		// + Settings.getModelSettings().getNewsExpirationTimeInMinutes() * 60 *
+		// 1000))) {
+		// i.remove();
+		// }
+		// }
+		// }
 
 		writeToFile();
 
@@ -151,10 +159,6 @@ public class State implements Serializable {
 
 	public Collection<Call> getCalls() {
 		return calls;
-	}
-
-	public Collection<News> getNews() {
-		return news;
 	}
 
 	public ConcurrentMap<String, CallSign> getCallSigns() {
@@ -179,5 +183,9 @@ public class State implements Serializable {
 
 	public ConcurrentMap<String, Rubric> getRubrics() {
 		return rubrics;
+	}
+
+	public ConcurrentMap<String, NewsList> getNews() {
+		return news;
 	}
 }

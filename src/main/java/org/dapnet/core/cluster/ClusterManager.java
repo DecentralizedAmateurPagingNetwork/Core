@@ -16,7 +16,6 @@ package org.dapnet.core.cluster;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -27,7 +26,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.Settings;
+import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestListener;
@@ -120,6 +121,15 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			logger.warn("Creating new empty State");
 		}
 
+		// Register news handler
+		for (Rubric r : state.getRubrics().values()) {
+			if (!state.getNews().containsKey(r.getName().toLowerCase())) {
+				state.getNews().put(r.getName().toLowerCase(), new NewsList());
+			}
+		}
+		// Set news handler
+		state.getNews().values().forEach(nl -> nl.setHandler(transmissionManager::handleNews));
+
 		// Validate
 		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(state);
 		for (ConstraintViolation<Object> violation : constraintViolations) {
@@ -131,7 +141,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 	}
 
-	public List<Transmitter> getNodeTransmitter() {
+	public Collection<Transmitter> getNodeTransmitter() {
 		ArrayList<Transmitter> myTransmitters = new ArrayList<>();
 		for (Transmitter transmitter : state.getTransmitters().values()) {
 			if (transmitter.getNodeName().equalsIgnoreCase(channel.getName())) {

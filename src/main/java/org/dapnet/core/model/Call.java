@@ -15,9 +15,9 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.constraints.NotNull;
@@ -46,17 +46,17 @@ public class Call implements Serializable {
 
 	// Internally set
 	@NotNull
-	private Date timestamp;
+	private Instant timestamp;
 
 	// Internally set
 	@NotNull
 	private String ownerName;
 
-	public Date getTimestamp() {
+	public Instant getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(Instant timestamp) {
 		this.timestamp = timestamp;
 	}
 

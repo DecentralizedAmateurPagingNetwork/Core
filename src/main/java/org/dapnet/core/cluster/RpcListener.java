@@ -26,6 +26,7 @@ import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.News;
+import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.Transmitter;
@@ -213,14 +214,18 @@ public class RpcListener {
 			}
 
 			// Add new Object
-			clusterManager.getState().getNews().add(news);
-			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+			NewsList nl = clusterManager.getState().getNews().get(news.getRubricName().toLowerCase());
+			if (nl != null) {
+				nl.add(news);
+
+				if (Settings.getModelSettings().isSavingImmediately()) {
+					clusterManager.getState().writeToFile();
+				}
+
+				return response = RpcResponse.OK;
+			} else {
+				return response = RpcResponse.BAD_REQUEST;
 			}
-
-			clusterManager.getTransmissionManager().handleNews(news);
-
-			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
 			return response = RpcResponse.INTERNAL_ERROR;
@@ -356,7 +361,16 @@ public class RpcListener {
 			}
 
 			// Replace object
-			clusterManager.getState().getRubrics().put(rubric.getName(), rubric);
+			final String rubricName = rubric.getName().toLowerCase();
+			clusterManager.getState().getRubrics().put(rubricName, rubric);
+
+			// Register new news list if missing
+			if (!clusterManager.getState().getNews().containsKey(rubricName)) {
+				NewsList nl = new NewsList();
+				nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
+				clusterManager.getState().getNews().put(rubricName, nl);
+			}
+
 			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
 			}
@@ -386,12 +400,9 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Delete depended Objects
-			// Delete News
-			ArrayList<News> deleteNews = new ArrayList<>();
-			clusterManager.getState().getNews().stream().filter(news -> news.getRubricName().equalsIgnoreCase(rubric))
-					.forEach(news -> deleteNews.add(news));
-			deleteNews.stream().forEach(news -> clusterManager.getState().getNews().remove(news));
+			rubric = rubric.toLowerCase();
+			// Remove news list as well
+			clusterManager.getState().getNews().remove(rubric);
 
 			// Delete Object with same Name, if existing
 			if (clusterManager.getState().getRubrics().remove(rubric) == null) {
@@ -716,12 +727,6 @@ public class RpcListener {
 					.forEach(call -> deleteCalls.add(call));
 			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
 
-			// Delete News
-			ArrayList<News> deleteNews = new ArrayList<>();
-			clusterManager.getState().getNews().stream().filter(news -> news.getOwnerName().equalsIgnoreCase(user))
-					.forEach(news -> deleteNews.add(news));
-			deleteNews.stream().forEach(news -> clusterManager.getState().getNews().remove(news));
-
 			// Delete Rubrics
 			ArrayList<String> deleteRubricNames = new ArrayList<>();
 			clusterManager.getState().getRubrics().values().stream()
@@ -735,6 +740,8 @@ public class RpcListener {
 							rubric.getOwnerNames().remove(user);
 						}
 					});
+			// Delete news first
+			deleteRubricNames.stream().forEach(name -> clusterManager.getState().getNews().remove(name));
 			deleteRubricNames.stream().forEach(name -> deleteRubric(name));
 
 			// Delete TransmitterGroups

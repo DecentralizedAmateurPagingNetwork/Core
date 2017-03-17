@@ -42,9 +42,9 @@ public class DAPNETCore {
 	private volatile Server deviceServer;
 
 	static {
-		String implVer = DAPNETCore.class.getPackage().getImplementationVersion();
-		if (implVer != null) {
-			CORE_VERSION = implVer;
+		String ver = DAPNETCore.class.getPackage().getImplementationVersion();
+		if (ver != null) {
+			CORE_VERSION = ver;
 		} else {
 			CORE_VERSION = "UNKNOWN";
 		}

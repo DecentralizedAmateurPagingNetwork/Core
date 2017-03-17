@@ -15,7 +15,7 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -36,13 +36,13 @@ public class News implements Serializable {
 	private String rubricName;
 
 	@NotNull
-	@Min(value = 1)
+	@Min(value = 0)
 	@Max(value = 10)
 	private int number;
 
 	// Internally set
 	@NotNull
-	private Date timestamp;
+	private Instant timestamp;
 
 	// Internally set
 	@NotNull
@@ -73,11 +73,11 @@ public class News implements Serializable {
 		this.number = number;
 	}
 
-	public Date getTimestamp() {
+	public Instant getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(Instant timestamp) {
 		this.timestamp = timestamp;
 	}
 

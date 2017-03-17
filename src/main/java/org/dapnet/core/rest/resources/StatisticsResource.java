@@ -41,7 +41,7 @@ public class StatisticsResource extends AbstractResource {
 			users = state.getUsers().size();
 			calls = state.getCalls().size();
 			callSigns = state.getCallSigns().size();
-			news = state.getNews().size();
+			news = state.getNews().values().stream().mapToInt(n -> n.getSize()).sum();
 			rubrics = state.getRubrics().size();
 			nodesTotal = state.getNodes().size();
 			nodesOnline = (int) state.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)
