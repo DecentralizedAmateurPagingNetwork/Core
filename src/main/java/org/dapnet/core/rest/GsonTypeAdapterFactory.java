@@ -50,7 +50,7 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 		}
 	}
 
-	private static class GenericTypeAdapter<T> extends TypeAdapter<T> {
+	private static final class GenericTypeAdapter<T> extends TypeAdapter<T> {
 		private final TypeAdapter<T> adapter;
 
 		public GenericTypeAdapter(TypeAdapter<T> adapter) {
@@ -87,7 +87,7 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 		}
 	}
 
-	private static class InstantTypeAdapter extends TypeAdapter<Instant> {
+	private static final class InstantTypeAdapter extends TypeAdapter<Instant> {
 
 		@Override
 		public void write(JsonWriter out, Instant value) throws IOException {
@@ -116,9 +116,10 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 
 			return ts;
 		}
+
 	}
 
-	private static class NewListTypeAdapter extends TypeAdapter<NewsList> {
+	private static final class NewListTypeAdapter extends TypeAdapter<NewsList> {
 
 		private final Gson context;
 
