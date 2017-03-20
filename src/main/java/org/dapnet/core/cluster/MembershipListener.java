@@ -66,7 +66,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 					handleMerge((MergeView) view);
 				} catch (Exception e) {
 					logger.fatal("Could not get State from majority", e);
-					DAPNETCore.stopDAPNETCore();
+					DAPNETCore.shutdown();
 					return;
 				}
 			}

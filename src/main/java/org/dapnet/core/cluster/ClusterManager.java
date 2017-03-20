@@ -24,6 +24,7 @@ import javax.validation.Validator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.NewsList;
@@ -95,10 +96,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		try {
 			channel.connect(getChannelName());
 		} catch (Exception e) {
-			logger.fatal("Could not connect to cluster");
-			System.out.println("Could not connect to cluster. Check your settings and make sure your node is already "
-					+ "registered.");
-			DAPNETCore.stopDAPNETCore();
+			logger.fatal("Could not connect to cluster.", e);
+			throw new CoreStartupException(e);
 		}
 
 		// Register transmitters
@@ -106,35 +105,38 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void initState() {
-		// Create
 		try {
-			// Read State from File (will be overwritten if joining an existing
-			// Cluster)
 			state = State.readFromFile();
 		} catch (Exception e) {
+			logger.error("Failed to load state from file.", e);
 		}
+
 		if (state == null) {
 			state = new State();
 			logger.warn("Creating new empty State");
 		}
 
-		// Register news handler
+		// Register news lists
 		for (Rubric r : state.getRubrics().values()) {
-			if (!state.getNews().containsKey(r.getName().toLowerCase())) {
-				state.getNews().put(r.getName().toLowerCase(), new NewsList());
+			String rubricName = r.getName().toLowerCase();
+
+			NewsList nl = state.getNews().get(rubricName);
+			if (nl == null) {
+				nl = new NewsList();
+				state.getNews().put(rubricName, nl);
 			}
+
+			nl.setHandler(transmissionManager::handleNews);
 		}
-		// Set news handler
-		state.getNews().values().forEach(nl -> nl.setHandler(transmissionManager::handleNews));
 
 		// Validate
 		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(state);
 		for (ConstraintViolation<Object> violation : constraintViolations) {
-			logger.error("Error validating State.json: " + violation.getPropertyPath() + " " + violation.getMessage());
+			logger.error("Error validating State.json: {} {}", violation.getPropertyPath(), violation.getMessage());
 		}
 
 		if (constraintViolations.size() != 0) {
-			DAPNETCore.stopDAPNETCore();
+			throw new CoreStartupException("State validation failed.");
 		}
 	}
 

@@ -19,7 +19,7 @@ import java.net.URI;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.Settings;
 import org.dapnet.core.rest.resources.AbstractResource;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -49,27 +49,22 @@ public class RestManager {
 			URI endpoint = new URI("http", null, settings.getHostname(), settings.getPort(), settings.getPath(), null,
 					null);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
-			logger.info("RestApi successfully started");
+			logger.info("RestApi successfully started.");
 		} catch (Exception e) {
-			logger.fatal("Starting RestApi failed");
-
-			// only short message in case of a BindException
 			if (e.getCause() instanceof BindException) {
-				logger.fatal(e.getCause().getMessage());
+				logger.fatal("Starting RestApi failed: {}", e.getCause().getMessage());
 			} else {
-				logger.catching(e);
+				logger.fatal("Starting RestApi failed.", e);
 			}
 
-			DAPNETCore.stopDAPNETCore();
+			throw new CoreStartupException(e);
 		}
 	}
 
 	public void stopServer() {
 		if (server != null) {
 			server.shutdownNow();
-			logger.info("RestApi successfully stopped");
-		} else {
-			logger.error("Stopping RestApi failed");
+			logger.info("RestApi successfully stopped.");
 		}
 	}
 }

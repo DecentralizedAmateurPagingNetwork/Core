@@ -16,12 +16,9 @@ package org.dapnet.core;
 
 import static org.jgroups.util.Util.readFile;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,24 +31,18 @@ import org.dapnet.core.transmission.TransmissionSettings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@XmlRootElement
 public class Settings implements Serializable {
 	private static final long serialVersionUID = 937400690804047335L;
 	private static final Logger logger = LogManager.getLogger();
-	private static volatile Settings settings;
+	private static Settings settings;
 
-	private TransmissionSettings transmissionSettings;
-	private ModelSettings modelSettings;
-	private RestSettings restSettings;
-	private ClusterSettings clusterSettings;
-	private SchedulerSettings schedulerSettings;
+	private final TransmissionSettings transmissionSettings = new TransmissionSettings();
+	private final ModelSettings modelSettings = new ModelSettings();
+	private final RestSettings restSettings = new RestSettings();
+	private final ClusterSettings clusterSettings = new ClusterSettings();
+	private final SchedulerSettings schedulerSettings = new SchedulerSettings();
 
 	private Settings() {
-		transmissionSettings = new TransmissionSettings();
-		modelSettings = new ModelSettings();
-		restSettings = new RestSettings();
-		clusterSettings = new ClusterSettings();
-		schedulerSettings = new SchedulerSettings();
 	}
 
 	public static TransmissionSettings getTransmissionSettings() {
@@ -74,31 +65,28 @@ public class Settings implements Serializable {
 		return getSettings().schedulerSettings;
 	}
 
-	private static Settings getSettings() {
+	private static synchronized Settings getSettings() {
 		if (settings == null) {
 			try {
 				String filename = System.getProperty("dapnet.core.settings", "config/Settings.json");
 				settings = new Gson().fromJson(readFile(filename), Settings.class);
 			} catch (Exception e) {
-				logger.warn("Creating new settings file");
-				settings = createDefaultSettings();
+				logger.warn("Creating new settings file.");
+				createDefaultSettings();
 			}
 		}
 		return settings;
 	}
 
-	private static Settings createDefaultSettings() {
+	private static void createDefaultSettings() {
 		settings = new Settings();
-		try {
-			File file = new File("config/Settings.json");
-			FileWriter writer = new FileWriter(file);
+
+		String filename = System.getProperty("dapnet.core.settings", "config/Settings.json");
+		try (FileWriter writer = new FileWriter(filename)) {
 			Gson gson = new GsonBuilder().setPrettyPrinting().create();
 			writer.write(gson.toJson(settings));
-			writer.flush();
-			writer.close();
 		} catch (IOException e) {
-			logger.error("Failed to create settings file. Using default values", e);
+			logger.error("Failed to create settings file.", e);
 		}
-		return settings;
 	}
 }

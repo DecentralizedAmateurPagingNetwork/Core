@@ -82,6 +82,9 @@ public class DAPNETCore {
 			serverThread.start();
 
 			logger.info("DAPNETCore started");
+		} catch (CoreStartupException e) {
+			logger.fatal("Failed to start DAPNETCore: {}", e.getMessage());
+			System.exit(1);
 		} catch (Exception e) {
 			logger.fatal("Failed to start DAPNETCore.", e);
 			System.exit(1);
@@ -166,8 +169,10 @@ public class DAPNETCore {
 		consoleHandler.setLevel(Level.WARNING);
 	}
 
-	public static void stopDAPNETCore() {
-		dapnetCore.stop();
+	public static void shutdown() {
+		if (dapnetCore != null) {
+			dapnetCore.stop();
+		}
 	}
 
 	public static String getCoreVersion() {
@@ -177,4 +182,5 @@ public class DAPNETCore {
 	public static String getApiVersion() {
 		return API_VERSION;
 	}
+
 }

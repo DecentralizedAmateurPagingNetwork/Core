@@ -41,6 +41,7 @@ public class Server implements Runnable, AutoCloseable {
 			serverFuture.channel().closeFuture().sync();
 		} catch (Exception ex) {
 			LOGGER.fatal("Exception in server thread.", ex);
+			// TODO Stop Core?
 		} finally {
 			try {
 				bossGroup.shutdownGracefully().sync();
@@ -65,6 +66,9 @@ public class Server implements Runnable, AutoCloseable {
 			if (future != null) {
 				future.channel().close().sync();
 			}
+
+			// XXX Wait for shutdown of event loop groups instead
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			LOGGER.warn("Interrupted while closing server channel.", e);
 		}

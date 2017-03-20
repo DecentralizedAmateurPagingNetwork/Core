@@ -96,10 +96,10 @@ public class SchedulerManager {
 	public void stop() {
 		try {
 			scheduler.shutdown();
+			logger.info("SchedulerManager successfully stopped");
 		} catch (SchedulerException e) {
 			logger.error("Failed to stop Scheduler:", e);
 		}
-		logger.info("SchedulerManager successfully stopped");
 	}
 
 }

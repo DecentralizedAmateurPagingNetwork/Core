@@ -34,13 +34,11 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 
 	@Override
 	public void channelConnected(Channel channel) {
-		// Get State
 		try {
 			channel.getState(null, 0);
 		} catch (Exception e) {
-			logger.fatal("Could not get State");
-			logger.catching(e);
-			DAPNETCore.stopDAPNETCore();
+			logger.fatal("Could not get state from cluster.", e);
+			DAPNETCore.shutdown();
 		}
 
 		// Creating Cluster?
@@ -86,16 +84,15 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		try {
 			node.setKey(HashUtil.createHash(node.getKey()));
 		} catch (Exception e) {
-			logger.catching(e);
-			logger.fatal("First node could not been created");
-			DAPNETCore.stopDAPNETCore();
+			logger.fatal("First node could not been created.", e);
+			DAPNETCore.shutdown();
 		}
 
 		if (clusterManager.handleStateOperation(null, "putNode", new Object[] { node }, new Class[] { Node.class })) {
 			logger.info("First node successfully created");
 		} else {
 			logger.fatal("First node could not been created");
-			DAPNETCore.stopDAPNETCore();
+			DAPNETCore.shutdown();
 		}
 	}
 
@@ -118,14 +115,14 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		} catch (Exception e) {
 			logger.catching(e);
 			logger.fatal("First user could not been created");
-			DAPNETCore.stopDAPNETCore();
+			DAPNETCore.shutdown();
 		}
 
 		if (clusterManager.handleStateOperation(null, "putUser", new Object[] { user }, new Class[] { User.class })) {
 			logger.info("First user successfully updated");
 		} else {
 			logger.fatal("First user could not be created");
-			DAPNETCore.stopDAPNETCore();
+			DAPNETCore.shutdown();
 		}
 	}
 

@@ -70,7 +70,8 @@ public class MessageListener implements org.jgroups.MessageListener {
 		}
 		if (constraintViolations.size() != 0) {
 			logger.fatal("Discarding received State");
-			DAPNETCore.stopDAPNETCore();
+			// FIXME Does not work?
+			DAPNETCore.shutdown();
 		}
 
 		clusterManager.getState().writeToFile();
