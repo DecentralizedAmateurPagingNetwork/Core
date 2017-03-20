@@ -57,7 +57,9 @@ public abstract class AbstractResource {
 
 	private static GsonBuilder createBuilder() {
 		GsonBuilder build = new GsonBuilder();
-		build.serializeNulls().setPrettyPrinting().registerTypeAdapterFactory(new GsonTypeAdapterFactory());
+		build.serializeNulls();
+		build.setPrettyPrinting();
+		build.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
 
 		return build;
 	}
