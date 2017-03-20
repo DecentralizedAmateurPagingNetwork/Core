@@ -14,6 +14,10 @@
 
 package org.dapnet.core.scheduler;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
@@ -24,10 +28,6 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
-
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 public class SchedulerManager {
 	private static final Logger logger = LogManager.getLogger();
@@ -43,6 +43,7 @@ public class SchedulerManager {
 
 		registerTimeTransmissionJob();
 		registerRubricNameTransmissionJob();
+		registerNewsTransmissionJob();
 		registerStateSavingJob();
 		registerStateCleaningJob();
 
@@ -81,6 +82,15 @@ public class SchedulerManager {
 		CronTrigger stateCleaningTrigger = newTrigger().withIdentity("stateCleaningTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateCleaningCron())).build();
 		scheduler.scheduleJob(stateCleaningJob, stateCleaningTrigger);
+	}
+
+	private void registerNewsTransmissionJob() throws SchedulerException {
+		JobDetail newsTransmissionJob = newJob(NewsTransmissionJob.class).withIdentity("newsTransmissionJob", "main")
+				.build();
+
+		CronTrigger newsTransmissionTrigger = newTrigger().withIdentity("newsTransmissionTrigger", "main")
+				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getNewsTransmissionCron())).build();
+		scheduler.scheduleJob(newsTransmissionJob, newsTransmissionTrigger);
 	}
 
 	public void stop() {

@@ -53,9 +53,9 @@ public class Server implements Runnable, AutoCloseable {
 			} catch (Throwable t) {
 				LOGGER.fatal("Failed to shut down worker group.", t);
 			}
-		}
 
-		LOGGER.info("Server stopped.");
+			LOGGER.info("Server stopped.");
+		}
 	}
 
 	@Override

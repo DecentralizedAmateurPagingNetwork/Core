@@ -83,7 +83,7 @@ public class DAPNETCore {
 
 			logger.info("DAPNETCore started");
 		} catch (Exception e) {
-			logger.fatal("Exception : ", e);
+			logger.fatal("Failed to start DAPNETCore.", e);
 			System.exit(1);
 		}
 	}
@@ -134,7 +134,7 @@ public class DAPNETCore {
 						dapnetCore.stop();
 					}
 				} catch (Exception ex) {
-					logger.fatal("Exception while stopping the Core.", ex);
+					logger.fatal("Exception while stopping DAPNETCore.", ex);
 				}
 
 				// Shutdown log4j
