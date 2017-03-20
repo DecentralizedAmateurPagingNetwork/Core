@@ -128,33 +128,30 @@ public class State implements Serializable {
 	}
 
 	public void clean() {
-		{
-			Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
-			Instant now = Instant.now();
-			Iterator<Call> it = calls.iterator();
-			while (it.hasNext()) {
-				Call call = it.next();
-				if (call.getTimestamp().plus(exp).isAfter(now)) {
-					it.remove();
-				}
-			}
-		}
+		Instant now = Instant.now();
 
-		// {
-		// Iterator<News> i = news.iterator();
-		// while (i.hasNext()) {
-		// News news = i.next();
-		// if (currentDate.after(new Date(news.getTimestamp().getTime()
-		// + Settings.getModelSettings().getNewsExpirationTimeInMinutes() * 60 *
-		// 1000))) {
-		// i.remove();
-		// }
-		// }
-		// }
+		cleanCalls(now);
+		cleanNews(now);
 
 		writeToFile();
 
 		logger.info("Successfully finished cleaning operation");
+	}
+
+	private void cleanCalls(Instant now) {
+		Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
+		Iterator<Call> it = calls.iterator();
+		while (it.hasNext()) {
+			Call call = it.next();
+			if (now.isAfter(call.getTimestamp().plus(exp))) {
+				it.remove();
+			}
+		}
+	}
+
+	private void cleanNews(Instant now) {
+		Duration ttl = Duration.ofMinutes(Settings.getModelSettings().getNewsExpirationTimeInMinutes());
+		news.values().forEach(nl -> nl.removeExpired(now, ttl));
 	}
 
 	public Collection<Call> getCalls() {

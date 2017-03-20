@@ -141,18 +141,19 @@ public class NewsList implements Serializable, Iterable<News> {
 	/**
 	 * Removes all expired news.
 	 * 
+	 * @param now
+	 *            Timepoint to start from.
 	 * @param ttl
-	 *            Time to live
+	 *            Time to live.
 	 */
-	public void removeExpired(Duration ttl) {
-		final Instant now = Instant.now();
+	public void removeExpired(Instant now, Duration ttl) {
 		boolean changed = false;
 
 		synchronized (lockObj) {
 			Iterator<News> it = slots.iterator();
 			while (it.hasNext()) {
 				News n = it.next();
-				if (n.getTimestamp().plus(ttl).isAfter(now)) {
+				if (now.isAfter(n.getTimestamp().plus(ttl))) {
 					it.remove();
 					changed = true;
 				}
