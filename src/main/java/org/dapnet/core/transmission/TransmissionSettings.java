@@ -16,25 +16,20 @@ package org.dapnet.core.transmission;
 
 import java.io.Serializable;
 
-public class TransmissionSettings implements Serializable {
+public final class TransmissionSettings implements Serializable {
 	private static final long serialVersionUID = 6990520510506509511L;
 	private PagingProtocolSettings pagingProtocolSettings = new PagingProtocolSettings();
-	private RaspagerSettings raspagerSettings = new RaspagerSettings();
 	private ServerSettings serverSettings = new ServerSettings();
 
 	public PagingProtocolSettings getPagingProtocolSettings() {
 		return pagingProtocolSettings;
 	}
 
-	public RaspagerSettings getRaspagerSettings() {
-		return raspagerSettings;
-	}
-
 	public ServerSettings getServerSettings() {
 		return serverSettings;
 	}
 
-	public class PagingProtocolSettings implements Serializable {
+	public final class PagingProtocolSettings implements Serializable {
 		private static final long serialVersionUID = 2535179621136596934L;
 		private int numberOfSyncLoops = 5;
 		private int sendSpeed = 1;// 0: 512, 1: 1200, 2:2400
@@ -53,36 +48,7 @@ public class TransmissionSettings implements Serializable {
 		}
 	}
 
-	public class RaspagerSettings implements Serializable {
-		private static final long serialVersionUID = 2017757137934920601L;
-		private int maxNumberOfReconnects = -1;
-		private int reconnectWaitTime = 20 * 1000;
-		private int connectionTimeout = 20000;
-		private int maxMessageCount = 4;
-		private int transmissionDelay = 4000;
-
-		public int getConnectionTimeout() {
-			return connectionTimeout;
-		}
-
-		public int getReconnectWaitTime() {
-			return reconnectWaitTime;
-		}
-
-		public int getMaxNumberOfReconnects() {
-			return maxNumberOfReconnects;
-		}
-
-		public int getMaxMessageCount() {
-			return maxMessageCount;
-		}
-
-		public int getTransmissionDelay() {
-			return transmissionDelay;
-		}
-	}
-
-	public class ServerSettings implements Serializable {
+	public final class ServerSettings implements Serializable {
 		private static final long serialVersionUID = 5452321606678683312L;
 		private int port = 43434;
 
