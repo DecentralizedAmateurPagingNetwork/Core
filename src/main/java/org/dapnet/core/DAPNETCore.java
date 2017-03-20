@@ -39,7 +39,7 @@ public class DAPNETCore {
 	private volatile RestManager restManager;
 	private volatile TransmissionManager transmissionManager;
 	private volatile SchedulerManager schedulerManager;
-	private volatile Server deviceServer;
+	private volatile Server transmitterServer;
 
 	static {
 		String ver = DAPNETCore.class.getPackage().getImplementationVersion();
@@ -77,8 +77,8 @@ public class DAPNETCore {
 			restManager.startServer();
 
 			logger.info("Starting Transmitter Server");
-			deviceServer = new Server(transmissionManager.getTransmitterManager());
-			Thread serverThread = new Thread(deviceServer);
+			transmitterServer = new Server(transmissionManager.getTransmitterManager());
+			Thread serverThread = new Thread(transmitterServer, "TransmitterServer");
 			serverThread.start();
 
 			logger.info("DAPNETCore started");
@@ -95,8 +95,8 @@ public class DAPNETCore {
 		logger.info("Stopping DAPNETCore ...");
 
 		try {
-			if (deviceServer != null) {
-				deviceServer.close();
+			if (transmitterServer != null) {
+				transmitterServer.close();
 			}
 		} catch (Exception ex) {
 			logger.error("Failed to close the device server.", ex);
@@ -129,7 +129,7 @@ public class DAPNETCore {
 		Locale.setDefault(Locale.ENGLISH);
 
 		// Register shutdown hook
-		Runtime.getRuntime().addShutdownHook(new Thread() {
+		Runtime.getRuntime().addShutdownHook(new Thread("ShutdownHook") {
 			@Override
 			public void run() {
 				try {

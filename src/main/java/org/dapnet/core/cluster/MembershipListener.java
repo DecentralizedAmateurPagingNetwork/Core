@@ -18,7 +18,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.model.Node;
-import org.jgroups.*;
+import org.jgroups.Address;
+import org.jgroups.Event;
+import org.jgroups.MergeView;
+import org.jgroups.PhysicalAddress;
+import org.jgroups.View;
 import org.jgroups.stack.IpAddress;
 
 public class MembershipListener implements org.jgroups.MembershipListener {
@@ -50,10 +54,11 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 		// momentarily not used
 	}
 
-	private class ViewHandler extends Thread {
-		View view;
+	private final class ViewHandler extends Thread {
+		private final View view;
 
 		private ViewHandler(View view) {
+			super("ViewHandler");
 			this.view = view;
 		}
 
