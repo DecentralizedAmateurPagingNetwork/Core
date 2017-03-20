@@ -136,13 +136,8 @@ public class DAPNETCore {
 				} catch (Exception ex) {
 					logger.fatal("Exception while stopping the Core.", ex);
 				}
-			}
-		});
 
-		// Shutdown hook for log4j
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
+				// Shutdown log4j
 				LogManager.shutdown();
 			}
 		});
