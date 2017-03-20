@@ -61,8 +61,9 @@ public class Server implements Runnable, AutoCloseable {
 	@Override
 	public void close() throws Exception {
 		try {
-			if (serverFuture != null) {
-				serverFuture.channel().close().sync();
+			ChannelFuture future = serverFuture;
+			if (future != null) {
+				future.channel().close().sync();
 			}
 		} catch (InterruptedException e) {
 			LOGGER.warn("Interrupted while closing server channel.", e);

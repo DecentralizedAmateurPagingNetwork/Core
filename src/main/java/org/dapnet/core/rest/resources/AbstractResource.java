@@ -49,6 +49,10 @@ public abstract class AbstractResource {
 
 	protected static final Gson gson;
 	protected static final Gson userGson;
+	// Resources are created with Jersey, cannot pass parameters, so using
+	// instead static attributes
+	protected static volatile RestListener restListener;
+	protected static volatile RestSecurity restSecurity;
 
 	static {
 		gson = createBuilder().addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
@@ -79,11 +83,6 @@ public abstract class AbstractResource {
 			return gson;
 		}
 	}
-
-	// Resources are created with Jersey, cannot pass parameters, so using
-	// instead static attributes
-	protected static RestListener restListener;
-	protected static RestSecurity restSecurity;
 
 	public static void setRestListener(RestListener restListenerPar) {
 		restListener = restListenerPar;

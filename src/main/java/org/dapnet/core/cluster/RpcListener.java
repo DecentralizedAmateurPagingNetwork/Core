@@ -36,7 +36,7 @@ import org.dapnet.core.model.User;
 public class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-	private ClusterManager clusterManager;
+	private final ClusterManager clusterManager;
 
 	public RpcListener(ClusterManager clusterManager) {
 		this.clusterManager = clusterManager;

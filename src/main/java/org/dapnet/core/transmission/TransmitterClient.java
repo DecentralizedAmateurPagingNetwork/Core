@@ -20,7 +20,7 @@ final class TransmitterClient {
 	private final Set<Integer> pendingAcks = new HashSet<>();
 	private final Channel channel;
 	private int sequenceNumber = 0;
-	private Transmitter transmitter;
+	private volatile Transmitter transmitter;
 
 	/**
 	 * Creates a new client session.
@@ -146,8 +146,9 @@ final class TransmitterClient {
 	 * closed.
 	 */
 	public void close() {
-		if (channel != null) {
-			channel.close().syncUninterruptibly();
+		Channel theChannel = channel;
+		if (theChannel != null) {
+			theChannel.close().syncUninterruptibly();
 		}
 	}
 

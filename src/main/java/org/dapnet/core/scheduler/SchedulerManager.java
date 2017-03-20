@@ -31,7 +31,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 public class SchedulerManager {
 	private static final Logger logger = LogManager.getLogger();
-	private Scheduler scheduler;
+	private final Scheduler scheduler;
 
 	public SchedulerManager(TransmissionManager transmissionManager, ClusterManager clusterManager)
 			throws SchedulerException {

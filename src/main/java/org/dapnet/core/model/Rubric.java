@@ -29,6 +29,7 @@ import org.dapnet.core.rest.RestAuthorizable;
 
 public class Rubric implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 6724514122275380520L;
+	private static volatile State state;
 
 	// ID
 	@NotNull
@@ -93,9 +94,6 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
 	}
-
-	// Getter returning references instead of String
-	private static State state;
 
 	public static void setState(State statePar) {
 		state = statePar;

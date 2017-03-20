@@ -47,20 +47,17 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-	private JChannel channel;
-	private ChannelListener channelListener;
-	private MembershipListener membershipListener;
-	private MessageListener messageListener;
-	private RpcDispatcher dispatcher;
-	private RequestOptions requestOptions;
-
-	private State state;
-
-	private TransmissionManager transmissionManager;
-	private TransmitterManager transmitterManager;
-
-	private boolean quorum = true;
-	private boolean stopping = false;
+	private final JChannel channel;
+	private final ChannelListener channelListener;
+	private final MembershipListener membershipListener;
+	private final MessageListener messageListener;
+	private final RpcDispatcher dispatcher;
+	private final RequestOptions requestOptions;
+	private final TransmissionManager transmissionManager;
+	private final TransmitterManager transmitterManager;
+	private volatile State state;
+	private volatile boolean quorum = true;
+	private volatile boolean stopping = false;
 
 	public ClusterManager(TransmissionManager transmissionManager) throws Exception {
 		// Register Transmission

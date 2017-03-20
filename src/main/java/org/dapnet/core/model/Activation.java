@@ -27,6 +27,7 @@ import java.util.List;
 
 public class Activation implements Serializable {
 	private static final long serialVersionUID = 2653692303199008619L;
+	private static volatile State state;
 
 	@NotNull
 	@Min(value = 0)
@@ -64,9 +65,6 @@ public class Activation implements Serializable {
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
-
-	// Getter returning references instead of String
-	private static State state;
 
 	public static void setState(State statePar) {
 		state = statePar;

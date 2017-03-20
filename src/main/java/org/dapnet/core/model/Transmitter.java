@@ -34,7 +34,7 @@ import org.jgroups.stack.IpAddress;
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	private static final long serialVersionUID = -8142160974834002456L;
-	private static State state;
+	private static volatile State state;
 
 	@NotNull
 	@Size(min = 3, max = 20)

@@ -28,7 +28,8 @@ import org.dapnet.core.rest.RestAuthorizable;
 
 public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 1884808852367562476L;
-
+	private static volatile State state;
+	
 	// ID
 	@NotNull
 	@Size(min = 3, max = 20)
@@ -80,9 +81,6 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
 	}
-
-	// Getter returning references instead of String
-	private static State state;
 
 	public static void setState(State statePar) {
 		state = statePar;

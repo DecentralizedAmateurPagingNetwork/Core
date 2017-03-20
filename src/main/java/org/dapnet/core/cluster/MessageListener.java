@@ -33,7 +33,7 @@ import java.util.Set;
 public class MessageListener implements org.jgroups.MessageListener {
 	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-	private ClusterManager clusterManager;
+	private final ClusterManager clusterManager;
 
 	public MessageListener(ClusterManager clusterManager) {
 		this.clusterManager = clusterManager;

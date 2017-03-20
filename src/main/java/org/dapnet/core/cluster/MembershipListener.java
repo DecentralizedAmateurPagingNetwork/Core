@@ -23,7 +23,7 @@ import org.jgroups.stack.IpAddress;
 
 public class MembershipListener implements org.jgroups.MembershipListener {
 	private static final Logger logger = LogManager.getLogger();
-	private ClusterManager clusterManager;
+	private final ClusterManager clusterManager;
 
 	public MembershipListener(ClusterManager clusterManager) {
 		this.clusterManager = clusterManager;

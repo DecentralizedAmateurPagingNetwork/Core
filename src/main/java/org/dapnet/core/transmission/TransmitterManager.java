@@ -18,7 +18,7 @@ public class TransmitterManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, Transmitter> registeredTranmsitters = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
-	private TransmitterManagerListener listener;
+	private volatile TransmitterManagerListener listener;
 
 	public void addTransmitter(Transmitter transmitter) {
 		String name = transmitter.getName().toLowerCase();
@@ -95,9 +95,7 @@ public class TransmitterManager {
 
 		connectedClients.put(t.getName(), client);
 
-		if (listener != null) {
-			listener.handleTransmitterStatusChanged(t);
-		}
+		notifyStatusChanged(t);
 	}
 
 	public void onDisconnect(TransmitterClient client) {
@@ -114,8 +112,13 @@ public class TransmitterManager {
 
 		connectedClients.remove(t.getName());
 
-		if (listener != null) {
-			listener.handleTransmitterStatusChanged(t);
+		notifyStatusChanged(t);
+	}
+
+	private void notifyStatusChanged(Transmitter t) {
+		TransmitterManagerListener theListener = listener;
+		if (theListener != null) {
+			theListener.handleTransmitterStatusChanged(t);
 		}
 	}
 
@@ -131,8 +134,9 @@ public class TransmitterManager {
 	public void disconnectFromAll() {
 		connectedClients.values().forEach(cl -> cl.close());
 
-		if (listener != null) {
-			listener.handleDisconnectedFromAllTransmitters();
+		TransmitterManagerListener theListener = listener;
+		if (theListener != null) {
+			theListener.handleDisconnectedFromAllTransmitters();
 		}
 	}
 

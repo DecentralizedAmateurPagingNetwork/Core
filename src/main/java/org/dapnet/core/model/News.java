@@ -26,6 +26,7 @@ import org.dapnet.core.model.validator.ValidName;
 
 public class News implements Serializable {
 	private static final long serialVersionUID = 255218965991641092L;
+	private static volatile State state;
 
 	// No ID
 	@NotNull
@@ -92,9 +93,6 @@ public class News implements Serializable {
 	public static State getState() {
 		return state;
 	}
-
-	// Getter returning references instead of String
-	private static State state;
 
 	public static void setState(State statePar) {
 		state = statePar;
