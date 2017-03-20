@@ -42,8 +42,17 @@ public class Server implements Runnable, AutoCloseable {
 		} catch (Exception ex) {
 			LOGGER.fatal("Exception in server thread.", ex);
 		} finally {
-			bossGroup.shutdownGracefully();
-			workerGroup.shutdownGracefully();
+			try {
+				bossGroup.shutdownGracefully().sync();
+			} catch (Throwable t) {
+				LOGGER.fatal("Failed to shut down boss group.", t);
+			}
+
+			try {
+				workerGroup.shutdownGracefully().sync();
+			} catch (Throwable t) {
+				LOGGER.fatal("Failed to shut down worker group.", t);
+			}
 		}
 
 		LOGGER.info("Server stopped.");
