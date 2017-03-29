@@ -232,13 +232,14 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	public boolean updateNodeStatus(Node.Status status) {
 		return handleStateOperation(null, "updateNodeStatus", new Object[] { channel.getName(), status },
 				new Class[] { String.class, Node.Status.class });
-
 	}
 
 	@SuppressWarnings("rawtypes")
 	private boolean isRspSuccessful(RspList list) {
-		if (list == null || list.getResults() == null || list.getResults().isEmpty())
+		if (list == null || list.getResults() == null || list.getResults().isEmpty()) {
 			return false;
+		}
+
 		for (Object result : list.getResults()) {
 			try {
 				if (result != RpcResponse.OK) {
@@ -249,6 +250,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 				return false;
 			}
 		}
+
 		return true;
 	}
 
