@@ -108,16 +108,26 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		state = ConnectionState.EXCEPTION_CAUGHT;
 
-		if (cause instanceof TransmitterException) {
-			logger.error("Closing connection: {}", cause.getMessage());
-		} else {
-			logger.error("Exception in server handler.", cause);
-		}
-
+		String transmitterName = null;
 		if (client != null) {
 			Transmitter t = client.getTransmitter();
 			if (t != null) {
 				t.setStatus(Status.ERROR);
+				transmitterName = t.getName();
+			}
+		}
+
+		if (transmitterName != null && !transmitterName.isEmpty()) {
+			if (cause instanceof TransmitterException) {
+				logger.error("Closing connection for {}: {}", transmitterName, cause.getMessage());
+			} else {
+				logger.error("Exception in server handler for {}.", transmitterName, cause);
+			}
+		} else {
+			if (cause instanceof TransmitterException) {
+				logger.error("Closing connection: {}", cause.getMessage());
+			} else {
+				logger.error("Exception in server handler.", cause);
 			}
 		}
 

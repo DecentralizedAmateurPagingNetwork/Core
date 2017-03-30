@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
@@ -42,17 +43,28 @@ public class RpcListener {
 		this.clusterManager = clusterManager;
 	}
 
-	private void logResponse(String methodName, Object object, RpcResponse response) {
-		String objectString = object != null ? (" " + object.toString()) : "";
-		if (response == null) {
-			logger.error(methodName + objectString + ": no response");
-		} else if (response == RpcResponse.INTERNAL_ERROR) {
-			logger.error(methodName + objectString + ": " + response);
-		} else if (response == RpcResponse.OK) {
-			logger.info(methodName + objectString + ": " + response);
-		} else {
-			logger.warn(methodName + objectString + ": " + response);
+	private static void logResponse(String methodName, Object object, RpcResponse response) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(methodName);
+
+		if (object != null) {
+			sb.append(' ');
+			sb.append(object);
 		}
+
+		sb.append(": ");
+		sb.append(response);
+
+		Level level = Level.WARN;
+		if (response == null) {
+			level = Level.ERROR;
+		} else if (response == RpcResponse.INTERNAL_ERROR) {
+			level = Level.ERROR;
+		} else if (response == RpcResponse.OK) {
+			level = Level.INFO;
+		}
+
+		logger.log(level, sb.toString());
 	}
 
 	// ### Call
