@@ -17,6 +17,11 @@
         xmlns="urn:org:jgroups"
         xsi:schemaLocation="urn:org:jgroups http://www.jgroups.org/schema/jgroups.xsd">
     <TCP bind_port="7800"/>
+<!-- FOR CORE BEHIND NAT USE
+   <TCP bind_port="7800"
+         external_addr="44.225.x.x"
+         loopback="true"/>
+-->
     <PDC cache_dir="knownHosts" />
     <!--Add here known initial hosts: HostA[7800],HostB[7800]...-->
     <TCPPING initial_hosts="44.225.164.162[7800]"
