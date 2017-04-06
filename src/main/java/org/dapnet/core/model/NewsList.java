@@ -168,8 +168,6 @@ public class NewsList implements Serializable, Iterable<News> {
 	private void updateNumbers() {
 		int num = 1;
 		for (News n : slots) {
-			System.out.println("DEBUG " + n.getNumber() + ", " + num);
-
 			if (n.getNumber() != num) {
 				n.setNumber(num);
 				notifyHandler(n);

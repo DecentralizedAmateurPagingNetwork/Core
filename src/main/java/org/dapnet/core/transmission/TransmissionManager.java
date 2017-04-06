@@ -41,6 +41,7 @@ public class TransmissionManager {
 	}
 
 	public void handleNews(News news) {
+		System.out.println("DEBUG handleNews");
 		try {
 			Message message = protocol.createMessageFromNews(news);
 			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
