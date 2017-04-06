@@ -178,6 +178,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	}
 
 	private void notifyHandler(News news) {
+		System.out.println("DEBUG notifyHandler");
 		Consumer<News> theHandler = handler;
 		if (theHandler != null) {
 			theHandler.accept(news);
