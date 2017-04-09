@@ -14,9 +14,9 @@
 
 package org.dapnet.core.cluster;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -101,7 +101,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 
 		// Register transmitters
-		transmitterManager.addTransmitters(getNodeTransmitter());
+		transmitterManager.addTransmitters(getNodeTransmitters());
 	}
 
 	private void initState() {
@@ -140,15 +140,14 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 	}
 
-	public Collection<Transmitter> getNodeTransmitter() {
-		ArrayList<Transmitter> myTransmitters = new ArrayList<>();
-		for (Transmitter transmitter : state.getTransmitters().values()) {
-			if (transmitter.getNodeName().equalsIgnoreCase(channel.getName())) {
-				myTransmitters.add(transmitter);
-			}
-		}
+	public Collection<Transmitter> getNodeTransmitters() {
+		return state.getTransmitters().values().stream().filter(t -> channel.getName().equalsIgnoreCase(t.getName()))
+				.collect(Collectors.toList());
+	}
 
-		return myTransmitters;
+	public Set<String> getNodeTransmitterNames() {
+		return state.getTransmitters().values().stream().filter(t -> channel.getName().equalsIgnoreCase(t.getName()))
+				.map(t -> t.getName()).collect(Collectors.toSet());
 	}
 
 	public void stop() {

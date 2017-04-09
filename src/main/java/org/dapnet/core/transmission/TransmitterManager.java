@@ -13,6 +13,11 @@ import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.model.TransmitterGroup;
 
+/**
+ * This class manages connected transmitters.
+ * 
+ * @author Philipp Thiel
+ */
 public class TransmitterManager {
 
 	private static final Logger logger = LogManager.getLogger();
@@ -20,6 +25,12 @@ public class TransmitterManager {
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
 	private volatile TransmitterManagerListener listener;
 
+	/**
+	 * Registers a transmitter so it is allowed to connect to the server.
+	 * 
+	 * @param transmitter
+	 *            Transmitter to register.
+	 */
 	public void addTransmitter(Transmitter transmitter) {
 		String name = transmitter.getName().toLowerCase();
 
@@ -27,6 +38,13 @@ public class TransmitterManager {
 		logger.info("Transmitter added: {}", name);
 	}
 
+	/**
+	 * Removes a transmitter from the list of known transmitters. If a
+	 * connection is established it will be closed.
+	 * 
+	 * @param transmitter
+	 *            Transmitter to remove.
+	 */
 	public void removeTransmitter(Transmitter transmitter) {
 		String name = transmitter.getName().toLowerCase();
 
@@ -39,14 +57,33 @@ public class TransmitterManager {
 		disconnectFrom(transmitter);
 	}
 
+	/**
+	 * Sets the event listener.
+	 * 
+	 * @param listener
+	 *            Event listener instance.
+	 */
 	public void setListener(TransmitterManagerListener listener) {
 		this.listener = listener;
 	}
 
+	/**
+	 * Adds a list of transmitters.
+	 * 
+	 * @param transmitters
+	 *            Transmitters to add.
+	 */
 	public void addTransmitters(Collection<Transmitter> transmitters) {
 		transmitters.forEach(this::addTransmitter);
 	}
 
+	/**
+	 * Returns a transmitter if it is registered.
+	 * 
+	 * @param name
+	 *            Transmitter name
+	 * @return Transmitter instance or {@code null} if no transmitter is found.
+	 */
 	public Transmitter get(String name) {
 		if (name != null) {
 			name = name.toLowerCase();
@@ -55,33 +92,76 @@ public class TransmitterManager {
 		return registeredTranmsitters.get(name);
 	}
 
+	/**
+	 * Sends a message to all connected transmitters.
+	 * 
+	 * @param message
+	 *            Message to send.
+	 */
 	public void sendMessage(Message message) {
-		connectedClients.values().forEach(c -> {
-			c.sendMessage(message);
-		});
+		connectedClients.values().forEach(c -> c.sendMessage(message));
 	}
 
+	/**
+	 * Sends a message to one or more transmitter groups.
+	 * 
+	 * @param message
+	 *            Message to send.
+	 * @param groups
+	 *            Transmitter groups to send to.
+	 */
 	public void sendMessage(Message message, Collection<TransmitterGroup> groups) {
-		Set<String> names = getTransmitterNames(groups);
-		for (String name : names) {
-			// name is already in lower case
-			TransmitterClient cl = connectedClients.get(name);
-			if (cl != null) {
-				cl.sendMessage(message);
-			}
-		}
+		getTransmitterNames(groups).forEach(n -> sendMessage(message, n));
 	}
 
+	/**
+	 * Sends multiple messages to one or more transmitter groups.
+	 * 
+	 * @param messages
+	 *            Messages to send.
+	 * @param groups
+	 *            Transmitter groups to send to.
+	 */
 	public void sendMessages(Collection<Message> messages, Collection<TransmitterGroup> groups) {
-		Set<String> names = getTransmitterNames(groups);
-		for (String name : names) {
-			TransmitterClient cl = connectedClients.get(name);
-			if (cl != null) {
-				cl.sendMessages(messages);
-			}
+		getTransmitterNames(groups).forEach(n -> sendMessages(messages, n));
+	}
+
+	/**
+	 * Sends a message to a specific connected transmitter.
+	 * 
+	 * @param message
+	 *            Message to send.
+	 * @param transmitterName
+	 *            Transmitter name.
+	 */
+	public void sendMessage(Message message, String transmitterName) {
+		TransmitterClient cl = connectedClients.get(transmitterName);
+		if (cl != null) {
+			cl.sendMessage(message);
 		}
 	}
 
+	/**
+	 * Sends multiple messages to a specific connected transmitter.
+	 * 
+	 * @param messages
+	 *            Messages to send.
+	 * @param transmitterName
+	 *            Transmitter name.
+	 */
+	public void sendMessages(Collection<Message> messages, String transmitterName) {
+		TransmitterClient cl = connectedClients.get(transmitterName);
+		if (cl != null) {
+			cl.sendMessages(messages);
+		}
+	}
+
+	/**
+	 * Callback to handle connect events.
+	 * 
+	 * @param client
+	 *            Transmitter client to add.
+	 */
 	public void onConnect(TransmitterClient client) {
 		Transmitter t = client.getTransmitter();
 		if (t == null) {
@@ -98,6 +178,12 @@ public class TransmitterManager {
 		notifyStatusChanged(t);
 	}
 
+	/**
+	 * Callback that handles disconnect events.
+	 * 
+	 * @param client
+	 *            Transmitter to remove.
+	 */
 	public void onDisconnect(TransmitterClient client) {
 		Transmitter t = client.getTransmitter();
 		if (t == null) {
@@ -131,6 +217,9 @@ public class TransmitterManager {
 		return selected;
 	}
 
+	/**
+	 * Disconnects from all connected transmitters.
+	 */
 	public void disconnectFromAll() {
 		connectedClients.values().forEach(cl -> cl.close());
 
@@ -140,6 +229,12 @@ public class TransmitterManager {
 		}
 	}
 
+	/**
+	 * Disconnects from the given transmitter.
+	 * 
+	 * @param t
+	 *            Transmitter to disconnect from.
+	 */
 	public void disconnectFrom(Transmitter t) {
 		TransmitterClient cl = connectedClients.remove(t.getName().toLowerCase());
 		if (cl != null) {
