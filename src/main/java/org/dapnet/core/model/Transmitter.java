@@ -112,12 +112,12 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@NotNull
 	private Usage usage;
 
+	private Instant connectedSince;
+
 	@Override
 	public String getName() {
 		return name;
 	}
-
-	private Instant connectedSince;
 
 	public void setName(String name) {
 		this.name = name;

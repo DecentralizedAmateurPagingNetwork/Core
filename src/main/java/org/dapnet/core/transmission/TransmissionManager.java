@@ -34,7 +34,7 @@ public class TransmissionManager {
 			Message message = protocol.createMessageFromTime(date);
 			transmitterManager.sendMessage(message);
 
-			logger.info("Time sent to all connected transmitters.");
+			logger.info("Time sent to transmitters.");
 		} catch (Exception e) {
 			logger.error("Failed to send Time", e);
 		}
@@ -67,7 +67,7 @@ public class TransmissionManager {
 			List<Message> messages = protocol.createMessagesFromCall(call);
 			transmitterManager.sendMessages(messages, call.getTransmitterGroups());
 
-			logger.info("Call sent to {} CallSigns, to {} Pager, using {} TransmitterGroups.",
+			logger.info("Call sent to {} CallSigns, to {} Pagers, using {} TransmitterGroups.",
 					call.getCallSigns().size(), messages.size(), call.getTransmitterGroupNames().size());
 		} catch (Exception e) {
 			logger.error("Failed to send Call", e);

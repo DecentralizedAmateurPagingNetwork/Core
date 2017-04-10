@@ -2,6 +2,7 @@ package org.dapnet.core.transmission;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -242,4 +243,13 @@ public class TransmitterManager {
 		}
 	}
 
+	/**
+	 * Returns a non-modifyable collection of the currently connected
+	 * transmitters.
+	 * 
+	 * @return Currently connected transmitters.
+	 */
+	public Collection<TransmitterClient> getConnectedTransmitters() {
+		return Collections.unmodifiableCollection(connectedClients.values());
+	}
 }
