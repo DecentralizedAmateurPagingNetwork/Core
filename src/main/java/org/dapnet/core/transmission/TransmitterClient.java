@@ -62,6 +62,18 @@ final class TransmitterClient {
 	}
 
 	/**
+	 * Sends a message containing the transmitter name (callsign) to the
+	 * connected transmitter.
+	 */
+	public void sendCallSignMessage() {
+		Transmitter theTransmitter = transmitter;
+		if (theTransmitter != null) {
+			Message msg = theTransmitter.createCallSignMessage();
+			sendMessage(msg);
+		}
+	}
+
+	/**
 	 * Sends a message to the client.
 	 * 
 	 * @param msg

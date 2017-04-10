@@ -29,6 +29,9 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.TimeSlot;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
+import org.dapnet.core.transmission.Message;
+import org.dapnet.core.transmission.Message.FunctionalBits;
+import org.dapnet.core.transmission.Message.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
@@ -111,6 +114,10 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@NotNull
 	private Usage usage;
+
+	@Min(value = 0)
+	@Max(value = 2097151, message = "address is limited to 21 bits")
+	private int callsignAddress = 1;
 
 	private Instant connectedSince;
 
@@ -347,6 +354,25 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		this.connectedSince = since;
 	}
 
+	/**
+	 * Gets the pager address used to send callsign messages to.
+	 * 
+	 * @return Pager address to use for sending callsign messages.
+	 */
+	public int getCallSignAddress() {
+		return callsignAddress;
+	}
+
+	/**
+	 * Sets the pager address used to send callsign messages to.
+	 * 
+	 * @param address
+	 *            Pager address to use for sending callsign messages.
+	 */
+	public void setCallSignAddress(int address) {
+		this.callsignAddress = address;
+	}
+
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
 	public Collection<User> getOwners() throws Exception {
 		if (state == null) {
@@ -385,6 +411,10 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@Override
 	public String toString() {
 		return String.format("Transmitter{name='%s', status=%s}", name, status);
+	}
+
+	public Message createCallSignMessage() {
+		return new Message(name, callsignAddress, MessagePriority.CALL, FunctionalBits.ALPHANUM);
 	}
 
 }

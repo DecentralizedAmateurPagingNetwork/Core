@@ -8,7 +8,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerContext;
 
-public class NewsTransmissionJob implements Job {
+public class CallSignTransmissionJob implements Job {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@Override
@@ -17,16 +17,9 @@ public class NewsTransmissionJob implements Job {
 			SchedulerContext schedulerContext = context.getScheduler().getContext();
 			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-			clusterManager.getState().getNews().values().forEach(nl -> {
-				try {
-					nl.triggerAll();
-				} catch (Throwable t) {
-					LOGGER.fatal("Failed to send news.", t);
-				}
-			});
-		} catch (Throwable t) {
-			LOGGER.fatal("Failed to execute news transmission job.", t);
+			clusterManager.getTransmissionManager().handleCallSigns();
+		} catch (Throwable cause) {
+			LOGGER.fatal("Failed to execute callsign transmission job.", cause);
 		}
 	}
-
 }
