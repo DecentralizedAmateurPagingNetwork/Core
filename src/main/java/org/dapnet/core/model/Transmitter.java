@@ -119,6 +119,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@Max(value = 2097151, message = "address is limited to 21 bits")
 	private int callsignAddress = 1;
 
+	private Instant lastConnected;
 	private Instant connectedSince;
 
 	@Override
@@ -333,6 +334,25 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	 */
 	public static void setState(State statePar) {
 		state = statePar;
+	}
+
+	/**
+	 * Gets the timepoint when the transmitter connected.
+	 * 
+	 * @return Timepoint
+	 */
+	public Instant getLastConnected() {
+		return lastConnected;
+	}
+
+	/**
+	 * Sets the timepoint when the transmitter connected.
+	 * 
+	 * @param when
+	 *            Timepoint
+	 */
+	public void setLastConnected(Instant when) {
+		this.lastConnected = when;
 	}
 
 	/**

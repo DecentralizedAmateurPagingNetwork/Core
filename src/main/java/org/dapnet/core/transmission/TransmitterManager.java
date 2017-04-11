@@ -183,7 +183,10 @@ public class TransmitterManager {
 		}
 
 		t.setStatus(Status.ONLINE);
-		t.setConnectedSince(Instant.now());
+
+		Instant lastConnected = Instant.now();
+		t.setLastConnected(lastConnected);
+		t.setConnectedSince(lastConnected);
 
 		connectedClients.put(t.getName(), client);
 
