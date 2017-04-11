@@ -16,7 +16,6 @@ import io.netty.channel.Channel;
  * @author Philipp Thiel
  */
 final class TransmitterClient {
-
 	private final Set<Integer> pendingAcks = new HashSet<>();
 	private final Channel channel;
 	private int sequenceNumber = 0;
@@ -36,6 +35,21 @@ final class TransmitterClient {
 		}
 
 		this.channel = channel;
+	}
+
+	/**
+	 * Returns the transmitter name if a transmitter instance is present or the
+	 * short channel ID.
+	 * 
+	 * @return Transmitter name or short channel ID.
+	 */
+	public String getName() {
+		Transmitter theTransmitter = transmitter;
+		if (theTransmitter != null) {
+			return theTransmitter.getName();
+		} else {
+			return channel.id().asShortText();
+		}
 	}
 
 	/**
@@ -90,10 +104,7 @@ final class TransmitterClient {
 	 *            Messages to send.
 	 */
 	public void sendMessages(Collection<Message> messages) {
-		messages.forEach(m -> {
-			channel.write(m);
-		});
-
+		messages.forEach(m -> channel.write(m));
 		channel.flush();
 	}
 
@@ -163,5 +174,4 @@ final class TransmitterClient {
 			theChannel.close().syncUninterruptibly();
 		}
 	}
-
 }

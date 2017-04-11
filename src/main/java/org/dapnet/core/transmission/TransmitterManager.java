@@ -2,7 +2,6 @@ package org.dapnet.core.transmission;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +19,6 @@ import org.dapnet.core.model.TransmitterGroup;
  * @author Philipp Thiel
  */
 public class TransmitterManager {
-
 	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, Transmitter> registeredTranmsitters = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
@@ -158,6 +156,19 @@ public class TransmitterManager {
 	}
 
 	/**
+	 * Sends a message containing the callsign to each connected transmitter.
+	 */
+	public void sendCallSigns() {
+		connectedClients.values().forEach(tx -> {
+			try {
+				tx.sendCallSignMessage();
+			} catch (Throwable cause) {
+				logger.error("Failed to send callsign to transmitter.", cause);
+			}
+		});
+	}
+
+	/**
 	 * Callback to handle connect events.
 	 * 
 	 * @param client
@@ -241,15 +252,5 @@ public class TransmitterManager {
 		if (cl != null) {
 			cl.close();
 		}
-	}
-
-	/**
-	 * Returns a non-modifyable collection of the currently connected
-	 * transmitters.
-	 * 
-	 * @return Currently connected transmitters.
-	 */
-	public Collection<TransmitterClient> getConnectedTransmitters() {
-		return Collections.unmodifiableCollection(connectedClients.values());
 	}
 }

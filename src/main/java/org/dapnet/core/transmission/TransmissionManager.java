@@ -87,13 +87,7 @@ public class TransmissionManager {
 
 	public void handleCallSigns() {
 		try {
-			transmitterManager.getConnectedTransmitters().forEach(tx -> {
-				try {
-					tx.sendCallSignMessage();
-				} catch (Throwable cause) {
-					logger.error("Failed to send callsign message to transmitter.", cause);
-				}
-			});
+			transmitterManager.sendCallSigns();
 
 			logger.info("Callsigns sent to transmitters.");
 		} catch (Exception e) {
