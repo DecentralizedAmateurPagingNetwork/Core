@@ -46,6 +46,7 @@ public class SchedulerManager {
 		registerNewsTransmissionJob();
 		registerStateSavingJob();
 		registerStateCleaningJob();
+		registerCallSignTransmissionJob();
 
 		logger.info("SchedulerManager successfully started");
 	}
@@ -90,6 +91,15 @@ public class SchedulerManager {
 
 		CronTrigger newsTransmissionTrigger = newTrigger().withIdentity("newsTransmissionTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getNewsTransmissionCron())).build();
+		scheduler.scheduleJob(newsTransmissionJob, newsTransmissionTrigger);
+	}
+
+	private void registerCallSignTransmissionJob() throws SchedulerException {
+		JobDetail newsTransmissionJob = newJob(CallSignTransmissionJob.class)
+				.withIdentity("callSignTransmissionJob", "main").build();
+
+		CronTrigger newsTransmissionTrigger = newTrigger().withIdentity("callSignTransmissionTrigger", "main")
+				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getCallSignTransmissionCron())).build();
 		scheduler.scheduleJob(newsTransmissionJob, newsTransmissionTrigger);
 	}
 
