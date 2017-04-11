@@ -141,13 +141,14 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	public Collection<Transmitter> getNodeTransmitters() {
-		return state.getTransmitters().values().stream().filter(t -> channel.getName().equalsIgnoreCase(t.getName()))
-				.collect(Collectors.toList());
+		return state.getTransmitters().values().stream()
+				.filter(t -> channel.getName().equalsIgnoreCase(t.getNodeName())).collect(Collectors.toList());
 	}
 
 	public Set<String> getNodeTransmitterNames() {
-		return state.getTransmitters().values().stream().filter(t -> channel.getName().equalsIgnoreCase(t.getName()))
-				.map(t -> t.getName()).collect(Collectors.toSet());
+		return state.getTransmitters().values().stream()
+				.filter(t -> channel.getName().equalsIgnoreCase(t.getNodeName())).map(t -> t.getName())
+				.collect(Collectors.toSet());
 	}
 
 	public void stop() {
