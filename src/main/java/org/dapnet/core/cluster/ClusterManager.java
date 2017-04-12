@@ -14,6 +14,7 @@
 
 package org.dapnet.core.cluster;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,8 +108,10 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private void initState() {
 		try {
 			state = State.readFromFile();
-		} catch (Exception e) {
-			logger.error("Failed to load state from file.", e);
+		} catch (FileNotFoundException ex) {
+			logger.warn("State file not found.");
+		} catch (Exception ex) {
+			throw new CoreStartupException(ex);
 		}
 
 		if (state == null) {

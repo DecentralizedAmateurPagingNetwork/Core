@@ -49,38 +49,29 @@ public class ClusterAuthentication extends AuthToken {
 
 	@Override
 	public boolean authenticate(AuthToken token, Message msg) {
-		Address sender = msg.getSrc();
-		/*
-		 * IpAddress address = sender != null ? (IpAddress) auth.down(new
-		 * Event(Event.GET_PHYSICAL_ADDRESS, sender)) : null;
-		 */
 		if (clusterManager == null) {
 			logger.error("Authentication has no reference to ClusterManager");
 			return false;
 		}
 
+		Address sender = msg.getSrc();
 		Node node = clusterManager.getState().getNodes().get(sender.toString());
 		if (node == null) {
-			logger.warn("Authentication of Node " + sender.toString() + " failed: Unknown node");
+			logger.warn("Authentication of Node {} failed: Unknown node", sender);
 			return false;
 		}
-		/*
-		 * if (!address.equals(node.getAddress())) {
-		 * logger.warn("Authentication of Node " + sender.toString() +
-		 * " failed: Received ip address " + address.getIpAddress() +
-		 * " is unequal to " + node.getAddress()); return false; }
-		 */
 
 		try {
 			if (!HashUtil.validatePassword(((ClusterAuthentication) token).getAuthValue(), node.getKey())) {
-				logger.warn("Authentication of Node " + sender.toString() + " failed: Wrong key");
+				logger.warn("Authentication of Node {} failed: Wrong key", sender);
 				return false;
 			}
 		} catch (Exception e) {
 			logger.catching(e);
-			logger.warn("Authentication of Node " + sender.toString() + " failed");
+			logger.warn("Authentication of Node {} failed", sender);
 			return false;
 		}
+
 		return true;
 	}
 
