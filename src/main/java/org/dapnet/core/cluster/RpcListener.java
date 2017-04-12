@@ -449,6 +449,7 @@ public class RpcListener {
 
 			transmitter.setStatus(updated.getStatus());
 			transmitter.setConnectedSince(updated.getConnectedSince());
+			transmitter.setLastConnected(updated.getLastConnected());
 			transmitter.setAddress(updated.getAddress());
 			transmitter.setDeviceType(updated.getDeviceType());
 			transmitter.setDeviceVersion(updated.getDeviceVersion());
