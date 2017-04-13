@@ -41,7 +41,7 @@ public class RestManager {
 		AbstractResource.setRestSecurity(restSecurity);
 	}
 
-	public void startServer() {
+	public void start() {
 		try {
 			RestSettings settings = Settings.getRestSettings();
 
@@ -61,7 +61,7 @@ public class RestManager {
 		}
 	}
 
-	public void stopServer() {
+	public void stop() {
 		if (server != null) {
 			server.shutdownNow();
 			logger.info("RestApi successfully stopped.");

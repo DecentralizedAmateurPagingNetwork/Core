@@ -26,8 +26,8 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.scheduler.SchedulerManager;
-import org.dapnet.core.transmission.Server;
 import org.dapnet.core.transmission.TransmissionManager;
+import org.dapnet.core.transmission.TransmitterServer;
 
 public class DAPNETCore {
 
@@ -39,7 +39,7 @@ public class DAPNETCore {
 	private volatile RestManager restManager;
 	private volatile TransmissionManager transmissionManager;
 	private volatile SchedulerManager schedulerManager;
-	private volatile Server transmitterServer;
+	private volatile TransmitterServer transmitterServer;
 
 	static {
 		String ver = DAPNETCore.class.getPackage().getImplementationVersion();
@@ -49,7 +49,8 @@ public class DAPNETCore {
 			CORE_VERSION = "UNKNOWN";
 		}
 
-		// TODO Use getSpecificationVersion?
+		// Extract API version from Core version
+		// Use getSpecificationVersion instead?
 		Pattern versionPattern = Pattern.compile("(\\d+\\.\\d+\\.\\d+)\\p{Graph}*");
 		Matcher m = versionPattern.matcher(CORE_VERSION);
 		if (m.matches()) {
@@ -74,12 +75,11 @@ public class DAPNETCore {
 
 			logger.info("Starting RestManager");
 			restManager = new RestManager(clusterManager);
-			restManager.startServer();
+			restManager.start();
 
 			logger.info("Starting Transmitter Server");
-			transmitterServer = new Server(transmissionManager.getTransmitterManager());
-			Thread serverThread = new Thread(transmitterServer, "TransmitterServer");
-			serverThread.start();
+			transmitterServer = new TransmitterServer(transmissionManager.getTransmitterManager());
+			transmitterServer.start();
 
 			logger.info("DAPNETCore started");
 		} catch (CoreStartupException e) {
@@ -94,16 +94,12 @@ public class DAPNETCore {
 	private void stop() {
 		logger.info("Stopping DAPNETCore ...");
 
-		try {
-			if (transmitterServer != null) {
-				transmitterServer.close();
-			}
-		} catch (Exception ex) {
-			logger.error("Failed to close the device server.", ex);
+		if (transmitterServer != null) {
+			transmitterServer.stop();
 		}
 
 		if (restManager != null) {
-			restManager.stopServer();
+			restManager.stop();
 		}
 
 		if (schedulerManager != null) {
