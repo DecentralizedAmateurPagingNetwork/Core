@@ -65,12 +65,11 @@ public class MessageListener implements org.jgroups.MessageListener {
 
 		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(state);
 		for (ConstraintViolation<Object> violation : constraintViolations) {
-			logger.error(
-					"Error validating received State: " + violation.getPropertyPath() + " " + violation.getMessage());
+			logger.error("Error validating received State: {} {}", violation.getPropertyPath(), violation.getMessage());
 		}
 		if (constraintViolations.size() != 0) {
 			logger.fatal("Discarding received State");
-			// FIXME Does not work?
+			// FIXME Does this work?
 			DAPNETCore.shutdown();
 		}
 

@@ -82,7 +82,6 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 			descriptor = new ExceptionDescriptor(4150, "Not Supported",
 					"The request entity media type is not supported");
 		}
-
 		// ServerErrorExceptions
 		else if (e instanceof InternalServerErrorException) {
 			descriptor = new ExceptionDescriptor(5000, "Internal Server Error",
@@ -96,7 +95,6 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 					"A server-side error occurred while executing the request");
 			logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage(), e);
 		}
-
 		// UnknownExceptions
 		else {
 			descriptor = new ExceptionDescriptor(5001, "Internal Server Error",

@@ -40,7 +40,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
 	@Override
 	public void suspect(Address address) {
-		logger.warn("Node " + address + " is suspected");
+		logger.warn("Node {} is suspected", address);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
 		@Override
 		public void run() {
-			logger.info("New View: " + view);
+			logger.info("New View: {}", view);
 			// Check whether merge is taking place
 			if (view instanceof MergeView) {
 				try {
@@ -159,20 +159,20 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 						.isPresent()) {
 					if (node.getStatus() == Node.Status.SUSPENDED) {
 						node.setStatus(Node.Status.ONLINE);
-						logger.info("Changed status of " + node.getName() + " from " + Node.Status.SUSPENDED + " to "
-								+ Node.Status.ONLINE);
+						logger.info("Changed status of {} from {} to {}", node.getName(), Node.Status.SUSPENDED,
+								Node.Status.ONLINE);
 					} else if (node.getStatus() == Node.Status.UNKNOWN) {
 						node.setStatus(Node.Status.ONLINE);
-						logger.info("Changed status of " + node.getName() + " from " + Node.Status.UNKNOWN + " to "
-								+ Node.Status.ONLINE);
+						logger.info("Changed status of {} from {} to {}", node.getName(), Node.Status.UNKNOWN,
+								Node.Status.ONLINE);
 					}
 					// else if node in ONLINE which is the correct status
 				} else {
 					// Known node is not present in view
 					if (node.getStatus() == Node.Status.ONLINE) {
 						node.setStatus(Node.Status.UNKNOWN);
-						logger.warn("Changed status of " + node.getName() + " from " + Node.Status.ONLINE + " to "
-								+ Node.Status.UNKNOWN);
+						logger.warn("Changed status of {} from {} to {}", node.getName(), Node.Status.ONLINE,
+								Node.Status.UNKNOWN);
 					}
 					// else if node is UNKNOWN or SUSPENDED which is the correct
 					// status

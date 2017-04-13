@@ -231,7 +231,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			if (isRspSuccessful(rspList)) {
 				return true;
 			} else {
-				logger.error("Response: " + rspList.toString());
+				logger.error("Response: {}", rspList);
 			}
 		} catch (Exception e) {
 			logger.catching(e);
