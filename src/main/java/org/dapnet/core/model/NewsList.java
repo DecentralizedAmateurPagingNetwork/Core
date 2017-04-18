@@ -21,6 +21,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	private final Object lockObj = new Object();
 	private final LinkedList<News> slots;
 	private transient volatile Consumer<News> handler;
+	private transient volatile Instant lastTrigger;
 
 	/**
 	 * Creates a new empty news list.
@@ -112,6 +113,15 @@ public class NewsList implements Serializable, Iterable<News> {
 	}
 
 	/**
+	 * Returns the timestamp when the last trigger operation was run.
+	 * 
+	 * @return Timestamp
+	 */
+	public Instant getLastTrigger() {
+		return lastTrigger;
+	}
+
+	/**
 	 * Returns a copy of the news list.
 	 * 
 	 * @return Copy of the internal list.
@@ -136,6 +146,8 @@ public class NewsList implements Serializable, Iterable<News> {
 				theHandler.accept(n);
 			}
 		}
+
+		lastTrigger = Instant.now();
 	}
 
 	/**
