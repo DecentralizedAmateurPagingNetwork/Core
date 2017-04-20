@@ -158,4 +158,5 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 		}
 
 	}
+
 }

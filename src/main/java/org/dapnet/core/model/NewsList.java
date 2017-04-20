@@ -3,10 +3,9 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.function.Consumer;
 
 /**
@@ -19,29 +18,18 @@ public class NewsList implements Serializable, Iterable<News> {
 
 	private static final long serialVersionUID = 8878795787181440875L;
 	private final Object lockObj = new Object();
-	private final LinkedList<News> slots;
+	private final News[] slots = new News[10];
 	private transient volatile Consumer<News> handler;
 	private transient volatile Instant lastTrigger;
 
-	/**
-	 * Creates a new empty news list.
-	 */
 	public NewsList() {
-		this(new LinkedList<>());
 	}
 
-	/**
-	 * Creates a new list backed by the given list.
-	 * 
-	 * @param slots
-	 *            List to use
-	 */
-	public NewsList(LinkedList<News> slots) {
-		if (slots == null) {
-			throw new NullPointerException("slots cannot be null.");
+	public NewsList(Collection<News> news) {
+		for (News n : news) {
+			int i = (n.getNumber() - 1) % slots.length;
+			slots[i] = n;
 		}
-
-		this.slots = slots;
 	}
 
 	/**
@@ -62,17 +50,23 @@ public class NewsList implements Serializable, Iterable<News> {
 	 */
 	public void add(News news) {
 		synchronized (lockObj) {
-			if (news.getNumber() < 1 || slots.size() < 1) {
-				slots.addFirst(news);
-				if (slots.size() > 10) {
-					slots.removeLast();
+			if (news.getNumber() < 1) {
+				for (int i = 0; i < slots.length - 1; ++i) {
+					if (news != null) {
+						news.setNumber(i + 1);
+					}
+
+					News next = slots[i];
+					slots[i] = news;
+					slots[i + 1] = next;
+					news = next;
 				}
 
-				updateNumbers();
+				triggerAll();
 			} else {
-				int idx = Integer.min(news.getNumber() - 1, slots.size() - 1);
-				news.setNumber(idx + 1);
-				slots.set(idx, news);
+				int idx = (news.getNumber() - 1) % slots.length;
+				slots[idx] = news;
+
 				notifyHandler(news);
 			}
 		}
@@ -93,24 +87,30 @@ public class NewsList implements Serializable, Iterable<News> {
 		}
 
 		synchronized (lockObj) {
-			News old = slots.remove(number - 1);
-			if (old != null) {
-				updateNumbers();
-			}
+			News old = slots[number - 1];
+			slots[number - 1] = null;
 
 			return old;
 		}
 	}
 
 	/**
-	 * Returns the list size.
+	 * Gets the list size (amount of non-null entries).
 	 * 
 	 * @return List size
 	 */
 	public int getSize() {
+		int size = 0;
+
 		synchronized (lockObj) {
-			return slots.size();
+			for (int i = 0; i < slots.length; ++i) {
+				if (slots[i] != null) {
+					++size;
+				}
+			}
 		}
+
+		return size;
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	 */
 	public Collection<News> getAsList() {
 		synchronized (lockObj) {
-			return new ArrayList<>(slots);
+			return Arrays.asList(slots);
 		}
 	}
 
@@ -144,7 +144,9 @@ public class NewsList implements Serializable, Iterable<News> {
 
 		synchronized (lockObj) {
 			for (News n : slots) {
-				theHandler.accept(n);
+				if (n != null) {
+					theHandler.accept(n);
+				}
 			}
 		}
 
@@ -160,39 +162,21 @@ public class NewsList implements Serializable, Iterable<News> {
 	 *            Time to live.
 	 */
 	public void removeExpired(Instant now, Duration ttl) {
-		boolean changed = false;
+		// TODO Reorder if list is changed?
 
 		synchronized (lockObj) {
-			Iterator<News> it = slots.iterator();
-			while (it.hasNext()) {
-				News n = it.next();
+			for (int i = 0; i < slots.length; ++i) {
+				News n = slots[i];
 				if (now.isAfter(n.getTimestamp().plus(ttl))) {
-					it.remove();
-					changed = true;
+					slots[i] = null;
 				}
 			}
-
-			if (changed) {
-				updateNumbers();
-			}
-		}
-	}
-
-	private void updateNumbers() {
-		int num = 1;
-		for (News n : slots) {
-			if (n.getNumber() != num) {
-				n.setNumber(num);
-				notifyHandler(n);
-			}
-
-			++num;
 		}
 	}
 
 	private void notifyHandler(News news) {
 		Consumer<News> theHandler = handler;
-		if (theHandler != null) {
+		if (news != null && theHandler != null) {
 			theHandler.accept(news);
 		}
 	}
@@ -206,22 +190,21 @@ public class NewsList implements Serializable, Iterable<News> {
 
 	private static final class CopyIterator implements Iterator<News> {
 
-		private final Collection<News> data;
-		private final Iterator<News> iterator;
+		private final News[] slots;
+		private int index = 0;
 
-		public CopyIterator(Collection<News> copyFrom) {
-			data = new ArrayList<>(copyFrom);
-			iterator = data.iterator();
+		public CopyIterator(News[] slots) {
+			this.slots = Arrays.copyOf(slots, slots.length);
 		}
 
 		@Override
 		public boolean hasNext() {
-			return iterator.hasNext();
+			return index < slots.length;
 		}
 
 		@Override
 		public News next() {
-			return iterator.next();
+			return slots[index++];
 		}
 
 	}
