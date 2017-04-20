@@ -62,7 +62,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	 */
 	public void add(News news) {
 		synchronized (lockObj) {
-			if (news.getNumber() < 1 || slots.size() == 0) {
+			if (news.getNumber() < 1 || slots.size() < 1) {
 				slots.addFirst(news);
 				if (slots.size() > 10) {
 					slots.removeLast();
@@ -70,7 +70,8 @@ public class NewsList implements Serializable, Iterable<News> {
 
 				updateNumbers();
 			} else {
-				int idx = Integer.min(news.getNumber() - 1, slots.size());
+				int idx = Integer.min(news.getNumber() - 1, slots.size() - 1);
+				news.setNumber(idx + 1);
 				slots.set(idx, news);
 				notifyHandler(news);
 			}
