@@ -23,7 +23,7 @@ public class SchedulerSettings implements Serializable {
 	private String newsTransmissionCron = "45 0 * * * ?";
 	private String stateSavingCron = "30 0/10 * * * ?";
 	private String stateCleaningCron = "0 0 0 * * ?";
-	private String callSignTransmissionCron = "0 0/10 * * * ?";
+	private String transmitterIdentificationCron = "0 0/10 * * * ?";
 
 	public String getTimeTransmissionCron() {
 		return timeTransmissionCron;
@@ -45,7 +45,7 @@ public class SchedulerSettings implements Serializable {
 		return newsTransmissionCron;
 	}
 
-	public String getCallSignTransmissionCron() {
-		return callSignTransmissionCron;
+	public String getTransmitterIdentificationCron() {
+		return transmitterIdentificationCron;
 	}
 }

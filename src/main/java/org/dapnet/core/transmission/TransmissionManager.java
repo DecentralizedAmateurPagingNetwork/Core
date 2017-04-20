@@ -85,13 +85,13 @@ public class TransmissionManager {
 		}
 	}
 
-	public void handleCallSigns() {
+	public void handleIdentification() {
 		try {
 			transmitterManager.sendCallSigns();
 
-			logger.info("Callsigns sent to transmitters.");
+			logger.info("Transmitter identifications sent.");
 		} catch (Exception e) {
-			logger.error("Failed to send callsign messages.");
+			logger.error("Failed to send transmitter identifications.");
 		}
 	}
 

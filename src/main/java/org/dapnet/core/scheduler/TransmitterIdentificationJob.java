@@ -8,7 +8,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.SchedulerContext;
 
-public class CallSignTransmissionJob implements Job {
+public class TransmitterIdentificationJob implements Job {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@Override
@@ -17,9 +17,9 @@ public class CallSignTransmissionJob implements Job {
 			SchedulerContext schedulerContext = context.getScheduler().getContext();
 			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-			clusterManager.getTransmissionManager().handleCallSigns();
+			clusterManager.getTransmissionManager().handleIdentification();
 		} catch (Throwable cause) {
-			LOGGER.fatal("Failed to execute callsign transmission job.", cause);
+			LOGGER.fatal("Failed to execute transmitter identification job.", cause);
 		}
 	}
 }

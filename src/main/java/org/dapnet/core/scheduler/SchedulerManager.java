@@ -46,27 +46,24 @@ public class SchedulerManager {
 		registerNewsTransmissionJob();
 		registerStateSavingJob();
 		registerStateCleaningJob();
-		registerCallSignTransmissionJob();
+		registerTransmitterIdentificationJob();
 
 		logger.info("SchedulerManager successfully started");
 	}
 
 	private void registerTimeTransmissionJob() throws SchedulerException {
-		JobDetail timeTransmissionJob = newJob(TimeTransmissionJob.class).withIdentity("timeTransmissionJob", "main")
-				.build();
-
-		CronTrigger timeTransmissionTrigger = newTrigger().withIdentity("timeTransmissionTrigger", "main")
+		JobDetail job = newJob(TimeTransmissionJob.class).withIdentity("timeTransmissionJob", "main").build();
+		CronTrigger trigger = newTrigger().withIdentity("timeTransmissionTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getTimeTransmissionCron())).build();
-		scheduler.scheduleJob(timeTransmissionJob, timeTransmissionTrigger);
+		scheduler.scheduleJob(job, trigger);
 	}
 
 	private void registerRubricNameTransmissionJob() throws SchedulerException {
-		JobDetail rubricNameTransmissionJob = newJob(RubricNameTransmissionJob.class)
-				.withIdentity("rubricNameTransmissionJob", "main").build();
-
-		CronTrigger rubricNameTransmissionTrigger = newTrigger().withIdentity("rubricNameTransmissionTrigger", "main")
+		JobDetail job = newJob(RubricNameTransmissionJob.class).withIdentity("rubricNameTransmissionJob", "main")
+				.build();
+		CronTrigger trigger = newTrigger().withIdentity("rubricNameTransmissionTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getRubricNameTransmissionCron())).build();
-		scheduler.scheduleJob(rubricNameTransmissionJob, rubricNameTransmissionTrigger);
+		scheduler.scheduleJob(job, trigger);
 	}
 
 	private void registerStateSavingJob() throws SchedulerException {
@@ -78,29 +75,25 @@ public class SchedulerManager {
 	}
 
 	private void registerStateCleaningJob() throws SchedulerException {
-		JobDetail stateCleaningJob = newJob(StateCleaningJob.class).withIdentity("stateCleaningJob", "main").build();
-
-		CronTrigger stateCleaningTrigger = newTrigger().withIdentity("stateCleaningTrigger", "main")
+		JobDetail job = newJob(StateCleaningJob.class).withIdentity("stateCleaningJob", "main").build();
+		CronTrigger trigger = newTrigger().withIdentity("stateCleaningTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateCleaningCron())).build();
-		scheduler.scheduleJob(stateCleaningJob, stateCleaningTrigger);
+		scheduler.scheduleJob(job, trigger);
 	}
 
 	private void registerNewsTransmissionJob() throws SchedulerException {
-		JobDetail newsTransmissionJob = newJob(NewsTransmissionJob.class).withIdentity("newsTransmissionJob", "main")
-				.build();
-
-		CronTrigger newsTransmissionTrigger = newTrigger().withIdentity("newsTransmissionTrigger", "main")
+		JobDetail job = newJob(NewsTransmissionJob.class).withIdentity("newsTransmissionJob", "main").build();
+		CronTrigger trigger = newTrigger().withIdentity("newsTransmissionTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getNewsTransmissionCron())).build();
-		scheduler.scheduleJob(newsTransmissionJob, newsTransmissionTrigger);
+		scheduler.scheduleJob(job, trigger);
 	}
 
-	private void registerCallSignTransmissionJob() throws SchedulerException {
-		JobDetail newsTransmissionJob = newJob(CallSignTransmissionJob.class)
-				.withIdentity("callSignTransmissionJob", "main").build();
-
-		CronTrigger newsTransmissionTrigger = newTrigger().withIdentity("callSignTransmissionTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getCallSignTransmissionCron())).build();
-		scheduler.scheduleJob(newsTransmissionJob, newsTransmissionTrigger);
+	private void registerTransmitterIdentificationJob() throws SchedulerException {
+		JobDetail job = newJob(TransmitterIdentificationJob.class).withIdentity("transmitterIdentificationJob", "main")
+				.build();
+		CronTrigger trigger = newTrigger().withIdentity("transmitterIdentificationTrigger", "main")
+				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getTransmitterIdentificationCron())).build();
+		scheduler.scheduleJob(job, trigger);
 	}
 
 	public void stop() {

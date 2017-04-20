@@ -117,7 +117,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@Min(value = 0)
 	@Max(value = 2097151, message = "address is limited to 21 bits")
-	private int callsignAddress = 1;
+	private int identificationAddress = 1;
 
 	private Instant lastConnected;
 	private Instant connectedSince;
@@ -375,22 +375,22 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	}
 
 	/**
-	 * Gets the pager address used to send callsign messages to.
+	 * Gets the pager address used to send identification messages to.
 	 * 
-	 * @return Pager address to use for sending callsign messages.
+	 * @return Pager address to use for sending identification messages.
 	 */
-	public int getCallSignAddress() {
-		return callsignAddress;
+	public int getIdentificationAddress() {
+		return identificationAddress;
 	}
 
 	/**
-	 * Sets the pager address used to send callsign messages to.
+	 * Sets the pager address used to send identification messages to.
 	 * 
 	 * @param address
-	 *            Pager address to use for sending callsign messages.
+	 *            Pager address to use for sending identification messages.
 	 */
-	public void setCallSignAddress(int address) {
-		this.callsignAddress = address;
+	public void setIdentificationAddress(int address) {
+		this.identificationAddress = address;
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
@@ -434,7 +434,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	}
 
 	public Message createCallSignMessage() {
-		return new Message(name, callsignAddress, MessagePriority.CALL, FunctionalBits.ALPHANUM);
+		return new Message(name, identificationAddress, MessagePriority.CALL, FunctionalBits.ALPHANUM);
 	}
 
 }
