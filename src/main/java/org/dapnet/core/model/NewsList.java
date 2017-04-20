@@ -22,13 +22,24 @@ public class NewsList implements Serializable, Iterable<News> {
 	private transient volatile Consumer<News> handler;
 	private transient volatile Instant lastTrigger;
 
+	/**
+	 * Creates a new empty news list.
+	 */
 	public NewsList() {
 	}
 
+	/**
+	 * Creates a new news list from the given news collection.
+	 * 
+	 * @param news
+	 *            News to load.
+	 */
 	public NewsList(Collection<News> news) {
 		for (News n : news) {
-			int i = (n.getNumber() - 1) % slots.length;
-			slots[i] = n;
+			if (n != null) {
+				int i = (n.getNumber() - 1) % slots.length;
+				slots[i] = n;
+			}
 		}
 	}
 
@@ -51,14 +62,13 @@ public class NewsList implements Serializable, Iterable<News> {
 	public void add(News news) {
 		synchronized (lockObj) {
 			if (news.getNumber() < 1) {
-				for (int i = 0; i < slots.length - 1; ++i) {
+				for (int i = 0; i < slots.length; ++i) {
 					if (news != null) {
 						news.setNumber(i + 1);
 					}
 
 					News next = slots[i];
 					slots[i] = news;
-					slots[i + 1] = next;
 					news = next;
 				}
 
