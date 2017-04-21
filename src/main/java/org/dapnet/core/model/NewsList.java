@@ -177,7 +177,7 @@ public class NewsList implements Serializable, Iterable<News> {
 		synchronized (lockObj) {
 			for (int i = 0; i < slots.length; ++i) {
 				News n = slots[i];
-				if (now.isAfter(n.getTimestamp().plus(ttl))) {
+				if (n != null && now.isAfter(n.getTimestamp().plus(ttl))) {
 					slots[i] = null;
 				}
 			}
