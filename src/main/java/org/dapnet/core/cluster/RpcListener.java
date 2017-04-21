@@ -78,7 +78,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(call).size() != 0) {
+			if (!validator.validate(call).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -111,7 +111,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(activation).size() != 0) {
+			if (!validator.validate(activation).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -143,7 +143,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(callSign).size() != 0) {
+			if (!validator.validate(callSign).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -221,7 +221,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(news).size() != 0) {
+			if (!validator.validate(news).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -289,7 +289,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(node).size() != 0) {
+			if (!validator.validate(node).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -368,7 +368,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(rubric).size() != 0) {
+			if (!validator.validate(rubric).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -481,7 +481,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(transmitter).size() != 0) {
+			if (!validator.validate(transmitter).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -587,7 +587,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(transmitterGroup).size() != 0) {
+			if (!validator.validate(transmitterGroup).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -686,7 +686,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (validator.validate(user).size() != 0) {
+			if (!validator.validate(user).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 

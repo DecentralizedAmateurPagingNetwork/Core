@@ -64,8 +64,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	public ClusterManager(TransmissionManager transmissionManager) throws Exception {
 		// Register Transmission
 		this.transmissionManager = transmissionManager;
-		this.transmitterManager = transmissionManager.getTransmitterManager();
-		this.transmitterManager.setListener(this);
+		transmitterManager = transmissionManager.getTransmitterManager();
+		transmitterManager.setListener(this);
 
 		// Initiate State
 		initState();
@@ -132,13 +132,13 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			nl.setHandler(transmissionManager::handleNews);
 		}
 
-		// Validate
-		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(state);
-		for (ConstraintViolation<Object> violation : constraintViolations) {
-			logger.error("Error validating State.json: {} {}", violation.getPropertyPath(), violation.getMessage());
-		}
+		// Validate state
+		Set<ConstraintViolation<Object>> violations = validator.validate(state);
+		if (!violations.isEmpty()) {
+			violations.forEach(v -> {
+				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
+			});
 
-		if (constraintViolations.size() != 0) {
 			throw new CoreStartupException("State validation failed.");
 		}
 	}

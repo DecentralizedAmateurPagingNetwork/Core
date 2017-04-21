@@ -47,33 +47,35 @@ public class MessageListener implements org.jgroups.MessageListener {
 	@Override
 	public void getState(OutputStream outputStream) throws Exception {
 		logger.info("Start sending State to other Node");
-		synchronized (clusterManager.getState()) {
-			Util.objectToStream(clusterManager.getState(), new DataOutputStream(outputStream));
-		}
+
+		State state = clusterManager.getState();
+		Util.objectToStream(state, new DataOutputStream(outputStream));
+
 		logger.info("Finished sending State to other Node");
 	}
 
 	@Override
 	public void setState(InputStream inputStream) throws Exception {
 		logger.info("Receiving State from other Node");
+
 		State state = (State) Util.objectFromStream(new DataInputStream(inputStream));
 
-		synchronized (clusterManager.getState()) {
+		// Validate state
+		Set<ConstraintViolation<Object>> violations = validator.validate(state);
+		if (violations.isEmpty()) {
 			clusterManager.setState(state);
-			clusterManager.getState().setModelReferences();
-		}
+			state.setModelReferences();
+			state.writeToFile();
 
-		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(state);
-		for (ConstraintViolation<Object> violation : constraintViolations) {
-			logger.error("Error validating received State: {} {}", violation.getPropertyPath(), violation.getMessage());
-		}
-		if (constraintViolations.size() != 0) {
+			logger.info("State successfully received");
+		} else {
+			violations.forEach(v -> {
+				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
+			});
+
 			logger.fatal("Discarding received State");
 			// FIXME Does this work?
 			DAPNETCore.shutdown();
 		}
-
-		clusterManager.getState().writeToFile();
-		logger.info("State successfully received");
 	}
 }
