@@ -223,7 +223,7 @@ public class TransmitterManager {
 		}
 	}
 
-	private Set<String> getTransmitterNames(Collection<TransmitterGroup> groups) {
+	private static Set<String> getTransmitterNames(Collection<TransmitterGroup> groups) {
 		Set<String> selected = new HashSet<>();
 		for (TransmitterGroup g : groups) {
 			g.getTransmitterNames().forEach(t -> selected.add(t.toLowerCase()));
