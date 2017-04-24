@@ -77,12 +77,12 @@ public class ClusterAuthentication extends AuthToken {
 
 	@Override
 	public void writeTo(DataOutput out) throws Exception {
-		Bits.writeString(this.auth_value, out);
+		Bits.writeString(auth_value, out);
 	}
 
 	@Override
 	public void readFrom(DataInput in) throws Exception {
-		this.auth_value = Bits.readString(in);
+		auth_value = Bits.readString(in);
 	}
 
 	@Override
