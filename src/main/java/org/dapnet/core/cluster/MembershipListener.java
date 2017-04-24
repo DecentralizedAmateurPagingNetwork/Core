@@ -35,7 +35,9 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
 	@Override
 	public void viewAccepted(View view) {
-		new ViewHandler(view).start();
+		ViewHandler handler = new ViewHandler(view);
+		Thread worker = new Thread(handler, "ViewHandler");
+		worker.start();
 	}
 
 	@Override
@@ -45,20 +47,16 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
 	@Override
 	public void block() {
-		// momentarily not used
-		// called in case of FLUSH Block
 	}
 
 	@Override
 	public void unblock() {
-		// momentarily not used
 	}
 
-	private final class ViewHandler extends Thread {
+	private final class ViewHandler implements Runnable {
 		private final View view;
 
 		private ViewHandler(View view) {
-			super("ViewHandler");
 			this.view = view;
 		}
 

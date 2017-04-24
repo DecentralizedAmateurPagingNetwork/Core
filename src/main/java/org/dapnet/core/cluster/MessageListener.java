@@ -41,7 +41,6 @@ public class MessageListener implements org.jgroups.MessageListener {
 
 	@Override
 	public void receive(Message message) {
-		// Not used, only using Messages forwarded to RpcListener
 	}
 
 	@Override
