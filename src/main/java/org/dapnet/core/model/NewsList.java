@@ -17,8 +17,7 @@ import java.util.function.Consumer;
 public class NewsList implements Serializable, Iterable<News> {
 
 	private static final long serialVersionUID = 8878795787181440875L;
-	private final Object lockObj = new Object();
-	private final News[] slots = new News[10];
+	private News[] slots = new News[10];
 	private transient volatile Consumer<News> handler;
 	private transient volatile Instant lastTrigger;
 
@@ -60,7 +59,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	 *            News object to add.
 	 */
 	public void add(News news) {
-		synchronized (lockObj) {
+		synchronized (slots) {
 			if (news.getNumber() < 1) {
 				for (int i = 0; i < slots.length; ++i) {
 					if (news != null) {
@@ -96,7 +95,7 @@ public class NewsList implements Serializable, Iterable<News> {
 			throw new IllegalArgumentException("number must be between 1 and 10.");
 		}
 
-		synchronized (lockObj) {
+		synchronized (slots) {
 			News old = slots[number - 1];
 			slots[number - 1] = null;
 
@@ -112,7 +111,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	public int getSize() {
 		int size = 0;
 
-		synchronized (lockObj) {
+		synchronized (slots) {
 			for (int i = 0; i < slots.length; ++i) {
 				if (slots[i] != null) {
 					++size;
@@ -138,7 +137,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	 * @return Copy of the internal list.
 	 */
 	public Collection<News> getAsList() {
-		synchronized (lockObj) {
+		synchronized (slots) {
 			return Arrays.asList(slots);
 		}
 	}
@@ -152,7 +151,7 @@ public class NewsList implements Serializable, Iterable<News> {
 			return;
 		}
 
-		synchronized (lockObj) {
+		synchronized (slots) {
 			for (News n : slots) {
 				if (n != null) {
 					theHandler.accept(n);
@@ -174,7 +173,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	public void removeExpired(Instant now, Duration ttl) {
 		// TODO Reorder if list is changed?
 
-		synchronized (lockObj) {
+		synchronized (slots) {
 			for (int i = 0; i < slots.length; ++i) {
 				News n = slots[i];
 				if (n != null && now.isAfter(n.getTimestamp().plus(ttl))) {
@@ -193,7 +192,7 @@ public class NewsList implements Serializable, Iterable<News> {
 
 	@Override
 	public Iterator<News> iterator() {
-		synchronized (lockObj) {
+		synchronized (slots) {
 			return new CopyIterator(slots);
 		}
 	}
