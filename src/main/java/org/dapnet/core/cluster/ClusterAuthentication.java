@@ -44,7 +44,7 @@ public class ClusterAuthentication extends AuthToken {
 
 	@Override
 	public String getName() {
-		return "org.dpnet.core.cluster.ClusterAuthentication";
+		return "org.dapnet.core.cluster.ClusterAuthentication";
 	}
 
 	@Override
