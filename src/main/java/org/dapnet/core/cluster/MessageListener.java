@@ -58,12 +58,12 @@ public class MessageListener implements org.jgroups.MessageListener {
 		logger.info("Receiving State from other Node");
 
 		State state = (State) Util.objectFromStream(new DataInputStream(inputStream));
+		clusterManager.setState(state);
+		state.setModelReferences();
 
 		// Validate state
 		Set<ConstraintViolation<Object>> violations = validator.validate(state);
 		if (violations.isEmpty()) {
-			clusterManager.setState(state);
-			state.setModelReferences();
 			state.writeToFile();
 
 			logger.info("State successfully received");
