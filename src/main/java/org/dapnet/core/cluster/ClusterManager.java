@@ -119,7 +119,20 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			logger.warn("Creating new empty State");
 		}
 
-		// Register news lists
+		registerNewsList();
+
+		// Validate state
+		Set<ConstraintViolation<Object>> violations = validator.validate(state);
+		if (!violations.isEmpty()) {
+			violations.forEach(v -> {
+				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
+			});
+
+			throw new CoreStartupException("State validation failed.");
+		}
+	}
+
+	private void registerNewsList() {
 		for (Rubric r : state.getRubrics().values()) {
 			String rubricName = r.getName().toLowerCase();
 
@@ -130,16 +143,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			}
 
 			nl.setHandler(transmissionManager::handleNews);
-		}
-
-		// Validate state
-		Set<ConstraintViolation<Object>> violations = validator.validate(state);
-		if (!violations.isEmpty()) {
-			violations.forEach(v -> {
-				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
-			});
-
-			throw new CoreStartupException("State validation failed.");
 		}
 	}
 
@@ -307,5 +310,9 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 	public void setState(State state) {
 		this.state = state;
+
+		if (state != null) {
+			registerNewsList();
+		}
 	}
 }
