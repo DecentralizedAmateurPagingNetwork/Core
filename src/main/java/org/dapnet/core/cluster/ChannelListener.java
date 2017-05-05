@@ -76,18 +76,11 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 	private void createFirstNode() {
 		logger.info("Creating first node");
 
+		// Get own IP address
 		IpAddress address = (IpAddress) clusterManager.getChannel()
 				.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
-
-		Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE,
-				clusterManager.getAuthValue());
-		try {
-			node.setKey(HashUtil.createHash(node.getKey()));
-		} catch (Exception e) {
-			logger.fatal("First node could not been created.", e);
-			DAPNETCore.shutdown();
-		}
-
+		// Create new node
+		Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE);
 		if (clusterManager.handleStateOperation(null, "putNode", new Object[] { node }, new Class[] { Node.class })) {
 			logger.info("First node successfully created");
 		} else {

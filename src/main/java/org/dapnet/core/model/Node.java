@@ -55,9 +55,6 @@ public class Node implements Serializable, Searchable {
 	private Status status;
 
 	@NotNull
-	private String key;
-
-	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
 	private Collection<String> ownerNames;
 
@@ -65,14 +62,12 @@ public class Node implements Serializable, Searchable {
 		ONLINE, SUSPENDED, UNKNOWN
 	}
 
-	// Used in case of creating new cluster
-	public Node(String name, IpAddress address, String longitude, String latitude, Status status, String key) {
+	public Node(String name, IpAddress address, String longitude, String latitude, Status status) {
 		this.name = name;
 		this.longitude = longitude;
 		this.latitude = latitude;
 		this.address = address;
 		this.status = status;
-		this.key = key;
 	}
 
 	public Status getStatus() {
@@ -114,14 +109,6 @@ public class Node implements Serializable, Searchable {
 
 	public void setAddress(IpAddress address) {
 		this.address = address;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
 	}
 
 	public Collection<String> getOwnerNames() {

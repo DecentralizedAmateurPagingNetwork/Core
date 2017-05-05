@@ -42,7 +42,6 @@ import org.jgroups.JChannel;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
-import org.jgroups.protocols.AUTH;
 import org.jgroups.util.RspList;
 
 public class ClusterManager implements TransmitterManagerListener, RestListener {
@@ -67,11 +66,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		transmitterManager = transmissionManager.getTransmitterManager();
 		transmitterManager.setListener(this);
 
-		// Initiate State
+		// Load State from file
 		initState(enforceStartup);
-
-		// Set Reference for Authentication System
-		ClusterAuthentication.setClusterManger(this);
 
 		// Create Channel
 		channel = new JChannel(Settings.getClusterSettings().getClusterConfigurationFile());
@@ -186,11 +182,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		int startPosition = namePosition + 5;
 		int endPosition = properties.indexOf('@', startPosition);
 		return properties.substring(startPosition, endPosition);
-	}
-
-	String getAuthValue() {
-		return ((ClusterAuthentication) ((AUTH) channel.getProtocolStack().findProtocol("AUTH")).getAuthToken())
-				.getAuthValue();
 	}
 
 	// ### Quorum
