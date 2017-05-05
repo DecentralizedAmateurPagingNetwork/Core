@@ -15,6 +15,9 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -22,10 +25,12 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.dapnet.core.model.validator.ValidName;
 import org.jgroups.stack.IpAddress;
 
 public class Node implements Serializable, Searchable {
 	private static final long serialVersionUID = -4104175163845286560L;
+	private static volatile State state;
 
 	// ID
 	@NotNull
@@ -51,6 +56,10 @@ public class Node implements Serializable, Searchable {
 
 	@NotNull
 	private String key;
+
+	@NotNull
+	@Size(min = 1, message = "must contain at least one ownerName")
+	private Collection<String> ownerNames;
 
 	public enum Status {
 		ONLINE, SUSPENDED, UNKNOWN
@@ -115,8 +124,50 @@ public class Node implements Serializable, Searchable {
 		this.key = key;
 	}
 
+	public Collection<String> getOwnerNames() {
+		return ownerNames;
+	}
+
+	public void setOwnerNames(Collection<String> owners) {
+		this.ownerNames = owners;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("Node{status=%s, name='%s'}", status, name);
+	}
+
+	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
+	public Collection<User> getOwners() throws Exception {
+		if (state == null) {
+			throw new Exception("StateNotSetException");
+		}
+
+		if (ownerNames == null) {
+			return null;
+		}
+
+		ConcurrentMap<String, User> users = state.getUsers();
+		ArrayList<User> results = new ArrayList<>();
+		for (String owner : ownerNames) {
+			User u = users.get(owner.toLowerCase());
+			if (u != null) {
+				results.add(u);
+			}
+		}
+
+		if (ownerNames.size() == results.size()) {
+			return results;
+		} else {
+			return null;
+		}
+	}
+
+	public static State getState() {
+		return state;
+	}
+
+	public static void setState(State statePar) {
+		state = statePar;
 	}
 }

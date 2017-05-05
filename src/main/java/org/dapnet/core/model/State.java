@@ -97,6 +97,7 @@ public class State implements Serializable {
 		Call.setState(this);
 		CallSign.setState(this);
 		News.setState(this);
+		Node.setState(this);
 		Rubric.setState(this);
 		Transmitter.setState(this);
 		TransmitterGroup.setState(this);
