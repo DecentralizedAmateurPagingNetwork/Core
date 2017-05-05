@@ -36,15 +36,14 @@ public class NewsResource extends AbstractResource {
 	@GET
 	public Response getNews(@QueryParam("rubricName") String rubricName) throws Exception {
 		if (rubricName == null || rubricName.isEmpty()) {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 			return getObject(restListener.getState().getNews(), status);
 		} else {
 			rubricName = rubricName.toLowerCase();
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY,
 					restListener.getState().getRubrics().get(rubricName));
 			return getObject(restListener.getState().getNews().get(rubricName), status);
 		}
-
 	}
 
 	@POST
@@ -62,7 +61,7 @@ public class NewsResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		// Check whether OWNER of rubric
+		// Check if user is OWNER of rubric
 		checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
 				restListener.getState().getRubrics().get(news.getRubricName()));
 
