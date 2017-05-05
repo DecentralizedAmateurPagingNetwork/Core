@@ -61,14 +61,14 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private volatile boolean quorum = true;
 	private volatile boolean stopping = false;
 
-	public ClusterManager(TransmissionManager transmissionManager) throws Exception {
+	public ClusterManager(TransmissionManager transmissionManager, boolean enforceStartup) throws Exception {
 		// Register Transmission
 		this.transmissionManager = transmissionManager;
 		transmitterManager = transmissionManager.getTransmitterManager();
 		transmitterManager.setListener(this);
 
 		// Initiate State
-		initState();
+		initState(enforceStartup);
 
 		// Set Reference for Authentication System
 		ClusterAuthentication.setClusterManger(this);
@@ -105,7 +105,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		transmitterManager.addTransmitters(getNodeTransmitters());
 	}
 
-	private void initState() {
+	private void initState(boolean enforceStartup) {
 		try {
 			state = State.readFromFile();
 		} catch (FileNotFoundException ex) {
@@ -128,7 +128,11 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
 			});
 
-			throw new CoreStartupException("State validation failed.");
+			if (!enforceStartup) {
+				throw new CoreStartupException("State validation failed.");
+			} else {
+				logger.warn("Startup enforced, ignoring state validation errors.");
+			}
 		}
 	}
 

@@ -60,7 +60,7 @@ public class DAPNETCore {
 		}
 	}
 
-	private void start() {
+	private void start(boolean enforceStartup) {
 		try {
 			logger.info("Starting DAPNETCore Version {} ...", CORE_VERSION);
 
@@ -68,7 +68,7 @@ public class DAPNETCore {
 			transmissionManager = new TransmissionManager();
 
 			logger.info("Starting Cluster");
-			clusterManager = new ClusterManager(transmissionManager);
+			clusterManager = new ClusterManager(transmissionManager, enforceStartup);
 
 			logger.info("Starting SchedulerManager");
 			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
@@ -141,8 +141,16 @@ public class DAPNETCore {
 			}
 		});
 
+		// Check args
+		boolean enforceStartup = false;
+		for (String arg : args) {
+			if (arg.equals("--enforce-startup")) {
+				enforceStartup = true;
+			}
+		}
+
 		dapnetCore = new DAPNETCore();
-		dapnetCore.start();
+		dapnetCore.start(enforceStartup);
 	}
 
 	private static void setJavaLogLevelToWarn() {
