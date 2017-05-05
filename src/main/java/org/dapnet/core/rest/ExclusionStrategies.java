@@ -35,7 +35,6 @@ public final class ExclusionStrategies {
 		@Override
 		public boolean shouldSkipField(FieldAttributes f) {
 			return (f.getDeclaringClass() == CallSign.class && f.getName().equals("pagers"))
-					|| (f.getDeclaringClass() == Node.class && f.getName().equals("key"))
 					|| (f.getDeclaringClass() == Node.class && f.getName().equals("address"))
 					|| (f.getDeclaringClass() == Transmitter.class && f.getName().equals("address"))
 					|| (f.getDeclaringClass() == Transmitter.class && f.getName().equals("authKey"))

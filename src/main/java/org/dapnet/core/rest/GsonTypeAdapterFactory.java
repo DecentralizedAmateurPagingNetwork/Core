@@ -16,9 +16,7 @@ package org.dapnet.core.rest;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.time.DateTimeException;
 import java.time.Instant;
-import java.util.Date;
 import java.util.LinkedList;
 
 import org.dapnet.core.model.News;
@@ -106,15 +104,11 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 			}
 
 			String raw = in.nextString();
-			Instant ts = null;
-			try {
-				ts = Instant.parse(raw);
-			} catch (DateTimeException ex) {
-				// TODO Remove once all states have been converted
-				ts = Instant.ofEpochMilli(Date.parse(raw));
+			if (raw != null && !raw.isEmpty()) {
+				return Instant.parse(raw);
+			} else {
+				return null;
 			}
-
-			return ts;
 		}
 
 	}
