@@ -70,6 +70,7 @@ public class NodeResource extends AbstractResource {
 		Node oldNode = restListener.getState().getNodes().get(nodeName);
 		if (oldNode != null) {
 			node.setStatus(oldNode.getStatus());
+			node.setAddress(oldNode.getAddress());
 		}
 
 		return handleObject(node, "putNode", oldNode == null, true);
