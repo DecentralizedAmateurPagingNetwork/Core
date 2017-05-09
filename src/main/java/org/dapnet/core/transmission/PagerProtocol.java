@@ -29,6 +29,8 @@ public interface PagerProtocol {
 
 	Message createMessageFromNews(News news);
 
+	Message createMessageFromNewsAsCall(News news);
+
 	Message createMessageFromActivation(Activation avtivation);
 
 	List<Message> createMessagesFromCall(Call call);

@@ -380,6 +380,7 @@ public class RpcListener {
 			if (!clusterManager.getState().getNews().containsKey(rubricName)) {
 				NewsList nl = new NewsList();
 				nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
+				nl.setAddHandler(clusterManager.getTransmissionManager()::handleNewsAsCall);
 				clusterManager.getState().getNews().put(rubricName, nl);
 			}
 

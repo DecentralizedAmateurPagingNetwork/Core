@@ -61,6 +61,10 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 		this.number = number;
 	}
 
+	public int getAddress() {
+		return 1000 + number;
+	}
+
 	public Collection<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}

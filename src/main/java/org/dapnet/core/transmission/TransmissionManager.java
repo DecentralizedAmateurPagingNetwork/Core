@@ -51,6 +51,17 @@ public class TransmissionManager {
 		}
 	}
 
+	public void handleNewsAsCall(News news) {
+		try {
+			Message message = protocol.createMessageFromNewsAsCall(news);
+			transmitterManager.sendMessage(message);
+
+			logger.info("News sent to transmitters as call.");
+		} catch (Exception ex) {
+			logger.error("Failed to send News as call", ex);
+		}
+	}
+
 	public void handleRubric(Rubric rubric) {
 		try {
 			Message message = protocol.createMessageFromRubric(rubric);

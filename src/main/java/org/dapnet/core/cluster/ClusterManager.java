@@ -143,6 +143,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			}
 
 			nl.setHandler(transmissionManager::handleNews);
+			nl.setAddHandler(transmissionManager::handleNewsAsCall);
 		}
 	}
 

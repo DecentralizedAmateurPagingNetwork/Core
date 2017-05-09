@@ -18,6 +18,7 @@ public class NewsList implements Serializable, Iterable<News> {
 
 	private static final long serialVersionUID = 8878795787181440875L;
 	private News[] slots = new News[10];
+	private transient volatile Consumer<News> addHandler;
 	private transient volatile Consumer<News> handler;
 	private transient volatile Instant lastTrigger;
 
@@ -46,10 +47,22 @@ public class NewsList implements Serializable, Iterable<News> {
 	 * Sets the news list change handler.
 	 * 
 	 * @param handler
-	 *            Change handler
+	 *            Change handler to use.
 	 */
 	public void setHandler(Consumer<News> handler) {
 		this.handler = handler;
+	}
+
+	/**
+	 * Sets the news list add element handler. This is a workaround for sending
+	 * updates to pagers that do not support rubrics and news must be sent to a
+	 * RIC instead.
+	 * 
+	 * @param addHandler
+	 *            Add handler to use.
+	 */
+	public void setAddHandler(Consumer<News> addHandler) {
+		this.addHandler = addHandler;
 	}
 
 	/**
@@ -59,6 +72,8 @@ public class NewsList implements Serializable, Iterable<News> {
 	 *            News object to add.
 	 */
 	public void add(News news) {
+		notifyHandler(addHandler, news);
+
 		synchronized (slots) {
 			if (news.getNumber() < 1) {
 				for (int i = 0; i < slots.length; ++i) {
@@ -76,7 +91,7 @@ public class NewsList implements Serializable, Iterable<News> {
 				int idx = (news.getNumber() - 1) % slots.length;
 				slots[idx] = news;
 
-				notifyHandler(news);
+				notifyHandler(handler, news);
 			}
 		}
 	}
@@ -183,10 +198,9 @@ public class NewsList implements Serializable, Iterable<News> {
 		}
 	}
 
-	private void notifyHandler(News news) {
-		Consumer<News> theHandler = handler;
-		if (news != null && theHandler != null) {
-			theHandler.accept(news);
+	private static void notifyHandler(Consumer<News> handler, News news) {
+		if (news != null && handler != null) {
+			handler.accept(news);
 		}
 	}
 
