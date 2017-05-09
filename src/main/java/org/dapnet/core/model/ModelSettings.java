@@ -22,6 +22,7 @@ public class ModelSettings implements Serializable {
 	private boolean savingImmediately = false;
 	private long callExpirationTimeInMinutes = 24 * 60;
 	private long newsExpirationTimeInMinutes = 24 * 60;
+	private long transmitterExpirationDays = 60;
 
 	public String getStateFile() {
 		return stateFile;
@@ -37,5 +38,9 @@ public class ModelSettings implements Serializable {
 
 	public long getNewsExpirationTimeInMinutes() {
 		return newsExpirationTimeInMinutes;
+	}
+
+	public long getTransmitterExpirationDays() {
+		return transmitterExpirationDays;
 	}
 }

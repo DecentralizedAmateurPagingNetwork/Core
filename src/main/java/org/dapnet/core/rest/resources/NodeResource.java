@@ -58,7 +58,6 @@ public class NodeResource extends AbstractResource {
 
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 
-		// Create Node
 		final Node node = gson.fromJson(nodeJSON, Node.class);
 		if (node != null) {
 			node.setName(nodeName);
@@ -67,7 +66,13 @@ public class NodeResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(node, "putNode", !restListener.getState().getNodes().containsKey(nodeName), true);
+		// Preserve old status
+		Node oldNode = restListener.getState().getNodes().get(nodeName);
+		if (oldNode != null) {
+			node.setStatus(oldNode.getStatus());
+		}
+
+		return handleObject(node, "putNode", oldNode == null, true);
 	}
 
 	@DELETE

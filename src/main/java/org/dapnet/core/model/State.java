@@ -20,12 +20,9 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -126,33 +123,6 @@ public class State implements Serializable {
 		} catch (Exception e) {
 			logger.fatal("Failed to write state file: ", e);
 		}
-	}
-
-	public void clean() {
-		Instant now = Instant.now();
-
-		cleanCalls(now);
-		cleanNews(now);
-
-		writeToFile();
-
-		logger.info("Successfully finished cleaning operation");
-	}
-
-	private void cleanCalls(Instant now) {
-		Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
-		Iterator<Call> it = calls.iterator();
-		while (it.hasNext()) {
-			Call call = it.next();
-			if (now.isAfter(call.getTimestamp().plus(exp))) {
-				it.remove();
-			}
-		}
-	}
-
-	private void cleanNews(Instant now) {
-		Duration ttl = Duration.ofMinutes(Settings.getModelSettings().getNewsExpirationTimeInMinutes());
-		news.values().forEach(nl -> nl.removeExpired(now, ttl));
 	}
 
 	public Collection<Call> getCalls() {
