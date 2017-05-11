@@ -14,29 +14,61 @@
 
 package org.dapnet.core.rest.resources;
 
-import org.dapnet.core.DAPNETCore;
-import org.dapnet.core.rest.RestSecurity;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.rest.RestSecurity;
+
 @Path("/core")
 @Produces(MediaType.APPLICATION_JSON)
 public class CoreResource extends AbstractResource {
+
+	public static final Version version = new Version();
+
 	@Path("/core_version")
 	@GET
 	public Response getCoreVersion() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		return getObject(DAPNETCore.getCoreVersion(), status);
+		VersionWrapper version = new VersionWrapper(DAPNETCore.getCoreVersion());
+		return getObject(version, status);
 	}
 
 	@Path("/api_version")
 	@GET
 	public Response getApiVersion() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		return getObject(DAPNETCore.getApiVersion(), status);
+		VersionWrapper version = new VersionWrapper(DAPNETCore.getApiVersion());
+		return getObject(version, status);
 	}
+
+	@Path("/version")
+	@GET
+	public Response getVersion() throws Exception {
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		return getObject(version, status);
+	}
+
+	// Workaround to get a proper JSON object
+	private static final class VersionWrapper {
+
+		@SuppressWarnings("unused")
+		private final String version;
+
+		public VersionWrapper(String version) {
+			this.version = version;
+		}
+
+	}
+
+	private static final class Version {
+		@SuppressWarnings("unused")
+		private final String core = DAPNETCore.getCoreVersion();
+		@SuppressWarnings("unused")
+		private final String api = DAPNETCore.getApiVersion();
+	}
+
 }
