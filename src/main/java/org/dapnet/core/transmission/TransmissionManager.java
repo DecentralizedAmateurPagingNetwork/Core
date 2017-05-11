@@ -54,7 +54,7 @@ public class TransmissionManager {
 	public void handleNewsAsCall(News news) {
 		try {
 			Message message = protocol.createMessageFromNewsAsCall(news);
-			transmitterManager.sendMessage(message);
+			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
 
 			logger.info("News sent to transmitters as call.");
 		} catch (Exception ex) {
