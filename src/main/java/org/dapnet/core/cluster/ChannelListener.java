@@ -14,6 +14,8 @@
 
 package org.dapnet.core.cluster;
 
+import java.util.Arrays;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
@@ -45,16 +47,16 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		if (clusterManager.getChannel().getView().size() == 1) {
 			printCreateClusterWarning();
 
+			// User already existing in State?
+			if (clusterManager.getState().getUsers().size() == 0) {
+				createFirstUser();
+			}
+
 			// Node already existing in State?
 			if (clusterManager.getState().getNodes().containsKey(channel.getName())) {
 				updateFirstNode();
 			} else {
 				createFirstNode();
-			}
-
-			// User already existing in State?
-			if (clusterManager.getState().getUsers().size() == 0) {
-				createFirstUser();
 			}
 		} else {
 			// Is performed automatically by each node!
@@ -81,6 +83,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 				.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
 		// Create new node
 		Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE);
+		node.setOwnerNames(Arrays.asList("admin"));
 		if (clusterManager.handleStateOperation(null, "putNode", new Object[] { node }, new Class[] { Node.class })) {
 			logger.info("First node successfully created");
 		} else {
