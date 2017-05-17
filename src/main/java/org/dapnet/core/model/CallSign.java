@@ -29,7 +29,7 @@ import org.dapnet.core.rest.RestAuthorizable;
 public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 1884808852367562476L;
 	private static volatile State state;
-	
+
 	// ID
 	@NotNull
 	@Size(min = 3, max = 20)
@@ -38,6 +38,9 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 	@NotNull
 	@Size(min = 0, max = 60)
 	private String description;
+
+	@NotNull
+	private boolean numeric = false;
 
 	@NotNull
 	@Valid
@@ -63,6 +66,14 @@ public class CallSign implements Serializable, RestAuthorizable, Searchable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean isNumeric() {
+		return numeric;
+	}
+
+	public void setNumeric(boolean numeric) {
+		this.numeric = numeric;
 	}
 
 	public Collection<Pager> getPagers() {

@@ -52,20 +52,27 @@ public class SkyperProtocol implements PagerProtocol {
 
 			List<Message> messages = new ArrayList<>();
 			for (CallSign callsign : call.getCallSigns()) {
+				FunctionalBits mode;
+				String text;
+				if (!callsign.isNumeric()) {
+					// Support for alphanumeric messages -> create ALPHANUM
+					// message
+					mode = FunctionalBits.ALPHANUM;
+					text = call.getText();
+				} else if (numeric) {
+					// No support for alphanumeric messages but text is numeric
+					// -> create NUMERIC message
+					mode = FunctionalBits.NUMERIC;
+					text = call.getText().toUpperCase();
+				} else {
+					// No support for alphanumeric messages and non-numeric
+					// message -> skip
+					logger.warn("Callsign {} does not support alphanumeric messages.", callsign.getName());
+					continue;
+				}
+
 				for (Pager pager : callsign.getPagers()) {
-					if (!pager.isNumeric()) {
-						// Pager supports ALPHANUM -> create ALPHANUM message
-						messages.add(new Message(call.getText(), pager.getNumber(), priority, FunctionalBits.ALPHANUM));
-					} else if (numeric) {
-						// Pager does not support ALPHANUM but text is numeric
-						// -> create NUMERIC message
-						messages.add(new Message(call.getText(), pager.getNumber(), priority, FunctionalBits.NUMERIC));
-					} else {
-						// Pager does not support ALPHANUM and text is not
-						// numeric -> do not create a message
-						logger.warn("Pager {} with address {} does not support alphanumeric messages.", pager.getName(),
-								pager.getNumber());
-					}
+					messages.add(new Message(text, pager.getNumber(), priority, mode));
 				}
 			}
 
