@@ -1,0 +1,7 @@
+# DAPNET Transmitter db0kwe
+define service {
+use generic-service-rwthafu ; Name of service template to use
+host_name db0sda.ampr.org
+service_description Funkrufsender DB0KWE
+check_command check_http_json!8080!transmitters/db0kwe!status!ONLINE
+}

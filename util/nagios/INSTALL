@@ -1,0 +1,10 @@
+Install https://github.com/drewkerrigan/nagios-http-json
+
+Add to resource.cfg
+
+USER12: API Username
+USER13: API Password
+
+Add command to commands.cfg
+
+Add Service
