@@ -39,7 +39,7 @@ public class SkyperProtocol implements PagerProtocol {
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 	private static final Logger logger = LogManager.getLogger();
-	private static final Pattern NUMERIC_PATTERN = Pattern.compile("\\d+");
+	private static final Pattern NUMERIC_PATTERN = Pattern.compile("[-Uu\\d\\(\\) ]+");
 
 	@Override
 	public List<Message> createMessagesFromCall(Call call) {
