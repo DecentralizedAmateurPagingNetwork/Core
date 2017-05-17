@@ -32,6 +32,9 @@ public class Pager implements Serializable {
 	@Size(min = 3, max = 20)
 	private String name;
 
+	@NotNull
+	private boolean numeric = false;
+
 	public int getNumber() {
 		return number;
 	}
@@ -48,8 +51,16 @@ public class Pager implements Serializable {
 		this.name = name;
 	}
 
+	public boolean isNumeric() {
+		return numeric;
+	}
+
+	public void setNumeric(boolean numeric) {
+		this.numeric = numeric;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("Pager{number=%07d, name='%s'}", number, name);
+		return String.format("Pager{number=%07d, name='%s', numeric=%b}", number, name, numeric);
 	}
 }

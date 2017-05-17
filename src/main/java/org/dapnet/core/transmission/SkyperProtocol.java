@@ -18,9 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,36 +31,49 @@ import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.transmission.Message.FunctionalBits;
+import org.dapnet.core.transmission.Message.MessagePriority;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 
 public class SkyperProtocol implements PagerProtocol {
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 	private static final Logger logger = LogManager.getLogger();
+	private static final Pattern NUMERIC_PATTERN = Pattern.compile("\\d+");
 
 	@Override
 	public List<Message> createMessagesFromCall(Call call) {
-		// Collect all addresses
-		Set<Integer> addresses = new HashSet<>();
+		MessagePriority priority = call.isEmergency() ? MessagePriority.EMERGENCY : MessagePriority.CALL;
+
 		try {
-			for (CallSign callSign : call.getCallSigns()) {
-				for (Pager pager : callSign.getPagers()) {
-					addresses.add(pager.getNumber());
+			// Test if message is numeric
+			Matcher m = NUMERIC_PATTERN.matcher(call.getText());
+			boolean numeric = m.matches();
+
+			List<Message> messages = new ArrayList<>();
+			for (CallSign callsign : call.getCallSigns()) {
+				for (Pager pager : callsign.getPagers()) {
+					if (!pager.isNumeric()) {
+						// Pager supports ALPHANUM -> create ALPHANUM message
+						messages.add(new Message(call.getText(), pager.getNumber(), priority, FunctionalBits.ALPHANUM));
+					} else if (numeric) {
+						// Pager does not support ALPHANUM but text is numeric
+						// -> create NUMERIC message
+						messages.add(new Message(call.getText(), pager.getNumber(), priority, FunctionalBits.NUMERIC));
+					} else {
+						// Pager does not support ALPHANUM and text is not
+						// numeric -> do not create a message
+						logger.warn("Pager {} with address {} does not support alphanumeric messages.", pager.getName(),
+								pager.getNumber());
+					}
 				}
 			}
-		} catch (Exception e) {
-			logger.error("Failed to create messages from call", e);
+
+			return messages;
+		} catch (Exception ex) {
+			logger.error("Failed to create messages from call.", ex);
 			return null;
 		}
-
-		// Create Messages
-		List<Message> messages = new ArrayList<>();
-
-		addresses.forEach(addr -> messages.add(new Message(call.getText(), addr,
-				call.isEmergency() ? Message.MessagePriority.EMERGENCY : Message.MessagePriority.CALL,
-				Message.FunctionalBits.ALPHANUM)));
-
-		return messages;
 	}
 
 	@Override
