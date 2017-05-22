@@ -14,7 +14,7 @@
 
 package org.dapnet.core.transmission;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,9 +29,9 @@ public class TransmissionManager {
 	private final PagerProtocol protocol = new SkyperProtocol();
 	private final TransmitterManager transmitterManager = new TransmitterManager();
 
-	public void handleTime(Date date) {
+	public void handleTime(LocalDateTime time) {
 		try {
-			Message message = protocol.createMessageFromTime(date);
+			Message message = protocol.createMessageFromTime(time);
 			transmitterManager.sendMessage(message);
 
 			logger.info("Time sent to transmitters.");

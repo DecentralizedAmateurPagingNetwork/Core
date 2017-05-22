@@ -14,16 +14,16 @@
 
 package org.dapnet.core.transmission;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
 
-import java.util.Date;
-import java.util.List;
-
 public interface PagerProtocol {
-	Message createMessageFromTime(Date date);
+	Message createMessageFromTime(LocalDateTime time);
 
 	Message createMessageFromRubric(Rubric rubric);
 

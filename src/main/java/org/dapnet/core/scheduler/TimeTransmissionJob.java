@@ -14,12 +14,17 @@
 
 package org.dapnet.core.scheduler;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.transmission.TransmissionManager;
-import org.quartz.*;
-
-import java.util.Date;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.quartz.SchedulerContext;
+import org.quartz.SchedulerException;
 
 public class TimeTransmissionJob implements Job {
 	private static final Logger logger = LogManager.getLogger();
@@ -34,7 +39,8 @@ public class TimeTransmissionJob implements Job {
 
 			// Possibility to implement TimeZones by adding here a
 			// TransmitterGroup
-			transmissionManager.handleTime(new Date());
+			LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+			transmissionManager.handleTime(now);
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute TimeTransmissionJob", e);
 		}

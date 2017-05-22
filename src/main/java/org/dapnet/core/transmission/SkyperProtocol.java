@@ -14,10 +14,10 @@
 
 package org.dapnet.core.transmission;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,6 +40,7 @@ public class SkyperProtocol implements PagerProtocol {
 			.getPagingProtocolSettings();
 	private static final Logger logger = LogManager.getLogger();
 	private static final Pattern NUMERIC_PATTERN = Pattern.compile("[-Uu\\d\\(\\) ]+");
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HHmmss   ddMMyy");
 
 	@Override
 	public List<Message> createMessagesFromCall(Call call) {
@@ -84,11 +85,9 @@ public class SkyperProtocol implements PagerProtocol {
 	}
 
 	@Override
-	public Message createMessageFromTime(Date date) {
-		// Generate timeString in necessary format
-		String timeString = new SimpleDateFormat("HHmmss   ddMMyy").format(date);
-
-		return new Message(timeString, 2504, Message.MessagePriority.TIME, Message.FunctionalBits.NUMERIC);
+	public Message createMessageFromTime(LocalDateTime time) {
+		return new Message(DATE_FORMATTER.format(time), 2504, Message.MessagePriority.TIME,
+				Message.FunctionalBits.NUMERIC);
 	}
 
 	@Override
