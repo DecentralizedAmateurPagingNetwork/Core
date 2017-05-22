@@ -29,9 +29,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	static final AttributeKey<TransmitterClient> CLIENT_KEY = AttributeKey.valueOf("client");
 	private static final Logger logger = LogManager.getLogger();
 	// Ack message #04 +
-	private static final Pattern ackPattern = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
+	private static final Pattern ACK_PATTERN = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
-	private static final Pattern authPattern = Pattern
+	private static final Pattern AUTH_PATTERN = Pattern
 			.compile("\\[([/\\-\\p{Alnum}]+) v(\\d[\\d\\.]+[\\p{Graph}]*) ([\\p{Alnum}_]+) (\\p{Alnum}+)\\]");
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
@@ -135,7 +135,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	private void handleMessageAck(String msg) throws Exception {
-		Matcher ackMatcher = ackPattern.matcher(msg);
+		Matcher ackMatcher = ACK_PATTERN.matcher(msg);
 		if (!ackMatcher.matches()) {
 			throw new TransmitterException("Invalid response received.");
 		}
@@ -150,7 +150,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
-		Matcher authMatcher = authPattern.matcher(msg);
+		Matcher authMatcher = AUTH_PATTERN.matcher(msg);
 		if (!authMatcher.matches()) {
 			throw new TransmitterException(String.format("Invalid welcome message format: %s", msg));
 		}

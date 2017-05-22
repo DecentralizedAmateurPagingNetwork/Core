@@ -129,7 +129,7 @@ public abstract class AbstractResource {
 			throw new NotFoundException();
 		}
 
-		return Response.status(Response.Status.OK).entity(getExclusionGson(status).toJson(object)).build();
+		return Response.ok(getExclusionGson(status).toJson(object)).build();
 	}
 
 	public Response handleObject(Object object, String methodName, boolean creation, boolean quorumNeeded)
@@ -174,7 +174,7 @@ public abstract class AbstractResource {
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
 				new Class[] { String.class })) {
 			// TODO Why do we return the deleted object here?
-			return Response.status(Response.Status.OK).entity(gson.toJson(object)).build();
+			return Response.ok(gson.toJson(object)).build();
 		} else {
 			throw new InternalServerErrorException();
 		}
