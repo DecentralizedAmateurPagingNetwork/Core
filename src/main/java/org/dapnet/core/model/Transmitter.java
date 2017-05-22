@@ -108,6 +108,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@Max(80)
 	private float antennaGainDbi;
 
+	private Instant lastUpdate;
+
 	public enum Usage {
 		WIDERANGE, PERSONAL
 	}
@@ -391,6 +393,25 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	 */
 	public void setIdentificationAddress(int address) {
 		this.identificationAddress = address;
+	}
+
+	/**
+	 * Sets the last update timestamp.
+	 * 
+	 * @param when
+	 *            Last update timestamp
+	 */
+	public void setLastUpdate(Instant when) {
+		this.lastUpdate = when;
+	}
+
+	/**
+	 * Gets the last update timestamp.
+	 * 
+	 * @return Last update timestamp
+	 */
+	public Instant getLastUpdate() {
+		return lastUpdate;
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")

@@ -14,6 +14,7 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,6 +83,7 @@ public class TransmitterResource extends AbstractResource {
 			}
 
 			transmitter.setName(transmitterName);
+			transmitter.setLastUpdate(Instant.now());
 		} else {
 			throw new EmptyBodyException();
 		}

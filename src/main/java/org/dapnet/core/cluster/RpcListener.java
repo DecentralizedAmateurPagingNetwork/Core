@@ -454,6 +454,7 @@ public class RpcListener {
 			transmitter.setAddress(updated.getAddress());
 			transmitter.setDeviceType(updated.getDeviceType());
 			transmitter.setDeviceVersion(updated.getDeviceVersion());
+			transmitter.setLastUpdate(updated.getLastUpdate());
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
