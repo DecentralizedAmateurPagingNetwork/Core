@@ -20,40 +20,23 @@ import org.dapnet.core.model.TransmitterGroup;
  */
 public class TransmitterManager {
 	private static final Logger logger = LogManager.getLogger();
-	private final ConcurrentMap<String, Transmitter> registeredTranmsitters = new ConcurrentHashMap<>();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
 	private volatile TransmitterManagerListener listener;
 
 	/**
-	 * Registers a transmitter so it is allowed to connect to the server.
+	 * Gets a transmitter by its name.
 	 * 
-	 * @param transmitter
-	 *            Transmitter to register.
+	 * @param name
+	 *            Transmitter name
+	 * @return Transmitter or {@code null} if not found.
 	 */
-	public void addTransmitter(Transmitter transmitter) {
-		String name = transmitter.getName().toLowerCase();
-
-		registeredTranmsitters.put(name, transmitter);
-		logger.info("Transmitter added: {}", name);
-	}
-
-	/**
-	 * Removes a transmitter from the list of known transmitters. If a
-	 * connection is established it will be closed.
-	 * 
-	 * @param transmitter
-	 *            Transmitter to remove.
-	 */
-	public void removeTransmitter(Transmitter transmitter) {
-		String name = transmitter.getName().toLowerCase();
-
-		if (registeredTranmsitters.remove(name) != null) {
-			logger.info("Transmitter removed: {}", name);
+	public Transmitter getTransmitter(String name) {
+		TransmitterManagerListener theListener = listener;
+		if (theListener != null) {
+			return theListener.handleGetTransmitter(name);
 		} else {
-			logger.warn("Transmitter is not registered: {}", name);
+			return null;
 		}
-
-		disconnectFrom(transmitter);
 	}
 
 	/**
@@ -64,31 +47,6 @@ public class TransmitterManager {
 	 */
 	public void setListener(TransmitterManagerListener listener) {
 		this.listener = listener;
-	}
-
-	/**
-	 * Adds a list of transmitters.
-	 * 
-	 * @param transmitters
-	 *            Transmitters to add.
-	 */
-	public void addTransmitters(Collection<Transmitter> transmitters) {
-		transmitters.forEach(this::addTransmitter);
-	}
-
-	/**
-	 * Returns a transmitter if it is registered.
-	 * 
-	 * @param name
-	 *            Transmitter name
-	 * @return Transmitter instance or {@code null} if no transmitter is found.
-	 */
-	public Transmitter get(String name) {
-		if (name != null) {
-			name = name.toLowerCase();
-		}
-
-		return registeredTranmsitters.get(name);
 	}
 
 	/**
@@ -190,7 +148,7 @@ public class TransmitterManager {
 
 		connectedClients.put(t.getName(), client);
 
-		notifyStatusChanged(t);
+		notifyStatusChanged(listener, t);
 	}
 
 	/**
@@ -213,13 +171,12 @@ public class TransmitterManager {
 
 		connectedClients.remove(t.getName());
 
-		notifyStatusChanged(t);
+		notifyStatusChanged(listener, t);
 	}
 
-	private void notifyStatusChanged(Transmitter t) {
-		TransmitterManagerListener theListener = listener;
-		if (theListener != null) {
-			theListener.handleTransmitterStatusChanged(t);
+	private static void notifyStatusChanged(TransmitterManagerListener listener, Transmitter t) {
+		if (listener != null) {
+			listener.handleTransmitterStatusChanged(t);
 		}
 	}
 

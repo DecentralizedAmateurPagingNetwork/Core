@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class State implements Serializable {
+
 	private static final long serialVersionUID = 7604901183837032119L;
 	private static final Logger logger = LogManager.getLogger();
 	private static final Gson gson;
@@ -80,6 +81,10 @@ public class State implements Serializable {
 	@NotNull(message = "nicht vorhande")
 	@Valid
 	private ConcurrentMap<String, NewsList> news = new ConcurrentHashMap<>();
+
+	@NotNull
+	@Valid
+	private CoreStatistics stats = new CoreStatistics();
 
 	public State() {
 		calls = Collections.synchronizedList(new ArrayList<>());
@@ -156,4 +161,9 @@ public class State implements Serializable {
 	public ConcurrentMap<String, NewsList> getNews() {
 		return news;
 	}
+
+	public CoreStatistics getCoreStats() {
+		return stats;
+	}
+
 }

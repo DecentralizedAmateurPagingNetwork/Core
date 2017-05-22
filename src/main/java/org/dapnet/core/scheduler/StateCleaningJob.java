@@ -17,8 +17,6 @@ package org.dapnet.core.scheduler;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +47,7 @@ public class StateCleaningJob implements Job {
 
 			cleanCalls(state, now);
 			cleanNews(state, now);
-			cleanTransmitters(state, now, clusterManager);
+			cleanTransmitters(state, now);
 
 			state.writeToFile();
 		} catch (SchedulerException e) {
@@ -73,28 +71,18 @@ public class StateCleaningJob implements Job {
 		state.getNews().values().forEach(nl -> nl.removeExpired(now, ttl));
 	}
 
-	private static void cleanTransmitters(State state, Instant now, ClusterManager manager) {
+	private static void cleanTransmitters(State state, Instant now) {
 		Duration exp = Duration.ofDays(Settings.getModelSettings().getTransmitterExpirationDays());
 
-		// Clean only own transmitters
-		ConcurrentMap<String, Transmitter> transmitters = state.getTransmitters();
-		Set<String> names = manager.getNodeTransmitterNames();
-		for (String name : names) {
-			Transmitter t = transmitters.get(name);
-			if (t != null && t.getLastConnected() != null && now.isAfter(t.getLastConnected().plus(exp))) {
-				logger.info("Removing transmitter due to inactivity: {}", name);
-				transmitters.remove(name);
-				removeTransmitter(manager, name);
+		Iterator<Transmitter> it = state.getTransmitters().values().iterator();
+		while (it.hasNext()) {
+			Transmitter t = it.next();
+			if (t != null && t.getLastConnected() != null && t.getStatus() != Transmitter.Status.ONLINE
+					&& now.isAfter(t.getLastConnected().plus(exp))) {
+				logger.info("Removing transmitter due to inactivity: {}", t.getName());
+				it.remove();
 			}
 		}
 	}
 
-	private static void removeTransmitter(ClusterManager manager, String name) {
-		try {
-			manager.handleStateOperation(null, "deleteTransmitter", new Object[] { name },
-					new Class[] { String.class });
-		} catch (Throwable t) {
-			logger.error("Failed to remove transmitter from cluster.", t);
-		}
-	}
 }

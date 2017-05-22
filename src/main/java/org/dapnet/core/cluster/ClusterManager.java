@@ -17,7 +17,6 @@ package org.dapnet.core.cluster;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -96,9 +95,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			logger.fatal("Could not connect to cluster.", e);
 			throw new CoreStartupException(e);
 		}
-
-		// Register transmitters
-		transmitterManager.addTransmitters(getNodeTransmitters());
 	}
 
 	private void initState(boolean enforceStartup) {
@@ -145,17 +141,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			nl.setHandler(transmissionManager::handleNews);
 			nl.setAddHandler(transmissionManager::handleNewsAsCall);
 		}
-	}
-
-	public Collection<Transmitter> getNodeTransmitters() {
-		return state.getTransmitters().values().stream()
-				.filter(t -> channel.getName().equalsIgnoreCase(t.getNodeName())).collect(Collectors.toList());
-	}
-
-	public Set<String> getNodeTransmitterNames() {
-		return state.getTransmitters().values().stream()
-				.filter(t -> channel.getName().equalsIgnoreCase(t.getNodeName())).map(t -> t.getName())
-				.collect(Collectors.toSet());
 	}
 
 	public void stop() {
@@ -269,8 +254,9 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// #############################################################################
 	@Override
 	public void handleTransmitterStatusChanged(Transmitter transmitter) {
-		String name = transmitter.getName();
-		if (state.getTransmitters().containsKey(name)) {
+		transmitter.setNodeName(getNodeName());
+
+		if (state.getTransmitters().containsKey(transmitter.getName())) {
 			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },
 					new Class[] { Transmitter.class });
 		}
@@ -283,6 +269,11 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			channel.close();
 			getState().writeToFile();
 		}
+	}
+
+	@Override
+	public Transmitter handleGetTransmitter(String name) {
+		return getState().getTransmitters().get(name);
 	}
 
 	// ### Getter and Setter

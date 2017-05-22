@@ -95,6 +95,8 @@ final class TransmitterClient {
 	 */
 	public void sendMessage(Message msg) {
 		channel.writeAndFlush(msg);
+
+		updateMessageCounter(transmitter, 1);
 	}
 
 	/**
@@ -106,6 +108,8 @@ final class TransmitterClient {
 	public void sendMessages(Collection<Message> messages) {
 		messages.forEach(m -> channel.write(m));
 		channel.flush();
+
+		updateMessageCounter(transmitter, messages.size());
 	}
 
 	/**
@@ -172,6 +176,12 @@ final class TransmitterClient {
 		Channel theChannel = channel;
 		if (theChannel != null) {
 			theChannel.close().syncUninterruptibly();
+		}
+	}
+
+	private static void updateMessageCounter(Transmitter transmitter, int delta) {
+		if (transmitter != null) {
+			transmitter.updateCallCount(delta);
 		}
 	}
 }

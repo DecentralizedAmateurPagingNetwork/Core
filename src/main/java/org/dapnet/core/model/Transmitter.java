@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -81,6 +82,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	private String deviceType;
 
 	private String deviceVersion;
+
+	private AtomicLong callCount = new AtomicLong();
 
 	public enum Status {
 		OFFLINE, ONLINE, ERROR, DISABLED
@@ -412,6 +415,35 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	 */
 	public Instant getLastUpdate() {
 		return lastUpdate;
+	}
+
+	/**
+	 * Gets the number of calls sent to this transmitter.
+	 * 
+	 * @return Call count
+	 */
+	public long getCallCount() {
+		return callCount.get();
+	}
+
+	/**
+	 * Sets the number of calls sent to this transmitter.
+	 * 
+	 * @param callCount
+	 *            Call count
+	 */
+	public void setCallCount(long callCount) {
+		this.callCount.set(callCount);
+	}
+
+	/**
+	 * Atomically updates the call counter.
+	 * 
+	 * @param delta
+	 *            Delta to add or subtract.
+	 */
+	public void updateCallCount(long delta) {
+		callCount.addAndGet(delta);
 	}
 
 	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")

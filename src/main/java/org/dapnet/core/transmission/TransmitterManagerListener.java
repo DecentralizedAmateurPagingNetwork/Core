@@ -20,4 +20,6 @@ public interface TransmitterManagerListener {
 	void handleTransmitterStatusChanged(Transmitter transmitter);
 
 	void handleDisconnectedFromAllTransmitters();
+
+	Transmitter handleGetTransmitter(String name);
 }

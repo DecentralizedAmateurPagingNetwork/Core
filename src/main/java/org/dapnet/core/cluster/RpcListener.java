@@ -30,6 +30,7 @@ import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
@@ -83,9 +84,11 @@ public class RpcListener {
 			}
 
 			// Add new Object
-			clusterManager.getState().getCalls().add(call);
+			State state = clusterManager.getState();
+			state.getCalls().add(call);
+			state.getCoreStats().incrementCalls();
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				state.writeToFile();
 			}
 
 			// Transmit new Call
@@ -226,12 +229,14 @@ public class RpcListener {
 			}
 
 			// Add new Object
-			NewsList nl = clusterManager.getState().getNews().get(news.getRubricName().toLowerCase());
+			State state = clusterManager.getState();
+			NewsList nl = state.getNews().get(news.getRubricName().toLowerCase());
 			if (nl != null) {
 				nl.add(news);
+				state.getCoreStats().incrementNews();
 
 				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+					state.writeToFile();
 				}
 
 				return response = RpcResponse.OK;
@@ -491,21 +496,12 @@ public class RpcListener {
 			Transmitter oldTransmitter = clusterManager.getState().getTransmitters().put(transmitter.getName(),
 					transmitter);
 			if (oldTransmitter != null) {
-				// Disconnect from old transmitter if my Transmitter
-				String myNodeName = clusterManager.getChannel().getName();
-				if (oldTransmitter.getNodeName().equalsIgnoreCase(myNodeName)) {
-					clusterManager.getTransmitterManager().removeTransmitter(oldTransmitter);
-				}
+				// Disconnect from old transmitter
+				clusterManager.getTransmitterManager().disconnectFrom(oldTransmitter);
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
 				clusterManager.getState().writeToFile();
-			}
-
-			// Connect to Transmitter if my Transmitter
-			String myNodeName = clusterManager.getChannel().getName();
-			if (transmitter.getNodeName().equalsIgnoreCase(myNodeName)) {
-				clusterManager.getTransmitterManager().addTransmitter(transmitter);
 			}
 
 			return response = RpcResponse.OK;
@@ -557,11 +553,8 @@ public class RpcListener {
 					clusterManager.getState().writeToFile();
 				}
 
-				// Disconnect from Transmitter if my Transmitter
-				String myNodeName = clusterManager.getChannel().getName();
-				if (transmitter.getNodeName().equalsIgnoreCase(myNodeName)) {
-					clusterManager.getTransmitterManager().removeTransmitter(transmitter);
-				}
+				// Disconnect from transmitter
+				clusterManager.getTransmitterManager().disconnectFrom(transmitter);
 
 				return response = RpcResponse.OK;
 			}

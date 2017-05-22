@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
@@ -29,8 +30,10 @@ public class StatisticsResource extends AbstractResource {
 	public static final class ObjectCounts {
 		private final int users;
 		private final int calls;
+		private final long callsTotal;
 		private final int callSigns;
 		private final int news;
+		private final long newsTotal;
 		private final int rubrics;
 		private final int nodesTotal;
 		private final int nodesOnline;
@@ -41,7 +44,9 @@ public class StatisticsResource extends AbstractResource {
 			users = state.getUsers().size();
 			calls = state.getCalls().size();
 			callSigns = state.getCallSigns().size();
-			news = state.getNews().values().stream().mapToInt(n -> n.getSize()).sum();
+			news = state.getNews().values().stream().mapToInt(NewsList::getSize).sum();
+			callsTotal = state.getCoreStats().getCalls();
+			newsTotal = state.getCoreStats().getNews();
 			rubrics = state.getRubrics().size();
 			nodesTotal = state.getNodes().size();
 			nodesOnline = (int) state.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)
@@ -59,12 +64,20 @@ public class StatisticsResource extends AbstractResource {
 			return calls;
 		}
 
+		public long getCallsTotal() {
+			return callsTotal;
+		}
+
 		public int getCallSigns() {
 			return callSigns;
 		}
 
 		public int getNews() {
 			return news;
+		}
+
+		public long getNewsTotal() {
+			return newsTotal;
 		}
 
 		public int getRubrics() {

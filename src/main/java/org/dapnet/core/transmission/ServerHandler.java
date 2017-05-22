@@ -160,7 +160,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		String name = authMatcher.group(3);
 		String key = authMatcher.group(4);
 
-		Transmitter t = manager.get(name);
+		Transmitter t = manager.getTransmitter(name);
 		if (t == null) {
 			throw new TransmitterException("The transmitter name is not registered.");
 		} else if (t.getStatus() == Status.DISABLED) {
