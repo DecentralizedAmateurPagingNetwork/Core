@@ -137,22 +137,19 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private void handleMessageAck(String msg) throws Exception {
 		Matcher ackMatcher = ACK_PATTERN.matcher(msg);
 		if (!ackMatcher.matches()) {
-			throw new TransmitterException("Invalid response received.");
+			throw new TransmitterException("Invalid response received: " + msg);
 		}
 
 		int seq = Integer.parseInt(ackMatcher.group(1), 16);
-		String ack = ackMatcher.group(2);
-		if (!ack.equals("+")) {
-			throw new TransmitterException("Unexpected response received.");
-		} else if (!client.ackSequenceNumber(seq)) {
-			throw new TransmitterException("Invalid sequence number received.");
+		if (!client.ackSequenceNumber(seq)) {
+			throw new TransmitterException("Invalid sequence number received: " + msg);
 		}
 	}
 
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
 		Matcher authMatcher = AUTH_PATTERN.matcher(msg);
 		if (!authMatcher.matches()) {
-			throw new TransmitterException(String.format("Invalid welcome message format: %s", msg));
+			throw new TransmitterException("Invalid welcome message format: " + msg);
 		}
 
 		String type = authMatcher.group(1);
