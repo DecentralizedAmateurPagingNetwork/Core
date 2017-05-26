@@ -30,9 +30,9 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.TimeSlot;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
-import org.dapnet.core.transmission.Message;
-import org.dapnet.core.transmission.Message.FunctionalBits;
-import org.dapnet.core.transmission.Message.MessagePriority;
+import org.dapnet.core.transmission.PagerMessage;
+import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
+import org.dapnet.core.transmission.PagerMessage.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
 public class Transmitter implements Serializable, RestAuthorizable, Searchable {
@@ -486,8 +486,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		return String.format("Transmitter{name='%s', status=%s}", name, status);
 	}
 
-	public Message createCallSignMessage() {
-		return new Message(name, identificationAddress, MessagePriority.CALL, FunctionalBits.ALPHANUM);
+	public PagerMessage createCallSignMessage() {
+		return new PagerMessage(name, identificationAddress, MessagePriority.CALL, FunctionalBits.ALPHANUM);
 	}
 
 }

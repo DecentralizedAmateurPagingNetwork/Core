@@ -15,7 +15,9 @@
 package org.dapnet.core.transmission;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +25,8 @@ import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.model.Transmitter;
+import org.dapnet.core.model.TransmitterGroup;
 
 public class TransmissionManager {
 	private static final Logger logger = LogManager.getLogger();
@@ -31,7 +35,7 @@ public class TransmissionManager {
 
 	public void handleTime(LocalDateTime time) {
 		try {
-			Message message = protocol.createMessageFromTime(time);
+			PagerMessage message = protocol.createMessageFromTime(time);
 			transmitterManager.sendMessage(message);
 
 			logger.info("Time sent to transmitters.");
@@ -42,7 +46,7 @@ public class TransmissionManager {
 
 	public void handleNews(News news) {
 		try {
-			Message message = protocol.createMessageFromNews(news);
+			PagerMessage message = protocol.createMessageFromNews(news);
 			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
 
 			logger.info("News sent to transmitters.");
@@ -53,7 +57,7 @@ public class TransmissionManager {
 
 	public void handleNewsAsCall(News news) {
 		try {
-			Message message = protocol.createMessageFromNewsAsCall(news);
+			PagerMessage message = protocol.createMessageFromNewsAsCall(news);
 			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
 
 			logger.info("News sent to transmitters as call.");
@@ -64,7 +68,7 @@ public class TransmissionManager {
 
 	public void handleRubric(Rubric rubric) {
 		try {
-			Message message = protocol.createMessageFromRubric(rubric);
+			PagerMessage message = protocol.createMessageFromRubric(rubric);
 			transmitterManager.sendMessage(message, rubric.getTransmitterGroups());
 
 			logger.info("Rubric sent to transmitters.");
@@ -75,11 +79,20 @@ public class TransmissionManager {
 
 	public void handleCall(Call call) {
 		try {
-			List<Message> messages = protocol.createMessagesFromCall(call);
+			List<PagerMessage> messages = protocol.createMessagesFromCall(call);
 			transmitterManager.sendMessages(messages, call.getTransmitterGroups());
 
 			logger.info("Call sent to {} CallSigns, to {} Pagers, using {} TransmitterGroups.",
 					call.getCallSigns().size(), messages.size(), call.getTransmitterGroupNames().size());
+
+			// XXX No other easy way of doing this without performing a
+			// cluster-wide remote procedure call
+			Set<Transmitter> transmitters = new HashSet<>();
+			for (TransmitterGroup grp : call.getTransmitterGroups()) {
+				transmitters.addAll(grp.getTransmitters());
+			}
+
+			transmitters.forEach(t -> t.updateCallCount(1));
 		} catch (Exception e) {
 			logger.error("Failed to send Call", e);
 		}
@@ -87,7 +100,7 @@ public class TransmissionManager {
 
 	public void handleActivation(Activation activation) {
 		try {
-			Message message = protocol.createMessageFromActivation(activation);
+			PagerMessage message = protocol.createMessageFromActivation(activation);
 			transmitterManager.sendMessage(message, activation.getTransmitterGroups());
 
 			logger.info("Activation sent to transmitters.");

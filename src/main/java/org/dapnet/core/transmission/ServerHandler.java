@@ -10,8 +10,8 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
-import org.dapnet.core.transmission.MessageEncoder.PagingMessageType;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
+import org.dapnet.core.transmission.TransmitterClient.AckType;
 import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -29,7 +29,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	static final AttributeKey<TransmitterClient> CLIENT_KEY = AttributeKey.valueOf("client");
 	private static final Logger logger = LogManager.getLogger();
 	// Ack message #04 +
-	private static final Pattern ACK_PATTERN = Pattern.compile("#(\\p{XDigit}{2}) (\\+)");
+	private static final Pattern ACK_PATTERN = Pattern.compile("#(\\p{XDigit}{2}) ([-%\\+])");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
 	private static final Pattern AUTH_PATTERN = Pattern
 			.compile("\\[([/\\-\\p{Alnum}]+) v(\\d[\\d\\.]+[\\p{Graph}]*) ([\\p{Alnum}_]+) (\\p{Alnum}+)\\]");
@@ -93,9 +93,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		}
 
 		if (client != null) {
-			int count = client.getPendingAckCount();
+			int count = client.getPendingMessageCount();
 			if (count > 0) {
-				logger.warn("Client has {} pending acks.", count);
+				logger.warn("Client has {} pending messages.", count);
 			}
 
 			manager.onDisconnect(client);
@@ -141,8 +141,20 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		}
 
 		int seq = Integer.parseInt(ackMatcher.group(1), 16);
-		if (!client.ackSequenceNumber(seq)) {
-			throw new TransmitterException("Invalid sequence number received: " + msg);
+		AckType type = AckType.ERROR;
+		switch (ackMatcher.group(2)) {
+		case "+":
+			type = AckType.OK;
+			break;
+		case "-":
+			type = AckType.RETRY;
+			break;
+		case "%":
+			type = AckType.ERROR;
+		}
+
+		if (!client.ackMessage(seq, type)) {
+			throw new TransmitterException("Invalid ack received: " + msg);
 		}
 	}
 
@@ -197,7 +209,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 			// Send timeslots to client
 			Transmitter t = client.getTransmitter();
-			String msg = String.format("%d:%s\n", PagingMessageType.SLOTS.getValue(), t.getTimeSlot());
+			String msg = String.format("%d:%s\n", MessageEncoder.MT_SLOTS, t.getTimeSlot());
 			ctx.writeAndFlush(msg);
 
 			state = ConnectionState.TIMESLOTS_SENT;

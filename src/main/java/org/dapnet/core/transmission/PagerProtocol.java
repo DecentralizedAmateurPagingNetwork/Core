@@ -23,15 +23,15 @@ import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
 
 public interface PagerProtocol {
-	Message createMessageFromTime(LocalDateTime time);
+	PagerMessage createMessageFromTime(LocalDateTime time);
 
-	Message createMessageFromRubric(Rubric rubric);
+	PagerMessage createMessageFromRubric(Rubric rubric);
 
-	Message createMessageFromNews(News news);
+	PagerMessage createMessageFromNews(News news);
 
-	Message createMessageFromNewsAsCall(News news);
+	PagerMessage createMessageFromNewsAsCall(News news);
 
-	Message createMessageFromActivation(Activation avtivation);
+	PagerMessage createMessageFromActivation(Activation avtivation);
 
-	List<Message> createMessagesFromCall(Call call);
+	List<PagerMessage> createMessagesFromCall(Call call);
 }

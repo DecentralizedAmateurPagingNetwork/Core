@@ -110,7 +110,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 	}
 
 	@ValidName(message = "must contain names of existing transmitters", fieldName = "transmitterNames", constraintName = "ValidTransmitterNames")
-	public Collection<Transmitter> getTransmitter() throws Exception {
+	public Collection<Transmitter> getTransmitters() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}

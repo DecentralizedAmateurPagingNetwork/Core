@@ -14,6 +14,7 @@
 
 package org.dapnet.core.transmission;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -31,8 +32,8 @@ import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
 import org.dapnet.core.model.Rubric;
-import org.dapnet.core.transmission.Message.FunctionalBits;
-import org.dapnet.core.transmission.Message.MessagePriority;
+import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
+import org.dapnet.core.transmission.PagerMessage.MessagePriority;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 
 public class SkyperProtocol implements PagerProtocol {
@@ -43,15 +44,16 @@ public class SkyperProtocol implements PagerProtocol {
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HHmmss   ddMMyy");
 
 	@Override
-	public List<Message> createMessagesFromCall(Call call) {
+	public List<PagerMessage> createMessagesFromCall(Call call) {
 		MessagePriority priority = call.isEmergency() ? MessagePriority.EMERGENCY : MessagePriority.CALL;
+		Instant now = Instant.now();
 
 		try {
 			// Test if message is numeric
 			Matcher m = NUMERIC_PATTERN.matcher(call.getText());
 			boolean numeric = m.matches();
 
-			List<Message> messages = new ArrayList<>();
+			List<PagerMessage> messages = new ArrayList<>();
 			for (CallSign callsign : call.getCallSigns()) {
 				FunctionalBits mode;
 				String text;
@@ -73,7 +75,7 @@ public class SkyperProtocol implements PagerProtocol {
 				}
 
 				for (Pager pager : callsign.getPagers()) {
-					messages.add(new Message(text, pager.getNumber(), priority, mode));
+					messages.add(new PagerMessage(now, text, pager.getNumber(), priority, mode));
 				}
 			}
 
@@ -85,13 +87,13 @@ public class SkyperProtocol implements PagerProtocol {
 	}
 
 	@Override
-	public Message createMessageFromTime(LocalDateTime time) {
-		return new Message(DATE_FORMATTER.format(time), 2504, Message.MessagePriority.TIME,
-				Message.FunctionalBits.NUMERIC);
+	public PagerMessage createMessageFromTime(LocalDateTime time) {
+		return new PagerMessage(DATE_FORMATTER.format(time), 2504, PagerMessage.MessagePriority.TIME,
+				PagerMessage.FunctionalBits.NUMERIC);
 	}
 
 	@Override
-	public Message createMessageFromRubric(Rubric rubric) {
+	public PagerMessage createMessageFromRubric(Rubric rubric) {
 		// Generate Rubric String: Coding adapted from Funkrufmaster
 		StringBuilder sb = new StringBuilder();
 		sb.append("1");
@@ -102,11 +104,12 @@ public class SkyperProtocol implements PagerProtocol {
 			sb.append(String.valueOf((char) ((int) rubric.getLabel().charAt(i) + 1)));
 		}
 
-		return new Message(sb.toString(), 4512, Message.MessagePriority.RUBRIC, Message.FunctionalBits.ALPHANUM);
+		return new PagerMessage(sb.toString(), 4512, PagerMessage.MessagePriority.RUBRIC,
+				PagerMessage.FunctionalBits.ALPHANUM);
 	}
 
 	@Override
-	public Message createMessageFromNews(News news) {
+	public PagerMessage createMessageFromNews(News news) {
 		// Generate News String: Coding adapted from Funkrufmaster
 		StringBuilder sb = new StringBuilder();
 		try {
@@ -122,21 +125,22 @@ public class SkyperProtocol implements PagerProtocol {
 		}
 
 		// Create Message
-		return new Message(sb.toString(), 4520, Message.MessagePriority.NEWS, Message.FunctionalBits.ALPHANUM);
+		return new PagerMessage(sb.toString(), 4520, PagerMessage.MessagePriority.NEWS,
+				PagerMessage.FunctionalBits.ALPHANUM);
 	}
 
 	@Override
-	public Message createMessageFromNewsAsCall(News news) {
+	public PagerMessage createMessageFromNewsAsCall(News news) {
 		try {
-			return new Message(news.getText(), news.getRubric().getAddress(), Message.MessagePriority.CALL,
-					Message.FunctionalBits.ALPHANUM);
+			return new PagerMessage(news.getText(), news.getRubric().getAddress(), PagerMessage.MessagePriority.CALL,
+					PagerMessage.FunctionalBits.ALPHANUM);
 		} catch (Exception ex) {
 			return null;
 		}
 	}
 
 	@Override
-	public Message createMessageFromActivation(Activation activation) {
+	public PagerMessage createMessageFromActivation(Activation activation) {
 		List<String> activationCode = Arrays.asList(settings.getActivationCode().split(","));
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < activationCode.size(); ++i) {
@@ -154,7 +158,7 @@ public class SkyperProtocol implements PagerProtocol {
 			sb.append(String.valueOf(c));
 		}
 
-		return new Message(sb.toString(), activation.getNumber(), Message.MessagePriority.ACTIVATION,
-				Message.FunctionalBits.ACTIVATION);
+		return new PagerMessage(sb.toString(), activation.getNumber(), PagerMessage.MessagePriority.ACTIVATION,
+				PagerMessage.FunctionalBits.ACTIVATION);
 	}
 }

@@ -3,8 +3,6 @@ package org.dapnet.core.transmission;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.dapnet.core.transmission.MessageEncoder.PagingMessageType;
-
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -94,7 +92,7 @@ final class SyncTimeHandler {
 		timeTx = (seconds * 10 + deltaTimemillis / 100) & 0xffff;
 
 		timeTxMsg = String.format("%04X", timeTx);
-		String resp = String.format("%d:%s\n", PagingMessageType.SYNCREQUEST.getValue(), timeTxMsg);
+		String resp = String.format("%d:%s\n", MessageEncoder.MT_SYNCREQUEST, timeTxMsg);
 		ctx.writeAndFlush(resp);
 
 		state = SyncState.READ_TIME;
@@ -127,7 +125,7 @@ final class SyncTimeHandler {
 		String timeStringClient = syncMatcher.group(3);
 		long timeLongClient = Long.parseLong(timeStringClient, 16);
 
-		if (id != PagingMessageType.SYNCREQUEST.getValue() || !timeTxMsg.equalsIgnoreCase(timeStringResp)) {
+		if (id != MessageEncoder.MT_SYNCREQUEST || !timeTxMsg.equalsIgnoreCase(timeStringResp)) {
 			throw new TransmitterException("Wrong sync response received.");
 		}
 
@@ -156,7 +154,7 @@ final class SyncTimeHandler {
 			sign = "-";
 		}
 
-		String msg = String.format("%d:%s%04X\n", PagingMessageType.SYNCORDER.getValue(), sign, abs);
+		String msg = String.format("%d:%s%04X\n", MessageEncoder.MT_SYNCORDER, sign, abs);
 		ctx.writeAndFlush(msg);
 
 		state = SyncState.READ_TIME_ADJUST_ACK;

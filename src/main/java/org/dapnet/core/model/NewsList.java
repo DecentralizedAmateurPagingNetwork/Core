@@ -186,8 +186,6 @@ public class NewsList implements Serializable, Iterable<News> {
 	 *            Time to live.
 	 */
 	public void removeExpired(Instant now, Duration ttl) {
-		// TODO Reorder if list is changed?
-
 		synchronized (slots) {
 			for (int i = 0; i < slots.length; ++i) {
 				News n = slots[i];

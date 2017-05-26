@@ -55,7 +55,7 @@ public class TransmitterManager {
 	 * @param message
 	 *            Message to send.
 	 */
-	public void sendMessage(Message message) {
+	public void sendMessage(PagerMessage message) {
 		connectedClients.values().forEach(c -> c.sendMessage(message));
 	}
 
@@ -67,7 +67,7 @@ public class TransmitterManager {
 	 * @param groups
 	 *            Transmitter groups to send to.
 	 */
-	public void sendMessage(Message message, Collection<TransmitterGroup> groups) {
+	public void sendMessage(PagerMessage message, Collection<TransmitterGroup> groups) {
 		getTransmitterNames(groups).forEach(n -> sendMessage(message, n));
 	}
 
@@ -79,7 +79,7 @@ public class TransmitterManager {
 	 * @param groups
 	 *            Transmitter groups to send to.
 	 */
-	public void sendMessages(Collection<Message> messages, Collection<TransmitterGroup> groups) {
+	public void sendMessages(Collection<PagerMessage> messages, Collection<TransmitterGroup> groups) {
 		getTransmitterNames(groups).forEach(n -> sendMessages(messages, n));
 	}
 
@@ -91,7 +91,7 @@ public class TransmitterManager {
 	 * @param transmitterName
 	 *            Transmitter name.
 	 */
-	public void sendMessage(Message message, String transmitterName) {
+	public void sendMessage(PagerMessage message, String transmitterName) {
 		TransmitterClient cl = connectedClients.get(transmitterName);
 		if (cl != null) {
 			cl.sendMessage(message);
@@ -106,7 +106,7 @@ public class TransmitterManager {
 	 * @param transmitterName
 	 *            Transmitter name.
 	 */
-	public void sendMessages(Collection<Message> messages, String transmitterName) {
+	public void sendMessages(Collection<PagerMessage> messages, String transmitterName) {
 		TransmitterClient cl = connectedClients.get(transmitterName);
 		if (cl != null) {
 			cl.sendMessages(messages);

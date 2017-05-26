@@ -220,8 +220,9 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		} catch (Exception e) {
 			logger.catching(e);
 		}
+
 		logger.fatal("Insecure Cluster State");
-		// TODO Rollback
+
 		return false;
 	}
 

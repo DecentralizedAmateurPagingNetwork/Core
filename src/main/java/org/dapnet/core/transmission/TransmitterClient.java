@@ -2,8 +2,7 @@ package org.dapnet.core.transmission;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.PriorityQueue;
 
 import org.dapnet.core.model.Transmitter;
 import org.jgroups.stack.IpAddress;
@@ -16,9 +15,15 @@ import io.netty.channel.Channel;
  * @author Philipp Thiel
  */
 final class TransmitterClient {
-	private final Set<Integer> pendingAcks = new HashSet<>();
+
+	public enum AckType {
+		OK, RETRY, ERROR;
+	}
+
+	private final PriorityQueue<PagerMessage> messageQueue = new PriorityQueue<>();
 	private final Channel channel;
-	private int sequenceNumber = 0;
+	private int sequenceNumber;
+	private Message currentMessage;
 	private volatile Transmitter transmitter;
 
 	/**
@@ -82,7 +87,7 @@ final class TransmitterClient {
 	public void sendCallSignMessage() {
 		Transmitter theTransmitter = transmitter;
 		if (theTransmitter != null) {
-			Message msg = theTransmitter.createCallSignMessage();
+			PagerMessage msg = theTransmitter.createCallSignMessage();
 			sendMessage(msg);
 		}
 	}
@@ -93,10 +98,11 @@ final class TransmitterClient {
 	 * @param msg
 	 *            Message to send.
 	 */
-	public void sendMessage(Message msg) {
-		channel.writeAndFlush(msg);
-
-		updateMessageCounter(transmitter, 1);
+	public void sendMessage(PagerMessage msg) {
+		synchronized (messageQueue) {
+			messageQueue.add(msg);
+			sendNext(false);
+		}
 	}
 
 	/**
@@ -105,66 +111,64 @@ final class TransmitterClient {
 	 * @param messages
 	 *            Messages to send.
 	 */
-	public void sendMessages(Collection<Message> messages) {
-		messages.forEach(m -> channel.write(m));
-		channel.flush();
-
-		updateMessageCounter(transmitter, messages.size());
-	}
-
-	/**
-	 * Returns the next sequence number.
-	 * 
-	 * @return Next sequence number.
-	 */
-	public int getSequenceNumber() {
-		synchronized (pendingAcks) {
-			int sn = sequenceNumber;
-			sequenceNumber = (sequenceNumber + 1) % 256;
-			// Add expected sequence number to pending list
-			pendingAcks.add(sequenceNumber);
-
-			return sn;
+	public void sendMessages(Collection<PagerMessage> messages) {
+		synchronized (messageQueue) {
+			messageQueue.addAll(messages);
+			sendNext(false);
 		}
 	}
 
 	/**
-	 * Acknowledges a sequence number and removes it from the list of pending
-	 * acks if it was valid.
+	 * Acknowleges a message an sends the next one.
 	 * 
 	 * @param sequenceNumber
 	 *            Sequence number to ack.
-	 * @return True if the sequence number was valid.
-	 * @see TransmitterClient#freeSequenceNumber(int)
+	 * @param response
+	 *            Ack response type.
 	 */
-	public boolean ackSequenceNumber(int sequenceNumber) {
-		synchronized (pendingAcks) {
-			return pendingAcks.remove(sequenceNumber);
+	public boolean ackMessage(int sequenceNumber, AckType response) {
+		synchronized (messageQueue) {
+			if (currentMessage == null) {
+				return false;
+			}
+
+			boolean valid = false;
+			boolean retransmit = false;
+			switch (response) {
+			case OK:
+				valid = currentMessage.getExpectedSequenceNumber() == sequenceNumber;
+				currentMessage = null;
+				break;
+			case RETRY:
+				valid = currentMessage.getSequenceNumber() == sequenceNumber;
+				if (!currentMessage.retry()) {
+					// Too many retries, discard message
+					currentMessage = null;
+				} else {
+					retransmit = true;
+				}
+				break;
+			case ERROR:
+				valid = currentMessage.getSequenceNumber() == sequenceNumber;
+				// Discard message
+				currentMessage = null;
+				break;
+			}
+
+			sendNext(retransmit);
+
+			return valid;
 		}
 	}
 
 	/**
-	 * Frees an allocated sequence number. The number will be incremented as if
-	 * a client has sent a correct response. Use this method only to free a
-	 * sequence number that will never be ackd due to errors etc.
+	 * Returns the number of pending messages.
 	 * 
-	 * @param sequenceNumber
-	 *            Sequence number to free.
-	 * @see TransmitterClient#ackSequenceNumber(int)
+	 * @return Number of pending messages.
 	 */
-	public void freeSequenceNumber(int sequenceNumber) {
-		sequenceNumber = (sequenceNumber + 1) % 256;
-		ackSequenceNumber(sequenceNumber);
-	}
-
-	/**
-	 * Returns the number of pending acks.
-	 * 
-	 * @return Number of pending acks.
-	 */
-	public int getPendingAckCount() {
-		synchronized (pendingAcks) {
-			return pendingAcks.size();
+	public int getPendingMessageCount() {
+		synchronized (messageQueue) {
+			return messageQueue.size();
 		}
 	}
 
@@ -179,9 +183,59 @@ final class TransmitterClient {
 		}
 	}
 
-	private static void updateMessageCounter(Transmitter transmitter, int delta) {
-		if (transmitter != null) {
-			transmitter.updateCallCount(delta);
+	private int getNextSequenceNumber() {
+		int sn = sequenceNumber;
+		sequenceNumber = (sequenceNumber + 1) % 256;
+		return sn;
+	}
+
+	private void sendNext(boolean retransmit) {
+		if (currentMessage == null) {
+			PagerMessage msg = messageQueue.poll();
+			if (msg != null) {
+				currentMessage = new Message(getNextSequenceNumber(), msg);
+				channel.writeAndFlush(currentMessage);
+			} else {
+				return;
+			}
+		} else if (retransmit) {
+			channel.writeAndFlush(currentMessage);
+		}
+	}
+
+	/**
+	 * This class wraps a non-transmitter message for transmission to a specific
+	 * transmitter.
+	 * 
+	 * @author Philipp Thiel
+	 */
+	public static class Message {
+
+		private static final int MAX_RETRY_COUNT = 5;
+		private final int sequenceNumber;
+		private final PagerMessage message;
+		private int retryCount;
+
+		public Message(int sequenceNumber, PagerMessage message) {
+			this.sequenceNumber = sequenceNumber;
+			this.message = message;
+		}
+
+		public int getSequenceNumber() {
+			return sequenceNumber;
+		}
+
+		public int getExpectedSequenceNumber() {
+			return sequenceNumber + 1;
+		}
+
+		public PagerMessage getMessage() {
+			return message;
+		}
+
+		public boolean retry() {
+			++retryCount;
+			return retryCount < MAX_RETRY_COUNT;
 		}
 	}
 }

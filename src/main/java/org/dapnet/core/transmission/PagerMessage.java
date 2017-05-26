@@ -14,12 +14,12 @@
 
 package org.dapnet.core.transmission;
 
-import java.util.Date;
+import java.time.Instant;
 
-public class Message implements Comparable<Message> {
+public class PagerMessage implements Comparable<PagerMessage> {
 	private final String text;
 	private final int address;
-	private final Date timestamp;
+	private final Instant timestamp;
 	private final MessagePriority priority;
 	private final FunctionalBits functionalBits;
 
@@ -41,12 +41,17 @@ public class Message implements Comparable<Message> {
 		}
 	}
 
-	public Message(String text, int address, MessagePriority priority, FunctionalBits functionalBits) {
+	public PagerMessage(Instant timestamp, String text, int address, MessagePriority priority,
+			FunctionalBits functionalBits) {
 		this.text = text;
 		this.address = address;
-		this.timestamp = new Date();
+		this.timestamp = timestamp;
 		this.priority = priority;
 		this.functionalBits = functionalBits;
+	}
+
+	public PagerMessage(String text, int address, MessagePriority priority, FunctionalBits functionalBits) {
+		this(Instant.now(), text, address, priority, functionalBits);
 	}
 
 	public String getText() {
@@ -57,7 +62,7 @@ public class Message implements Comparable<Message> {
 		return address;
 	}
 
-	public Date getTimestamp() {
+	public Instant getTimestamp() {
 		return timestamp;
 	}
 
@@ -70,17 +75,17 @@ public class Message implements Comparable<Message> {
 	}
 
 	@Override
-	public int compareTo(Message message) {
-		if (priority.ordinal() < message.getPriority().ordinal()) {
+	public int compareTo(PagerMessage o) {
+		if (priority.ordinal() < o.priority.ordinal()) {
 			return -1;
-		} else if (priority.ordinal() > message.getPriority().ordinal()) {
+		} else if (priority.ordinal() > o.priority.ordinal()) {
 			return 1;
 		}
 
 		// Same Priority, check Timestamp
-		if (timestamp.before(message.getTimestamp())) {
+		if (timestamp.isBefore(o.timestamp)) {
 			return -1;
-		} else if (timestamp.after(message.getTimestamp())) {
+		} else if (timestamp.isAfter(o.timestamp)) {
 			return 1;
 		} else {
 			return 0;

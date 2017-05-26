@@ -4,72 +4,51 @@ import java.util.List;
 
 import org.dapnet.core.Settings;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
+import org.dapnet.core.transmission.TransmitterClient.Message;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
 
 /**
- * Encodes a {@link Message} into string.
+ * Encodes a {@link PagerMessage} into string.
  * 
  * @author Philipp Thiel
  */
 @Sharable
 class MessageEncoder extends MessageToMessageEncoder<Message> {
 
-	public enum PagingMessageType {
-		SYNCREQUEST(2), SYNCORDER(3), SLOTS(4), NUMERIC(5), ALPHANUM(6);
-
-		private final int value;
-
-		private PagingMessageType(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return value;
-		}
-	}
+	public static final int MT_SYNCREQUEST = 2;
+	public static final int MT_SYNCORDER = 3;
+	public static final int MT_SLOTS = 4;
+	public static final int MT_NUMERIC = 5;
+	public static final int MT_ALPHANUM = 6;
 
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
-		TransmitterClient client = ctx.channel().attr(ServerHandler.CLIENT_KEY).get();
-		if (client == null) {
-			return;
-		}
+		PagerMessage pm = msg.getMessage();
 
 		// Mostly adapted from Sven Jung
 		// See Diplomarbeit Jansen Page 30
-		PagingMessageType type = null;
-		switch (msg.getFunctionalBits()) {
+		int type = 0;
+		switch (pm.getFunctionalBits()) {
 		case ACTIVATION:
-			type = PagingMessageType.ALPHANUM;
-			break;
 		case ALPHANUM:
-			type = PagingMessageType.ALPHANUM;
+		case TONE:
+			type = MT_ALPHANUM;
 			break;
 		case NUMERIC:
-			type = PagingMessageType.NUMERIC;
-			break;
-		case TONE:
-			type = PagingMessageType.ALPHANUM;
+			type = MT_NUMERIC;
 			break;
 		}
 
-		int sn = client.getSequenceNumber();
-		try {
-			String encoded = String.format("#%02X %s:%X:%X:%s:%s\n", sn, type.getValue(), settings.getSendSpeed(),
-					msg.getAddress(), msg.getFunctionalBits().getValue(), msg.getText());
+		String encoded = String.format("#%02X %s:%X:%X:%s:%s\n", msg.getSequenceNumber(), type, settings.getSendSpeed(),
+				pm.getAddress(), pm.getFunctionalBits().getValue(), pm.getText());
 
-			out.add(encoded);
-		} catch (Exception ex) {
-			client.ackSequenceNumber(sn);
-
-			throw ex;
-		}
+		out.add(encoded);
 	}
 
 }
