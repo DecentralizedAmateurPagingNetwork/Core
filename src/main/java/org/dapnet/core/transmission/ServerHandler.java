@@ -146,10 +146,10 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		case "+":
 			type = AckType.OK;
 			break;
-		case "-":
+		case "%":
 			type = AckType.RETRY;
 			break;
-		case "%":
+		case "-":
 			type = AckType.ERROR;
 		}
 
