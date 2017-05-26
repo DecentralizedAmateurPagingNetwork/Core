@@ -119,7 +119,7 @@ final class TransmitterClient {
 	}
 
 	/**
-	 * Acknowleges a message an sends the next one.
+	 * Acknowleges a message and sends the next one.
 	 * 
 	 * @param sequenceNumber
 	 *            Sequence number to ack.

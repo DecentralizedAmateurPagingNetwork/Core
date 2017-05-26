@@ -17,7 +17,6 @@ import org.jgroups.stack.IpAddress;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.ScheduledFuture;
 
 class ServerHandler extends SimpleChannelInboundHandler<String> {
@@ -26,7 +25,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		AUTH_PENDING, SYNC_TIME, TIMESLOTS_SENT, ONLINE, OFFLINE, EXCEPTION_CAUGHT
 	}
 
-	static final AttributeKey<TransmitterClient> CLIENT_KEY = AttributeKey.valueOf("client");
 	private static final Logger logger = LogManager.getLogger();
 	// Ack message #04 +
 	private static final Pattern ACK_PATTERN = Pattern.compile("#(\\p{XDigit}{2}) ([-%\\+])");
@@ -70,11 +68,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		logger.info("Accepted new connection from {}", ctx.channel().remoteAddress());
 
-		client = new TransmitterClient(ctx.channel());
-		// Register channel attribute (used by message encoder)
-		ctx.channel().attr(CLIENT_KEY).set(client);
 		// Do not add the client to the transmitter manager yet. This is done
 		// once the handshake is finished.
+		client = new TransmitterClient(ctx.channel());
 
 		syncHandler = new SyncTimeHandler(settings.getNumberOfSyncLoops());
 
