@@ -453,6 +453,7 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
+			transmitter.setNodeName(updated.getNodeName());
 			transmitter.setStatus(updated.getStatus());
 			transmitter.setConnectedSince(updated.getConnectedSince());
 			transmitter.setLastConnected(updated.getLastConnected());
