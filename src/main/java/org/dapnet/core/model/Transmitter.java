@@ -66,7 +66,6 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	@Max(200)
 	private String power;
 
-	@NotNull
 	private String nodeName;
 
 	private IpAddress address;
@@ -474,6 +473,10 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 
 	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")
 	public Node getNode() throws Exception {
+		if (nodeName == null) {
+			return null;
+		}
+
 		if (state != null) {
 			return state.getNodes().get(nodeName.toLowerCase());
 		} else {
