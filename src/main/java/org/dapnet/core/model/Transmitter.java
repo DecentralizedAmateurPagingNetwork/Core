@@ -471,7 +471,8 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 		}
 	}
 
-	@ValidName(message = "must contain the name of an existing node", fieldName = "nodeName", constraintName = "ValidNodeName")
+	// @ValidName(message = "must contain the name of an existing node",
+	// fieldName = "nodeName", constraintName = "ValidNodeName")
 	public Node getNode() throws Exception {
 		if (nodeName == null) {
 			return null;
