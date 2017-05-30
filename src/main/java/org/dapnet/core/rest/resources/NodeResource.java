@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -68,8 +69,8 @@ public class NodeResource extends AbstractResource {
 
 		// Preserve old status
 		Node oldNode = restListener.getState().getNodes().get(nodeName);
-		if (oldNode != null) {
-			node.setStatus(oldNode.getStatus());
+		if (oldNode != null && oldNode.getStatus() == Status.ONLINE) {
+			node.setStatus(Status.ONLINE);
 			node.setAddress(oldNode.getAddress());
 		}
 
