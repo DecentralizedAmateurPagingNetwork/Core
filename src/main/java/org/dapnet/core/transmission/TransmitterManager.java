@@ -33,7 +33,7 @@ public class TransmitterManager {
 	public Transmitter getTransmitter(String name) {
 		TransmitterManagerListener theListener = listener;
 		if (theListener != null) {
-			return theListener.handleGetTransmitter(name);
+			return theListener.handleGetTransmitter(name.toLowerCase());
 		} else {
 			return null;
 		}
@@ -92,7 +92,7 @@ public class TransmitterManager {
 	 *            Transmitter name.
 	 */
 	public void sendMessage(PagerMessage message, String transmitterName) {
-		TransmitterClient cl = connectedClients.get(transmitterName);
+		TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
 		if (cl != null) {
 			cl.sendMessage(message);
 		}
@@ -107,7 +107,7 @@ public class TransmitterManager {
 	 *            Transmitter name.
 	 */
 	public void sendMessages(Collection<PagerMessage> messages, String transmitterName) {
-		TransmitterClient cl = connectedClients.get(transmitterName);
+		TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
 		if (cl != null) {
 			cl.sendMessages(messages);
 		}
@@ -146,7 +146,7 @@ public class TransmitterManager {
 		t.setLastConnected(lastConnected);
 		t.setConnectedSince(lastConnected);
 
-		connectedClients.put(t.getName(), client);
+		connectedClients.put(t.getName().toLowerCase(), client);
 
 		notifyStatusChanged(listener, t);
 	}
@@ -169,7 +169,7 @@ public class TransmitterManager {
 
 		t.setConnectedSince(null);
 
-		connectedClients.remove(t.getName());
+		connectedClients.remove(t.getName().toLowerCase());
 
 		notifyStatusChanged(listener, t);
 	}

@@ -168,16 +168,16 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		Transmitter t = manager.getTransmitter(name);
 		if (t == null) {
-			throw new TransmitterException("The transmitter name is not registered.");
+			throw new TransmitterException("The transmitter name is not registered: " + name);
 		} else if (t.getStatus() == Status.DISABLED) {
-			logger.error("Transmitter is disabled and not allowed to connect.");
+			logger.error("Transmitter is disabled and not allowed to connect: " + name);
 			ctx.close();
 			return;
 		}
 
 		// Test authentication key
 		if (!t.getAuthKey().equals(key)) {
-			logger.error("Wrong authentication key supplied.");
+			logger.error("Wrong authentication key supplied for transmitter: " + name);
 			ctx.close();
 			return;
 		}

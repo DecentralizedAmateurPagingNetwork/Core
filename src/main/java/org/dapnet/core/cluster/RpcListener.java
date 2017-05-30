@@ -494,8 +494,8 @@ public class RpcListener {
 			}
 
 			// Replace object
-			Transmitter oldTransmitter = clusterManager.getState().getTransmitters().put(transmitter.getName(),
-					transmitter);
+			Transmitter oldTransmitter = clusterManager.getState().getTransmitters()
+					.put(transmitter.getName().toLowerCase(), transmitter);
 			if (oldTransmitter != null) {
 				// Disconnect from old transmitter
 				clusterManager.getTransmitterManager().disconnectFrom(oldTransmitter);
