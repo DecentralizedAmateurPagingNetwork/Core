@@ -71,9 +71,9 @@ public class TransmissionManager {
 			PagerMessage message = protocol.createMessageFromRubric(rubric);
 			transmitterManager.sendMessage(message, rubric.getTransmitterGroups());
 
-			logger.info("Rubric sent to transmitters.");
+			logger.info("Rubric {} sent to transmitters.", rubric.getName());
 		} catch (Exception e) {
-			logger.error("Failed to send Rubric", e);
+			logger.error("Failed to send Rubric " + rubric.getName(), e);
 		}
 	}
 
