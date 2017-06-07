@@ -328,13 +328,15 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Delete depended Objects
-			// Delete Transmitters
-			ArrayList<String> deleteTransmitterNames = new ArrayList<>();
-			clusterManager.getState().getTransmitters().values().stream()
-					.filter(transmitter -> transmitter.getNodeName().equalsIgnoreCase(node))
-					.forEach(transmitter -> deleteTransmitterNames.add(transmitter.getName()));
-			deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
+			// TODO Disconnect transmitters
+			// ArrayList<Transmitter> deleteTransmitterNames = new
+			// ArrayList<>();
+			// clusterManager.getState().getTransmitters().values().stream()
+			// .filter(transmitter ->
+			// transmitter.getNodeName().equalsIgnoreCase(node))
+			// .forEach(transmitter -> deleteTransmitterNames.add(transmitter));
+			// deleteTransmitterNames.stream().forEach(t ->
+			// clusterManager.getTransmitterManager().disconnectFrom(t));
 
 			// Delete Object with same Name, if existing
 			if (clusterManager.getState().getNodes().remove(node) == null) {
