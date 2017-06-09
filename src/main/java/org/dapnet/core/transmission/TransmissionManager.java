@@ -14,6 +14,7 @@
 
 package org.dapnet.core.transmission;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -106,6 +107,23 @@ public class TransmissionManager {
 			logger.info("Activation sent to transmitters.");
 		} catch (Exception e) {
 			logger.error("Failed to send Activation", e);
+			return;
+		}
+
+		// Send info message
+		try {
+			Call call = new Call();
+			call.setTimestamp(Instant.now());
+			call.setText("Your skyper has been activated.");
+			call.setOwnerName("admin");
+			call.setTransmitterGroupNames(activation.getTransmitterGroupNames());
+
+			List<PagerMessage> messages = protocol.createMessagesFromCall(call);
+			transmitterManager.sendMessages(messages, call.getTransmitterGroups());
+
+			logger.info("Activation info message sent to transmitters.");
+		} catch (Exception e) {
+			logger.error("Failed to send activation info message", e);
 		}
 	}
 

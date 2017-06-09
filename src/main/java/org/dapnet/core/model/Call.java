@@ -73,12 +73,20 @@ public class Call implements Serializable {
 		return text;
 	}
 
+	public void setText(String text) {
+		this.text = text;
+	}
+
 	public Collection<String> getCallSignNames() {
 		return callSignNames;
 	}
 
 	public Collection<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
+	}
+
+	public void setTransmitterGroupNames(Collection<String> transmitterGroupNames) {
+		this.transmitterGroupNames = transmitterGroupNames;
 	}
 
 	public boolean isEmergency() {
