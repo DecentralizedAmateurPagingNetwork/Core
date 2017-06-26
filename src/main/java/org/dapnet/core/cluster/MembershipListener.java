@@ -153,24 +153,19 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			// (expect of first node, which might not be in the state, but will
 			// add itself immediately)
 			for (Node node : clusterManager.getState().getNodes().values()) {
+				Node.Status oldStatus = node.getStatus();
 				if (view.getMembers().stream().filter(m -> m.toString().equalsIgnoreCase(node.getName())).findFirst()
 						.isPresent()) {
-					if (node.getStatus() == Node.Status.SUSPENDED) {
+					if (oldStatus == Node.Status.SUSPENDED || oldStatus == Node.Status.UNKNOWN) {
 						node.setStatus(Node.Status.ONLINE);
-						logger.info("Changed status of {} from {} to {}", node.getName(), Node.Status.SUSPENDED,
-								Node.Status.ONLINE);
-					} else if (node.getStatus() == Node.Status.UNKNOWN) {
-						node.setStatus(Node.Status.ONLINE);
-						logger.info("Changed status of {} from {} to {}", node.getName(), Node.Status.UNKNOWN,
-								Node.Status.ONLINE);
+						logger.info("Changed status of {} from {} to {}", node.getName(), oldStatus, node.getStatus());
 					}
 					// else if node in ONLINE which is the correct status
 				} else {
 					// Known node is not present in view
-					if (node.getStatus() == Node.Status.ONLINE) {
+					if (oldStatus == Node.Status.ONLINE) {
 						node.setStatus(Node.Status.UNKNOWN);
-						logger.warn("Changed status of {} from {} to {}", node.getName(), Node.Status.ONLINE,
-								Node.Status.UNKNOWN);
+						logger.warn("Changed status of {} from {} to {}", node.getName(), oldStatus, node.getStatus());
 					}
 					// else if node is UNKNOWN or SUSPENDED which is the correct
 					// status
