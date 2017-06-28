@@ -16,6 +16,8 @@ package org.dapnet.core.scheduler;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,10 +38,8 @@ public class StateCleaningJob implements Job {
 
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
-
-		SchedulerContext schedulerContext = null;
 		try {
-			schedulerContext = context.getScheduler().getContext();
+			SchedulerContext schedulerContext = context.getScheduler().getContext();
 			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
 			State state = clusterManager.getState();
@@ -47,7 +47,8 @@ public class StateCleaningJob implements Job {
 
 			cleanCalls(state, now);
 			cleanNews(state, now);
-			cleanTransmitters(state, now);
+			// FIXME This is broken
+			// cleanTransmitters(clusterManager, now);
 
 			state.writeToFile();
 		} catch (SchedulerException e) {
@@ -71,18 +72,21 @@ public class StateCleaningJob implements Job {
 		state.getNews().values().forEach(nl -> nl.removeExpired(now, ttl));
 	}
 
-	private static void cleanTransmitters(State state, Instant now) {
+	private static void cleanTransmitters(ClusterManager manager, Instant now) {
 		Duration exp = Duration.ofDays(Settings.getModelSettings().getTransmitterExpirationDays());
 
-		Iterator<Transmitter> it = state.getTransmitters().values().iterator();
-		while (it.hasNext()) {
-			Transmitter t = it.next();
+		Collection<Transmitter> transmitters = new ArrayList<>(manager.getState().getTransmitters().values());
+		for (Transmitter t : transmitters) {
 			if (t != null && t.getLastConnected() != null && t.getStatus() != Transmitter.Status.ONLINE
 					&& now.isAfter(t.getLastConnected().plus(exp))) {
 				logger.info("Removing transmitter due to inactivity: {}", t.getName());
-				it.remove();
+				deleteTransmitter(manager, t.getName().toLowerCase());
 			}
 		}
+	}
+
+	private static void deleteTransmitter(ClusterManager manager, String name) {
+		manager.handleStateOperation(null, "deleteTransmitter", new Object[] { name }, new Class[] { String.class });
 	}
 
 }
