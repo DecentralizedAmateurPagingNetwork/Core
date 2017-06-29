@@ -29,6 +29,7 @@ import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
@@ -112,6 +113,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 
 		registerNewsList();
+		resetNodeStates();
 
 		// Validate state
 		Set<ConstraintViolation<Object>> violations = validator.validate(state);
@@ -140,6 +142,12 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 			nl.setHandler(transmissionManager::handleNews);
 			nl.setAddHandler(transmissionManager::handleNewsAsCall);
+		}
+	}
+
+	private void resetNodeStates() {
+		for (Node n : state.getNodes().values()) {
+			n.setStatus(Status.SUSPENDED);
 		}
 	}
 
