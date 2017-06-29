@@ -150,8 +150,12 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		}
 
 		if (!client.ackMessage(seq, type)) {
-			logger.warn("Invalid ack received: {}", msg);
-			// throw new TransmitterException("Invalid ack received: " + msg);
+			Transmitter t = client.getTransmitter();
+			if (t != null) {
+				logger.warn("Invalid ack received from {}: {}", t.getName(), msg);
+			} else {
+				logger.warn("Invalid ack received: {}", msg);
+			}
 		}
 	}
 
