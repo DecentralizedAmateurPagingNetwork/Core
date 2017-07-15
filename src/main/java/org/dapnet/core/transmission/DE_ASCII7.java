@@ -212,7 +212,7 @@ final class DE_ASCII7 extends Charset {
 			case 'ü':
 				return 125;
 			default:
-				return (byte) c;
+				return (byte) (c & 0x7F);
 			}
 		}
 
