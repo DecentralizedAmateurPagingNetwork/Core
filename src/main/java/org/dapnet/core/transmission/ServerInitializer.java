@@ -17,6 +17,7 @@ import io.netty.handler.codec.string.StringEncoder;
  * @author Philipp Thiel
  */
 class ServerInitializer extends ChannelInitializer<SocketChannel> {
+	// Receive in US_ASCII and send in DE_ASCII
 	private static final Charset CHARSET = new DE_ASCII7();
 	private static final StringEncoder encoder = new StringEncoder(CHARSET);
 	private static final StringDecoder decoder = new StringDecoder(StandardCharsets.US_ASCII);
