@@ -197,8 +197,6 @@ final class DE_ASCII7 extends Charset {
 
 		private static byte toByte(char c) {
 			switch (c) {
-			case 'ß':
-				return 64;
 			case 'Ä':
 				return 91;
 			case 'Ö':
@@ -211,6 +209,8 @@ final class DE_ASCII7 extends Charset {
 				return 124;
 			case 'ü':
 				return 125;
+			case 'ß':
+				return 126;
 			default:
 				return (byte) (c & 0x7F);
 			}
