@@ -1,6 +1,6 @@
 package org.dapnet.core.transmission;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -16,8 +16,9 @@ import io.netty.handler.codec.string.StringEncoder;
  * @author Philipp Thiel
  */
 class ServerInitializer extends ChannelInitializer<SocketChannel> {
-	private static final StringEncoder encoder = new StringEncoder(StandardCharsets.US_ASCII);
-	private static final StringDecoder decoder = new StringDecoder(StandardCharsets.US_ASCII);
+	private static final Charset CHARSET = new DE_ASCII7();
+	private static final StringEncoder encoder = new StringEncoder(CHARSET);
+	private static final StringDecoder decoder = new StringDecoder(CHARSET);
 	private static final MessageEncoder msgEncoder = new MessageEncoder();
 	private final TransmitterManager manager;
 
