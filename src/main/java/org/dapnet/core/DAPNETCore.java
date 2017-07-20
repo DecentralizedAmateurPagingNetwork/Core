@@ -70,16 +70,16 @@ public class DAPNETCore {
 			logger.info("Starting Cluster");
 			clusterManager = new ClusterManager(transmissionManager, enforceStartup);
 
+			logger.info("Starting Transmitter Server");
+			transmitterServer = new TransmitterServer(transmissionManager.getTransmitterManager());
+			transmitterServer.start();
+
 			logger.info("Starting SchedulerManager");
 			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
 
 			logger.info("Starting RestManager");
 			restManager = new RestManager(clusterManager);
 			restManager.start();
-
-			logger.info("Starting Transmitter Server");
-			transmitterServer = new TransmitterServer(transmissionManager.getTransmitterManager());
-			transmitterServer.start();
 
 			logger.info("DAPNETCore started");
 		} catch (CoreStartupException e) {
@@ -94,16 +94,16 @@ public class DAPNETCore {
 	private void stop() {
 		logger.info("Stopping DAPNETCore ...");
 
-		if (transmitterServer != null) {
-			transmitterServer.stop();
-		}
-
 		if (restManager != null) {
 			restManager.stop();
 		}
 
 		if (schedulerManager != null) {
 			schedulerManager.stop();
+		}
+
+		if (transmitterServer != null) {
+			transmitterServer.stop();
 		}
 
 		if (clusterManager != null) {
