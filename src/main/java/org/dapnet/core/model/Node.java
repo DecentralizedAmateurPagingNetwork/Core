@@ -58,6 +58,8 @@ public class Node implements Serializable, Searchable {
 	@Size(min = 1, message = "must contain at least one ownerName")
 	private Collection<String> ownerNames;
 
+	private String version;
+
 	public enum Status {
 		ONLINE, SUSPENDED, UNKNOWN
 	}
@@ -117,6 +119,14 @@ public class Node implements Serializable, Searchable {
 
 	public void setOwnerNames(Collection<String> owners) {
 		this.ownerNames = owners;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	@Override

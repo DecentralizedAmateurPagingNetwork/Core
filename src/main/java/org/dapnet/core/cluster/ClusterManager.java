@@ -15,6 +15,7 @@
 package org.dapnet.core.cluster;
 
 import java.io.FileNotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Set;
 
@@ -42,6 +43,7 @@ import org.jgroups.JChannel;
 import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
+import org.jgroups.util.ExtendedUUID;
 import org.jgroups.util.RspList;
 
 public class ClusterManager implements TransmitterManagerListener, RestListener {
@@ -72,6 +74,11 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		// Create Channel
 		channel = new JChannel(Settings.getClusterSettings().getClusterConfigurationFile());
 		channel.setName(getNodeName());
+		channel.addAddressGenerator(() -> {
+			ExtendedUUID address = ExtendedUUID.randomUUID(channel.getName());
+			address.put("version", DAPNETCore.getCoreVersion().getBytes(StandardCharsets.UTF_8));
+			return address;
+		});
 
 		// Create Dispatcher (for creating Block on top of channel)
 		dispatcher = new RpcDispatcher(channel, new RpcListener(this));
@@ -89,7 +96,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		// Create default RequestOptions
 		requestOptions = new RequestOptions(ResponseMode.GET_ALL, Settings.getClusterSettings().getResponseTimeout());
 
-		// Connect to channel
 		try {
 			channel.connect(getChannelName());
 		} catch (Exception e) {

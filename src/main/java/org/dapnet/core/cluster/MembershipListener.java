@@ -14,6 +14,8 @@
 
 package org.dapnet.core.cluster;
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
@@ -24,6 +26,7 @@ import org.jgroups.MergeView;
 import org.jgroups.PhysicalAddress;
 import org.jgroups.View;
 import org.jgroups.stack.IpAddress;
+import org.jgroups.util.ExtendedUUID;
 
 public class MembershipListener implements org.jgroups.MembershipListener {
 	private static final Logger logger = LogManager.getLogger();
@@ -75,13 +78,26 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			}
 
 			for (Address add : view.getMembers()) {
+				Node node = clusterManager.getState().getNodes().get(add.toString());
+				if (node == null) {
+					logger.warn("Unknown node in view: " + add);
+					continue;
+				}
+
+				// Try to set version information
+				if (add instanceof ExtendedUUID) {
+					ExtendedUUID extaddr = (ExtendedUUID) add;
+					byte[] buff = extaddr.get("version");
+					if (buff != null) {
+						node.setVersion(new String(buff, StandardCharsets.UTF_8));
+					}
+				}
+
+				// Try to set IP address for node
 				PhysicalAddress physicalAddress = (PhysicalAddress) clusterManager.getChannel()
 						.down(new Event(Event.GET_PHYSICAL_ADDRESS, add));
 				if (physicalAddress instanceof IpAddress) {
-					Node n = clusterManager.getState().getNodes().get(add.toString());
-					if (n != null) {
-						n.setAddress((IpAddress) physicalAddress);
-					}
+					node.setAddress((IpAddress) physicalAddress);
 				}
 			}
 
@@ -105,10 +121,9 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			} else {
 				/*
 				 * if (clusterManager.isQuorum()) { logger.
-				 * fatal("Node has quorum although it is the minoritySubgroup "
-				 * + "(Seems to merge independent clusters). " +
-				 * "Stopping minority group."); DAPNETCore.stopDAPNETCore(); }
-				 * else {
+				 * fatal("Node has quorum although it is the minoritySubgroup " +
+				 * "(Seems to merge independent clusters). " + "Stopping minority group.");
+				 * DAPNETCore.stopDAPNETCore(); } else {
 				 */
 				logger.info("Node is minoritySubgroup");
 
