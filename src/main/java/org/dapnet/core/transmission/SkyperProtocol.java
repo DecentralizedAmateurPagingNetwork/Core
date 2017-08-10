@@ -14,6 +14,7 @@
 
 package org.dapnet.core.transmission;
 
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,6 +43,7 @@ public class SkyperProtocol implements PagerProtocol {
 	private static final Logger logger = LogManager.getLogger();
 	private static final Pattern NUMERIC_PATTERN = Pattern.compile("[-Uu\\d\\(\\) ]+");
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HHmmss   ddMMyy");
+	private static final Charset PAGER_CHARSET = new DE_ASCII7();
 
 	@Override
 	public List<PagerMessage> createMessagesFromCall(Call call) {
@@ -61,7 +63,7 @@ public class SkyperProtocol implements PagerProtocol {
 					// Support for alphanumeric messages -> create ALPHANUM
 					// message
 					mode = FunctionalBits.ALPHANUM;
-					text = call.getText();
+					text = encodeString(call.getText());
 				} else if (numeric) {
 					// No support for alphanumeric messages but text is numeric
 					// -> create NUMERIC message
@@ -95,13 +97,14 @@ public class SkyperProtocol implements PagerProtocol {
 	@Override
 	public PagerMessage createMessageFromRubric(Rubric rubric) {
 		// Generate Rubric String: Coding adapted from Funkrufmaster
+		String label = encodeString(rubric.getLabel());
 		StringBuilder sb = new StringBuilder();
 		sb.append("1");
 		sb.append(String.valueOf((char) (rubric.getNumber() + 0x1f)));
 		sb.append(String.valueOf((char) (10 + 0x20)));
 
-		for (int i = 0; i < rubric.getLabel().length(); ++i) {
-			sb.append(String.valueOf((char) ((int) rubric.getLabel().charAt(i) + 1)));
+		for (int i = 0; i < label.length(); ++i) {
+			sb.append(String.valueOf((char) ((int) label.charAt(i) + 1)));
 		}
 
 		return new PagerMessage(sb.toString(), 4512, PagerMessage.MessagePriority.RUBRIC,
@@ -111,6 +114,7 @@ public class SkyperProtocol implements PagerProtocol {
 	@Override
 	public PagerMessage createMessageFromNews(News news) {
 		// Generate News String: Coding adapted from Funkrufmaster
+		String text = encodeString(news.getText());
 		StringBuilder sb = new StringBuilder();
 		try {
 			sb.append(String.valueOf((char) (news.getRubric().getNumber() + 0x1f)));
@@ -120,8 +124,8 @@ public class SkyperProtocol implements PagerProtocol {
 
 		sb.append(String.valueOf((char) (news.getNumber() + 0x20)));
 
-		for (int i = 0; i < news.getText().length(); ++i) {
-			sb.append(String.valueOf((char) ((int) news.getText().charAt(i) + 1)));
+		for (int i = 0; i < text.length(); ++i) {
+			sb.append(String.valueOf((char) ((int) text.charAt(i) + 1)));
 		}
 
 		// Create Message
@@ -160,5 +164,14 @@ public class SkyperProtocol implements PagerProtocol {
 
 		return new PagerMessage(sb.toString(), activation.getNumber(), PagerMessage.MessagePriority.ACTIVATION,
 				PagerMessage.FunctionalBits.ACTIVATION);
+	}
+
+	private static String encodeString(String input) {
+		if (input != null) {
+			byte[] encoded = input.getBytes(PAGER_CHARSET);
+			return new String(encoded, PAGER_CHARSET);
+		} else {
+			return null;
+		}
 	}
 }
