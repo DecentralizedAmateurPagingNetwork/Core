@@ -15,6 +15,7 @@
 package org.dapnet.core.transmission;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -169,7 +170,7 @@ public class SkyperProtocol implements PagerProtocol {
 	private static String encodeString(String input) {
 		if (input != null) {
 			byte[] encoded = input.getBytes(PAGER_CHARSET);
-			return new String(encoded, PAGER_CHARSET);
+			return new String(encoded, StandardCharsets.US_ASCII);
 		} else {
 			return null;
 		}
