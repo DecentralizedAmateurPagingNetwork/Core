@@ -34,6 +34,7 @@ import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
+import org.dapnet.core.transmission.TransmissionManager;
 
 public class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
@@ -803,6 +804,27 @@ public class RpcListener {
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("DeleteUser", user, response);
+		}
+	}
+
+	public synchronized RpcResponse sendRubricNames(String transmitterName) {
+		RpcResponse response = null;
+		try {
+			if (!clusterManager.getState().getTransmitters().containsKey(transmitterName)) {
+				return RpcResponse.BAD_REQUEST;
+			}
+
+			TransmissionManager manager = clusterManager.getTransmissionManager();
+			for (Rubric r : clusterManager.getState().getRubrics().values()) {
+				manager.handleRubricToTransmitter(r, transmitterName);
+			}
+
+			return response = RpcResponse.OK;
+		} catch (Exception e) {
+			logger.error("Exception : ", e);
+			return response = RpcResponse.INTERNAL_ERROR;
+		} finally {
+			logResponse("SendRubricNames", transmitterName, response);
 		}
 	}
 }

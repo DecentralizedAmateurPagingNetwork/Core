@@ -78,6 +78,17 @@ public class TransmissionManager {
 		}
 	}
 
+	public void handleRubricToTransmitter(Rubric rubric, String transmitterName) {
+		try {
+			PagerMessage message = protocol.createMessageFromRubric(rubric);
+			transmitterManager.sendMessage(message, transmitterName);
+
+			logger.info("Rubric {} sent to transmitter {}", rubric.getName(), transmitterName);
+		} catch (Exception ex) {
+			logger.error("Failed to send rubric " + rubric.getName() + " to transmitter " + transmitterName, ex);
+		}
+	}
+
 	public void handleCall(Call call) {
 		try {
 			List<PagerMessage> messages = protocol.createMessagesFromCall(call);
