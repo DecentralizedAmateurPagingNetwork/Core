@@ -224,6 +224,10 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	@SuppressWarnings("rawtypes")
 	public boolean handleStateOperation(Collection<Address> destination, String methodName, Object[] args,
 			Class[] types) {
+		if (!channel.isConnected()) {
+			return false;
+		}
+
 		try {
 			RspList rspList = dispatcher.callRemoteMethods(destination, methodName, args, types, requestOptions);
 			if (isRspSuccessful(rspList)) {
