@@ -73,7 +73,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 		// Create Channel
 		channel = new JChannel(Settings.getClusterSettings().getClusterConfigurationFile());
-		channel.setName(getNodeName());
+		channel.setName(readNodeName());
 		channel.addAddressGenerator(() -> {
 			ExtendedUUID address = ExtendedUUID.randomUUID(channel.getName());
 			address.put("version", DAPNETCore.getCoreVersion().getBytes(StandardCharsets.UTF_8));
@@ -97,7 +97,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		requestOptions = new RequestOptions(ResponseMode.GET_ALL, Settings.getClusterSettings().getResponseTimeout());
 
 		try {
-			channel.connect(getChannelName());
+			channel.connect(readChannelName());
 		} catch (Exception e) {
 			logger.fatal("Could not connect to cluster.", e);
 			throw new CoreStartupException(e);
@@ -164,7 +164,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 	// ### Helper for reading Cluster Config
 	// ############################################################################
-	private String getChannelName() {
+	private String readChannelName() {
 		// Ugly solution but prevents the use of a second configuration file
 		String properties = channel.getProperties();
 		int gmsPosition = properties.indexOf("pbcast.GMS");
@@ -174,7 +174,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		return properties.substring(startPosition, endPosition) + DAPNETCore.getCoreVersion();
 	}
 
-	private String getNodeName() {
+	private String readNodeName() {
 		// Ugly solution but prevents the use of a second configuration file
 		String properties = channel.getProperties();
 		int gmsPosition = properties.indexOf("pbcast.GMS");
@@ -273,7 +273,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// #############################################################################
 	@Override
 	public void handleTransmitterStatusChanged(Transmitter transmitter) {
-		transmitter.setNodeName(getNodeName());
+		transmitter.setNodeName(channel.getName());
 
 		if (state.getTransmitters().containsKey(transmitter.getName())) {
 			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },

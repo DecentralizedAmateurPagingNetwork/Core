@@ -76,5 +76,12 @@ public class MessageListener implements org.jgroups.MessageListener {
 			// FIXME Does this work?
 			DAPNETCore.shutdown();
 		}
+
+		// Check if node name is in received state.
+		String nodeName = clusterManager.getChannel().getName();
+		if (!state.getNodes().containsKey(nodeName)) {
+			logger.fatal("Current node name does not exist in received state: {}", nodeName);
+			DAPNETCore.shutdown();
+		}
 	}
 }
