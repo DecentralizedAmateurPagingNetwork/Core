@@ -15,7 +15,6 @@
 package org.dapnet.core.rest;
 
 import org.dapnet.core.model.CallSign;
-import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.User;
 
@@ -35,10 +34,9 @@ public final class ExclusionStrategies {
 		@Override
 		public boolean shouldSkipField(FieldAttributes f) {
 			return (f.getDeclaringClass() == CallSign.class && f.getName().equals("pagers"))
-					|| (f.getDeclaringClass() == Node.class && f.getName().equals("address"))
-					|| (f.getDeclaringClass() == Transmitter.class && f.getName().equals("address"))
 					|| (f.getDeclaringClass() == Transmitter.class && f.getName().equals("authKey"))
-					|| (f.getDeclaringClass() == User.class && f.getName().equals("hash"));
+					|| (f.getDeclaringClass() == User.class && f.getName().equals("hash"))
+					|| (f.getDeclaringClass() == User.class && f.getName().equals("mail"));
 		}
 
 		@Override

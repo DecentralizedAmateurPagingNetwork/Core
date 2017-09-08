@@ -45,8 +45,9 @@ public class UserResource extends AbstractResource {
 			userName = userName.toLowerCase();
 		}
 
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getUsers().get(userName), status);
+		User user = restListener.getState().getUsers().get(userName);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, user);
+		return getObject(user, status);
 	}
 
 	@PUT
