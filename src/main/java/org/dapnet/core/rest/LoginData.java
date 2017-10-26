@@ -14,10 +14,10 @@
 
 package org.dapnet.core.rest;
 
-import javax.ws.rs.core.HttpHeaders;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.StringTokenizer;
+
+import javax.ws.rs.core.HttpHeaders;
 
 public class LoginData {
 	private String username;
@@ -34,13 +34,16 @@ public class LoginData {
 
 	public LoginData(String authorizationToken) throws UnsupportedEncodingException {
 		String encodedUserPassword = authorizationToken.replaceFirst("Basic ", "");
-		String usernameAndPassword = null;
 		byte[] decodedBytes = Base64.getDecoder().decode(encodedUserPassword);
-		usernameAndPassword = new String(decodedBytes, "UTF-8");
+		String usernameAndPassword = new String(decodedBytes, "UTF-8");
 
-		StringTokenizer tokenizer = new StringTokenizer(usernameAndPassword, ":");
-		this.username = tokenizer.nextToken();
-		this.password = tokenizer.nextToken();
+		int index = usernameAndPassword.indexOf(':');
+		if (index == -1) {
+			throw new IllegalArgumentException("Invalid basic auth format.");
+		}
+
+		this.username = usernameAndPassword.substring(0, index);
+		this.password = usernameAndPassword.substring(index + 1);
 	}
 
 	public String getUsername() {
