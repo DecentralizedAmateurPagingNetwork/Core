@@ -77,8 +77,7 @@ public abstract class AbstractResource {
 		case USER:
 			return userGson;
 		case ANYBODY:
-			// TODO Why not userGson?
-			return gson;
+			return userGson;
 		default:
 			return gson;
 		}

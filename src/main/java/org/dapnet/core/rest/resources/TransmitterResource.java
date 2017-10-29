@@ -40,7 +40,7 @@ public class TransmitterResource extends AbstractResource {
 
 	@GET
 	public Response getTransmitters() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
 		return getObject(restListener.getState().getTransmitters().values(), status);
 	}
 
@@ -52,7 +52,7 @@ public class TransmitterResource extends AbstractResource {
 		}
 
 		Transmitter obj = restListener.getState().getTransmitters().get(transmitterName);
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY, obj);
 		return getObject(obj, status);
 	}
 
