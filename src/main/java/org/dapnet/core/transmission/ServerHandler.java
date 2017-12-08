@@ -60,6 +60,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			handleMessageAck(msg);
 			break;
 		default:
+			logger.fatal("Invalid state.");
+			ctx.close();
 			break;
 		}
 	}
