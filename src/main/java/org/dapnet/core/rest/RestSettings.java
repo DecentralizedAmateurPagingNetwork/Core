@@ -16,6 +16,11 @@ package org.dapnet.core.rest;
 
 import java.io.Serializable;
 
+/**
+ * This class contains the settings for the REST service.
+ * 
+ * @author Philipp Thiel
+ */
 public class RestSettings implements Serializable {
 	private static final long serialVersionUID = 4524821306768847015L;
 	private String hostname = "localhost";
