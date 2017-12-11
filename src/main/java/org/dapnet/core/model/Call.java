@@ -81,6 +81,10 @@ public class Call implements Serializable {
 		return callSignNames;
 	}
 
+	public void setCallSignNames(Collection<String> callSignNames) {
+		this.callSignNames = callSignNames;
+	}
+
 	public Collection<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}
