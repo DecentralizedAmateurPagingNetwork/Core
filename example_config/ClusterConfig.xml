@@ -44,7 +44,8 @@
     <FRAG2/>
     <pbcast.STATE_TRANSFER/>
     <pbcast.FLUSH timeout="2000"/>
-    <!--Enter here NodeName@ClusterName -->
-    <pbcast.GMS name="THIS_IS_YOUR_CALLSIGN@DAPNET"
+    <!-- Enter here NodeName@ClusterName -->
+    <!-- BE AWARE, it's case sensitive. So put *EXACTLY* the name of the node as it's set up on the existing cluster -->
+    <pbcast.GMS name="THIS_IS_YOUR_CALLSIGN_AS_ITS_IN_SETUP_IN_THE_CLUSTER@DAPNET"
                 print_local_addr="false"/>
 </config>
