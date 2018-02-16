@@ -25,6 +25,8 @@ import org.dapnet.core.model.Rubric;
 public interface PagerProtocol {
 	PagerMessage createMessageFromTime(LocalDateTime time);
 
+        PagerMessage createMessageFromTimeSwissphone(LocalDateTime time);
+
 	PagerMessage createMessageFromRubric(Rubric rubric);
 
 	PagerMessage createMessageFromNews(News news);
