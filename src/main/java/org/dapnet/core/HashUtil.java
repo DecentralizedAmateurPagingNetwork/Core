@@ -48,6 +48,8 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * PBKDF2 salted password hashing.
@@ -55,16 +57,18 @@ import java.security.spec.InvalidKeySpecException;
  * www: http://crackstation.net/hashing-security.htm
  */
 public class HashUtil {
-	public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
+	private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
 
 	// The following constants may be changed without breaking existing hashes.
-	public static final int SALT_BYTE_SIZE = 24;
-	public static final int HASH_BYTE_SIZE = 24;
-	public static final int PBKDF2_ITERATIONS = 1000;
+	private static final int SALT_BYTE_SIZE = 24;
+	private static final int HASH_BYTE_SIZE = 24;
+	private static final int PBKDF2_ITERATIONS = 1000;
 
-	public static final int ITERATION_INDEX = 0;
-	public static final int SALT_INDEX = 1;
-	public static final int PBKDF2_INDEX = 2;
+	private static final int ITERATION_INDEX = 0;
+	private static final int SALT_INDEX = 1;
+	private static final int PBKDF2_INDEX = 2;
+
+	private static final Pattern VALID_CHARS = Pattern.compile("\\p{Alnum}+");
 
 	/**
 	 * Returns a salted PBKDF2 hash of the password.
@@ -72,9 +76,16 @@ public class HashUtil {
 	 * @param password
 	 *            the password to hash
 	 * @return a salted PBKDF2 hash of the password
+	 * @throws IllegalArgumentException
+	 *             if the password contains non-alphanumeric characters.
 	 */
 	public static String createHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
-		return createHash(password.toCharArray());
+		Matcher m = VALID_CHARS.matcher(password);
+		if (m.matches()) {
+			return createHash(password.toCharArray());
+		} else {
+			throw new IllegalArgumentException("Password must not contain special characters.");
+		}
 	}
 
 	/**
@@ -135,9 +146,9 @@ public class HashUtil {
 	}
 
 	/**
-	 * Compares two byte arrays in length-constant time. This comparison method
-	 * is used so that password hashes cannot be extracted from an on-line
-	 * system using a timing attack and then attacked off-line.
+	 * Compares two byte arrays in length-constant time. This comparison method is
+	 * used so that password hashes cannot be extracted from an on-line system using
+	 * a timing attack and then attacked off-line.
 	 *
 	 * @param a
 	 *            the first byte array
