@@ -226,7 +226,8 @@ final class TransmitterClient {
 		}
 
 		public int getExpectedSequenceNumber() {
-			return sequenceNumber + 1;
+/* Warp around on 8 Bits */
+			return ((sequenceNumber + 1) % 256);
 		}
 
 		public PagerMessage getMessage() {
