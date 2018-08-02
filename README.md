@@ -1,4 +1,6 @@
-﻿# DAPNET CORE #
+# DAPNET CORE #
+# At the moment, there is no need for new instations of DAPNET Cores of this version. A second one is under development. So please wait. #
+
 ## Introduction ##
 The DAPNET CORE offers the main functionality of the Decentralized Amateur Paging Network.
 It builds up a cluster together with other DAPNET Core instances over the HAMNET and
@@ -8,7 +10,6 @@ controls connected paging transmitter. All functions can be accessed via the RES
 Using the packed release version no installation is required. All external libraries are
 included. Just make sure a JAVA 8+ runtime environment is available.
 
-Detailed installation instructions are avaiable here https://www.afu.rwth-aachen.de/projekte/funkruf-pager-pocsag/funkrufmaster-2-0-dapnet/anleitung-zum-installieren-neuer-knoten (for now just in German)
 
 ## Usage ##
 ### Basic Configuration ###
