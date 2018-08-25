@@ -26,8 +26,7 @@ public class TransmitterManager {
 	/**
 	 * Gets a transmitter by its name.
 	 * 
-	 * @param name
-	 *            Transmitter name
+	 * @param name Transmitter name
 	 * @return Transmitter or {@code null} if not found.
 	 */
 	public Transmitter getTransmitter(String name) {
@@ -42,8 +41,7 @@ public class TransmitterManager {
 	/**
 	 * Sets the event listener.
 	 * 
-	 * @param listener
-	 *            Event listener instance.
+	 * @param listener Event listener instance.
 	 */
 	public void setListener(TransmitterManagerListener listener) {
 		this.listener = listener;
@@ -52,8 +50,7 @@ public class TransmitterManager {
 	/**
 	 * Sends a message to all connected transmitters.
 	 * 
-	 * @param message
-	 *            Message to send.
+	 * @param message Message to send.
 	 */
 	public void sendMessage(PagerMessage message) {
 		connectedClients.values().forEach(c -> c.sendMessage(message));
@@ -62,10 +59,8 @@ public class TransmitterManager {
 	/**
 	 * Sends a message to one or more transmitter groups.
 	 * 
-	 * @param message
-	 *            Message to send.
-	 * @param groups
-	 *            Transmitter groups to send to.
+	 * @param message Message to send.
+	 * @param groups  Transmitter groups to send to.
 	 */
 	public void sendMessage(PagerMessage message, Collection<TransmitterGroup> groups) {
 		getTransmitterNames(groups).forEach(n -> sendMessage(message, n));
@@ -74,10 +69,8 @@ public class TransmitterManager {
 	/**
 	 * Sends multiple messages to one or more transmitter groups.
 	 * 
-	 * @param messages
-	 *            Messages to send.
-	 * @param groups
-	 *            Transmitter groups to send to.
+	 * @param messages Messages to send.
+	 * @param groups   Transmitter groups to send to.
 	 */
 	public void sendMessages(Collection<PagerMessage> messages, Collection<TransmitterGroup> groups) {
 		getTransmitterNames(groups).forEach(n -> sendMessages(messages, n));
@@ -86,10 +79,8 @@ public class TransmitterManager {
 	/**
 	 * Sends a message to a specific connected transmitter.
 	 * 
-	 * @param message
-	 *            Message to send.
-	 * @param transmitterName
-	 *            Transmitter name.
+	 * @param message         Message to send.
+	 * @param transmitterName Transmitter name.
 	 */
 	public void sendMessage(PagerMessage message, String transmitterName) {
 		TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
@@ -101,10 +92,8 @@ public class TransmitterManager {
 	/**
 	 * Sends multiple messages to a specific connected transmitter.
 	 * 
-	 * @param messages
-	 *            Messages to send.
-	 * @param transmitterName
-	 *            Transmitter name.
+	 * @param messages        Messages to send.
+	 * @param transmitterName Transmitter name.
 	 */
 	public void sendMessages(Collection<PagerMessage> messages, String transmitterName) {
 		TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
@@ -129,8 +118,7 @@ public class TransmitterManager {
 	/**
 	 * Callback to handle connect events.
 	 * 
-	 * @param client
-	 *            Transmitter client to add.
+	 * @param client Transmitter client to add.
 	 */
 	public void onConnect(TransmitterClient client) {
 		Transmitter t = client.getTransmitter();
@@ -154,8 +142,7 @@ public class TransmitterManager {
 	/**
 	 * Callback that handles disconnect events.
 	 * 
-	 * @param client
-	 *            Transmitter to remove.
+	 * @param client Transmitter to remove.
 	 */
 	public void onDisconnect(TransmitterClient client) {
 		Transmitter t = client.getTransmitter();
@@ -204,8 +191,7 @@ public class TransmitterManager {
 	/**
 	 * Disconnects from the given transmitter.
 	 * 
-	 * @param t
-	 *            Transmitter to disconnect from.
+	 * @param t Transmitter to disconnect from.
 	 */
 	public void disconnectFrom(Transmitter t) {
 		TransmitterClient cl = connectedClients.remove(t.getName().toLowerCase());

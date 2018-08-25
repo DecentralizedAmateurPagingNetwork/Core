@@ -31,8 +31,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	/**
 	 * Creates a new news list from the given news collection.
 	 * 
-	 * @param news
-	 *            News to load.
+	 * @param news News to load.
 	 */
 	public NewsList(Collection<News> news) {
 		for (News n : news) {
@@ -46,8 +45,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	/**
 	 * Sets the news list change handler.
 	 * 
-	 * @param handler
-	 *            Change handler to use.
+	 * @param handler Change handler to use.
 	 */
 	public void setHandler(Consumer<News> handler) {
 		this.handler = handler;
@@ -55,11 +53,10 @@ public class NewsList implements Serializable, Iterable<News> {
 
 	/**
 	 * Sets the news list add element handler. This is a workaround for sending
-	 * updates to pagers that do not support rubrics and news must be sent to a
-	 * RIC instead.
+	 * updates to pagers that do not support rubrics and news must be sent to a RIC
+	 * instead.
 	 * 
-	 * @param addHandler
-	 *            Add handler to use.
+	 * @param addHandler Add handler to use.
 	 */
 	public void setAddHandler(Consumer<News> addHandler) {
 		this.addHandler = addHandler;
@@ -68,8 +65,7 @@ public class NewsList implements Serializable, Iterable<News> {
 	/**
 	 * Adds a news object to the list.
 	 * 
-	 * @param news
-	 *            News object to add.
+	 * @param news News object to add.
 	 */
 	public void add(News news) {
 		notifyHandler(addHandler, news);
@@ -99,11 +95,9 @@ public class NewsList implements Serializable, Iterable<News> {
 	/**
 	 * Removes the news at the given slot.
 	 * 
-	 * @param number
-	 *            Slot number (1 to 10).
+	 * @param number Slot number (1 to 10).
 	 * @return Old news entry if present.
-	 * @throws IndexOutOfBoundsException
-	 *             if no news exists at the given slot number.
+	 * @throws IndexOutOfBoundsException if no news exists at the given slot number.
 	 */
 	public News remove(int number) {
 		if (number < 1 || number > 10) {
@@ -180,10 +174,8 @@ public class NewsList implements Serializable, Iterable<News> {
 	/**
 	 * Removes all expired news.
 	 * 
-	 * @param now
-	 *            Timepoint to start from.
-	 * @param ttl
-	 *            Time to live.
+	 * @param now Timepoint to start from.
+	 * @param ttl Time to live.
 	 */
 	public void removeExpired(Instant now, Duration ttl) {
 		synchronized (slots) {

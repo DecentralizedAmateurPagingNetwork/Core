@@ -17,5 +17,5 @@ package org.dapnet.core.model.validator;
 import javax.validation.Payload;
 
 public interface MyPayload extends Payload {
-    String getTest();
+	String getTest();
 }

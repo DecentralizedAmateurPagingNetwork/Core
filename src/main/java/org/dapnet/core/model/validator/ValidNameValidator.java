@@ -18,13 +18,13 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class ValidNameValidator implements ConstraintValidator<ValidName, Object> {
-    @Override
-    public void initialize(ValidName constraintAnnotation) {
-        return;
-    }
+	@Override
+	public void initialize(ValidName constraintAnnotation) {
+		return;
+	}
 
-    @Override
-    public boolean isValid(Object value, ConstraintValidatorContext context) {
-        return value != null;
-    }
+	@Override
+	public boolean isValid(Object value, ConstraintValidatorContext context) {
+		return value != null;
+	}
 }

@@ -228,8 +228,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the antenna height above ground level in meters.
 	 * 
-	 * @param antennaAboveGroundLevel
-	 *            Antenna height above ground level in meters.
+	 * @param antennaAboveGroundLevel Antenna height above ground level in meters.
 	 */
 	public void setAntennaAboveGroundLevel(int antennaAboveGroundLevel) {
 		this.antennaAboveGroundLevel = antennaAboveGroundLevel;
@@ -247,8 +246,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the antenna type.
 	 * 
-	 * @param antennaType
-	 *            Antenna type.
+	 * @param antennaType Antenna type.
 	 */
 	public void setAntennaType(AntennaType antennaType) {
 		this.antennaType = antennaType;
@@ -266,8 +264,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the antenna main direction (only for directional antennas).
 	 * 
-	 * @param antennaDirection
-	 *            Antenna main direction.
+	 * @param antennaDirection Antenna main direction.
 	 */
 	public void setAntennaDirection(int antennaDirection) {
 		this.antennaDirection = antennaDirection;
@@ -285,8 +282,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the antenna gain minus cable losses in dBi.
 	 * 
-	 * @param antennaGainDbi
-	 *            Antenna gain minus cable losses in dBi.
+	 * @param antennaGainDbi Antenna gain minus cable losses in dBi.
 	 */
 	public void setAntennaGainDbi(float antennaGainDbi) {
 		this.antennaGainDbi = antennaGainDbi;
@@ -304,8 +300,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the transmitter usage.
 	 * 
-	 * @param usage
-	 *            Transmitter usage.
+	 * @param usage Transmitter usage.
 	 */
 	public void setUsage(Usage usage) {
 		this.usage = usage;
@@ -323,8 +318,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the transmitter status.
 	 * 
-	 * @param status
-	 *            Transmitter status.
+	 * @param status Transmitter status.
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
@@ -333,8 +327,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the Core state instance.
 	 * 
-	 * @param statePar
-	 *            Core state.
+	 * @param statePar Core state.
 	 */
 	public static void setState(State statePar) {
 		state = statePar;
@@ -352,8 +345,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the timepoint when the transmitter connected.
 	 * 
-	 * @param when
-	 *            Timepoint
+	 * @param when Timepoint
 	 */
 	public void setLastConnected(Instant when) {
 		this.lastConnected = when;
@@ -371,8 +363,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the timepoint since when the transmitter is connected.
 	 * 
-	 * @param since
-	 *            Timepoint
+	 * @param since Timepoint
 	 */
 	public void setConnectedSince(Instant since) {
 		this.connectedSince = since;
@@ -390,8 +381,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the pager address used to send identification messages to.
 	 * 
-	 * @param address
-	 *            Pager address to use for sending identification messages.
+	 * @param address Pager address to use for sending identification messages.
 	 */
 	public void setIdentificationAddress(int address) {
 		this.identificationAddress = address;
@@ -400,8 +390,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the last update timestamp.
 	 * 
-	 * @param when
-	 *            Last update timestamp
+	 * @param when Last update timestamp
 	 */
 	public void setLastUpdate(Instant when) {
 		this.lastUpdate = when;
@@ -428,8 +417,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Sets the number of calls sent to this transmitter.
 	 * 
-	 * @param callCount
-	 *            Call count
+	 * @param callCount Call count
 	 */
 	public void setCallCount(long callCount) {
 		this.callCount.set(callCount);
@@ -438,8 +426,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 	/**
 	 * Atomically updates the call counter.
 	 * 
-	 * @param delta
-	 *            Delta to add or subtract.
+	 * @param delta Delta to add or subtract.
 	 */
 	public void updateCallCount(long delta) {
 		callCount.addAndGet(delta);

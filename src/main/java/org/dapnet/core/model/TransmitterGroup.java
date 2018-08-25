@@ -28,7 +28,7 @@ import org.dapnet.core.rest.RestAuthorizable;
 public class TransmitterGroup implements Serializable, RestAuthorizable, Searchable {
 	private static final long serialVersionUID = 2641698714366327412L;
 	private static volatile State state;
-	
+
 	// ID
 	@NotNull
 	@Size(min = 3, max = 20)

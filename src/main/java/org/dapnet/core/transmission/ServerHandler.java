@@ -14,6 +14,7 @@ import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 import org.dapnet.core.transmission.TransmitterClient.AckType;
 import org.jgroups.stack.IpAddress;
 
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -177,14 +178,14 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			throw new TransmitterException("The transmitter name is not registered: " + name);
 		} else if (t.getStatus() == Status.DISABLED) {
 			logger.error("Transmitter is disabled and not allowed to connect: " + name);
-			ctx.close();
+			ctx.writeAndFlush("07 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
 
 		// Test authentication key
 		if (!t.getAuthKey().equals(key)) {
 			logger.error("Wrong authentication key supplied for transmitter: " + name);
-			ctx.close();
+			ctx.writeAndFlush("07 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
 

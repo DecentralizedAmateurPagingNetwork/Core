@@ -43,15 +43,15 @@ public class TransmissionManager {
 		} catch (Exception e) {
 			logger.error("Failed to send Time in Skyper format.", e);
 		}
-		//Swissphone Time
-                try {
-                        PagerMessage message = protocol.createMessageFromTimeSwissphone(time);
-                        transmitterManager.sendMessage(message);
+		// Swissphone Time
+		try {
+			PagerMessage message = protocol.createMessageFromTimeSwissphone(time);
+			transmitterManager.sendMessage(message);
 
-                        logger.info("Time sent to transmitters in Swissphone format.");
-                } catch (Exception e) {
-                        logger.error("Failed to send Time in Swissphone format.", e);
-                }
+			logger.info("Time sent to transmitters in Swissphone format.");
+		} catch (Exception e) {
+			logger.error("Failed to send Time in Swissphone format.", e);
+		}
 
 	}
 

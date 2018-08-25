@@ -29,10 +29,8 @@ final class TransmitterClient {
 	/**
 	 * Creates a new client session.
 	 * 
-	 * @param channel
-	 *            Client connection channel
-	 * @throws NullPointerException
-	 *             If channel is null.
+	 * @param channel Client connection channel
+	 * @throws NullPointerException If channel is null.
 	 */
 	public TransmitterClient(Channel channel) {
 		if (channel == null) {
@@ -69,8 +67,7 @@ final class TransmitterClient {
 	/**
 	 * Sets the transmitter data.
 	 * 
-	 * @param transmitter
-	 *            Transmitter data
+	 * @param transmitter Transmitter data
 	 */
 	public void setTransmitter(Transmitter transmitter) {
 		if (transmitter != null) {
@@ -81,8 +78,8 @@ final class TransmitterClient {
 	}
 
 	/**
-	 * Sends a message containing the transmitter name (callsign) to the
-	 * connected transmitter.
+	 * Sends a message containing the transmitter name (callsign) to the connected
+	 * transmitter.
 	 */
 	public void sendCallSignMessage() {
 		Transmitter theTransmitter = transmitter;
@@ -95,8 +92,7 @@ final class TransmitterClient {
 	/**
 	 * Sends a message to the client.
 	 * 
-	 * @param msg
-	 *            Message to send.
+	 * @param msg Message to send.
 	 */
 	public void sendMessage(PagerMessage msg) {
 		synchronized (messageQueue) {
@@ -108,8 +104,7 @@ final class TransmitterClient {
 	/**
 	 * Sends all messages to the client.
 	 * 
-	 * @param messages
-	 *            Messages to send.
+	 * @param messages Messages to send.
 	 */
 	public void sendMessages(Collection<PagerMessage> messages) {
 		synchronized (messageQueue) {
@@ -121,10 +116,8 @@ final class TransmitterClient {
 	/**
 	 * Acknowleges a message and sends the next one.
 	 * 
-	 * @param sequenceNumber
-	 *            Sequence number to ack.
-	 * @param response
-	 *            Ack response type.
+	 * @param sequenceNumber Sequence number to ack.
+	 * @param response       Ack response type.
 	 */
 	public boolean ackMessage(int sequenceNumber, AckType response) {
 		synchronized (messageQueue) {
@@ -173,8 +166,7 @@ final class TransmitterClient {
 	}
 
 	/**
-	 * Closes the connection. This call will block until the connection is
-	 * closed.
+	 * Closes the connection. This call will block until the connection is closed.
 	 */
 	public void close() {
 		Channel theChannel = channel;
@@ -226,7 +218,7 @@ final class TransmitterClient {
 		}
 
 		public int getExpectedSequenceNumber() {
-/* Warp around on 8 Bits */
+			/* Warp around on 8 Bits */
 			return ((sequenceNumber + 1) % 256);
 		}
 

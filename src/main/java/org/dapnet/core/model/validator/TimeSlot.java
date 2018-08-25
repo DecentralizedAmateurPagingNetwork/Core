@@ -23,14 +23,14 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target({METHOD, FIELD, ANNOTATION_TYPE})
+@Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Constraint(validatedBy = TimeSlotValidator.class)
 @Retention(RUNTIME)
 @Documented
 public @interface TimeSlot {
-    String message() default "must be a valid timeSlotDescription";
+	String message() default "must be a valid timeSlotDescription";
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 }

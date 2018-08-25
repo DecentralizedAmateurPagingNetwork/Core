@@ -73,11 +73,10 @@ public class HashUtil {
 	/**
 	 * Returns a salted PBKDF2 hash of the password.
 	 *
-	 * @param password
-	 *            the password to hash
+	 * @param password the password to hash
 	 * @return a salted PBKDF2 hash of the password
-	 * @throws IllegalArgumentException
-	 *             if the password contains non-alphanumeric characters.
+	 * @throws IllegalArgumentException if the password contains non-alphanumeric
+	 *                                  characters.
 	 */
 	public static String createHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
 		Matcher m = VALID_CHARS.matcher(password);
@@ -91,8 +90,7 @@ public class HashUtil {
 	/**
 	 * Returns a salted PBKDF2 hash of the password.
 	 *
-	 * @param password
-	 *            the password to hash
+	 * @param password the password to hash
 	 * @return a salted PBKDF2 hash of the password
 	 */
 	public static String createHash(char[] password) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -110,10 +108,8 @@ public class HashUtil {
 	/**
 	 * Validates a password using a hash.
 	 *
-	 * @param password
-	 *            the password to check
-	 * @param correctHash
-	 *            the hash of the valid password
+	 * @param password    the password to check
+	 * @param correctHash the hash of the valid password
 	 * @return true if the password is correct, false if not
 	 */
 	public static boolean validatePassword(String password, String correctHash)
@@ -124,10 +120,8 @@ public class HashUtil {
 	/**
 	 * Validates a password using a hash.
 	 *
-	 * @param password
-	 *            the password to check
-	 * @param correctHash
-	 *            the hash of the valid password
+	 * @param password    the password to check
+	 * @param correctHash the hash of the valid password
 	 * @return true if the password is correct, false if not
 	 */
 	public static boolean validatePassword(char[] password, String correctHash)
@@ -150,10 +144,8 @@ public class HashUtil {
 	 * used so that password hashes cannot be extracted from an on-line system using
 	 * a timing attack and then attacked off-line.
 	 *
-	 * @param a
-	 *            the first byte array
-	 * @param b
-	 *            the second byte array
+	 * @param a the first byte array
+	 * @param b the second byte array
 	 * @return true if both byte arrays are the same, false if not
 	 */
 	private static boolean slowEquals(byte[] a, byte[] b) {
@@ -166,14 +158,10 @@ public class HashUtil {
 	/**
 	 * Computes the PBKDF2 hash of a password.
 	 *
-	 * @param password
-	 *            the password to hash.
-	 * @param salt
-	 *            the salt
-	 * @param iterations
-	 *            the iteration count (slowness factor)
-	 * @param bytes
-	 *            the length of the hash to compute in bytes
+	 * @param password   the password to hash.
+	 * @param salt       the salt
+	 * @param iterations the iteration count (slowness factor)
+	 * @param bytes      the length of the hash to compute in bytes
 	 * @return the PBDKF2 hash of the password
 	 */
 	private static byte[] pbkdf2(char[] password, byte[] salt, int iterations, int bytes)
@@ -186,8 +174,7 @@ public class HashUtil {
 	/**
 	 * Converts a string of hexadecimal characters into a byte array.
 	 *
-	 * @param hex
-	 *            the hex string
+	 * @param hex the hex string
 	 * @return the hex string decoded into a byte array
 	 */
 	private static byte[] fromHex(String hex) {
@@ -201,8 +188,7 @@ public class HashUtil {
 	/**
 	 * Converts a byte array into a hexadecimal string.
 	 *
-	 * @param array
-	 *            the byte array to convert
+	 * @param array the byte array to convert
 	 * @return a length*2 character string encoding the byte array
 	 */
 	private static String toHex(byte[] array) {
@@ -218,8 +204,7 @@ public class HashUtil {
 	/**
 	 * Tests the basic functionality of the HashUtil class
 	 *
-	 * @param args
-	 *            ignored
+	 * @param args ignored
 	 */
 	public static void main(String[] args) {
 		try {

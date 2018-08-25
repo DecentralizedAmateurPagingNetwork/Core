@@ -32,8 +32,7 @@ final class SyncTimeHandler {
 	/**
 	 * Creates a new instance.
 	 * 
-	 * @param maxLoops
-	 *            Number of time synchronizations to perform.
+	 * @param maxLoops Number of time synchronizations to perform.
 	 */
 	public SyncTimeHandler(int maxLoops) {
 		this.maxLoops = maxLoops;
@@ -42,12 +41,9 @@ final class SyncTimeHandler {
 	/**
 	 * Handles the incoming message depending on the connection state.
 	 * 
-	 * @param ctx
-	 *            Channel handler context (used to send responses if required).
-	 * @param message
-	 *            Received message.
-	 * @throws Exception
-	 *             If an error occurs.
+	 * @param ctx     Channel handler context (used to send responses if required).
+	 * @param message Received message.
+	 * @throws Exception If an error occurs.
 	 */
 	public void handleMessage(ChannelHandlerContext ctx, String message) throws Exception {
 		switch (state) {

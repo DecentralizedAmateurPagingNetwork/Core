@@ -24,13 +24,13 @@ import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Constraint(validatedBy = EMailValidator.class)
-@Target({METHOD, FIELD, ANNOTATION_TYPE})
+@Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 @Documented
 public @interface EMail {
-    String message() default "must be valid mail address";
+	String message() default "must be valid mail address";
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 }
