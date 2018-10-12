@@ -43,6 +43,7 @@ public class TransmissionManager {
 		} catch (Exception e) {
 			logger.error("Failed to send Time in Skyper format.", e);
 		}
+
 		// Swissphone Time
 		try {
 			PagerMessage message = protocol.createMessageFromTimeSwissphone(time);
@@ -51,6 +52,16 @@ public class TransmissionManager {
 			logger.info("Time sent to transmitters in Swissphone format.");
 		} catch (Exception e) {
 			logger.error("Failed to send Time in Swissphone format.", e);
+		}
+
+		// AlphaPoc Time
+		try {
+			PagerMessage message = protocol.createMessageFromTimeAlphaPoc(time);
+			transmitterManager.sendMessage(message);
+
+			logger.info("Time sent to transmitters in AlphaPoc format.");
+		} catch (Exception e) {
+			logger.error("Failed to send Time in AlphaPoc format.", e);
 		}
 
 	}
