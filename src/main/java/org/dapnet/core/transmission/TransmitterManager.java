@@ -90,6 +90,31 @@ public class TransmitterManager {
 	}
 
 	/**
+	 * Sends a message to a specific connected transmitter only if it is in one of
+	 * the given transmitter groups.
+	 * 
+	 * @param message         Message to send.
+	 * @param transmitterName Transmitter name.
+	 * @param groups          Transmitter groups to check.
+	 * @return {@code true} if the message was sent.
+	 */
+	public boolean sendMessageIfInGroups(PagerMessage message, String transmitterName,
+			Collection<TransmitterGroup> groups) {
+		Collection<String> transmitters = getTransmitterNames(groups);
+		for (String name : transmitters) {
+			if (name.equalsIgnoreCase(transmitterName)) {
+				TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
+				if (cl != null) {
+					cl.sendMessage(message);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Sends multiple messages to a specific connected transmitter.
 	 * 
 	 * @param messages        Messages to send.
