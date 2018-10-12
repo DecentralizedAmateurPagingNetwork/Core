@@ -46,6 +46,8 @@ public class SkyperProtocol implements PagerProtocol {
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HHmmss   ddMMyy");
 	private static final DateTimeFormatter DATE_FORMATTER_SWISSPHONE = DateTimeFormatter
 			.ofPattern("'XTIME='HHmmddMMyy");
+	private static final DateTimeFormatter DATE_FORMATTER_ALPHAPOC = DateTimeFormatter
+			.ofPattern("'YYYYMMDDHHMMSS'yyMMddHHmm'00'");
 	private static final Charset PAGER_CHARSET = new DE_ASCII7();
 
 	@Override
@@ -102,6 +104,12 @@ public class SkyperProtocol implements PagerProtocol {
 		String s = DATE_FORMATTER_SWISSPHONE.format(time);
 		String s2 = s + s;
 		return new PagerMessage(s2, 165856, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
+	}
+
+	@Override
+	public PagerMessage createMessageFromTimeAlphaPoc(LocalDateTime time) {
+		String s = DATE_FORMATTER_ALPHAPOC.format(time);
+		return new PagerMessage(s, 165866, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
 	}
 
 	@Override

@@ -27,6 +27,8 @@ public interface PagerProtocol {
 
 	PagerMessage createMessageFromTimeSwissphone(LocalDateTime time);
 
+	PagerMessage createMessageFromTimeAlphaPoc(LocalDateTime time);
+
 	PagerMessage createMessageFromRubric(Rubric rubric);
 
 	PagerMessage createMessageFromNews(News news);
