@@ -121,7 +121,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 			}
 		}
 
-		if (result.size() == result.size()) {
+		if (transmitterGroupNames.size() == result.size()) {
 			return result;
 		} else {
 			return null;

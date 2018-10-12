@@ -165,9 +165,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private void handleAuth(ChannelHandlerContext ctx, String msg) throws Exception {
 		Matcher authMatcher = AUTH_PATTERN.matcher(msg);
 		if (!authMatcher.matches()) {
-                        logger.error("Invalid welcome message format: " + msg);
-                        ctx.writeAndFlush("07 Invalid welcom message format").addListener(ChannelFutureListener.CLOSE);
-                        return;
+			logger.error("Invalid welcome message format: " + msg);
+			ctx.writeAndFlush("07 Invalid welcom message format").addListener(ChannelFutureListener.CLOSE);
+			return;
 //			throw new TransmitterException("Invalid welcome message format: " + msg);
 		}
 
@@ -178,9 +178,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		Transmitter t = manager.getTransmitter(name);
 		if (t == null) {
-                        logger.error("The transmitter name is not registered: " + name);
-                        ctx.writeAndFlush("07 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
-                        return;
+			logger.error("The transmitter name is not registered: " + name);
+			ctx.writeAndFlush("07 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
+			return;
 //			throw new TransmitterException("The transmitter name is not registered: " + name);
 		} else if (t.getStatus() == Status.DISABLED) {
 			logger.error("Transmitter is disabled and not allowed to connect: " + name);
