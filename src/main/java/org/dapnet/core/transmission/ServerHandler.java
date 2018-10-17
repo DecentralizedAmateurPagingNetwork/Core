@@ -130,6 +130,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 					logger.error("Exception in server handler.", cause);
 				}
 			}
+		} catch (Exception ex) {
+			logger.error("Exception in exception handler", ex);
 		} finally {
 			ctx.close();
 		}
