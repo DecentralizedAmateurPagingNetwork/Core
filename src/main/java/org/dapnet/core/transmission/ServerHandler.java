@@ -86,7 +86,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		if (client != null) {
-			logger.info("Connection to {} with callsign {} closed in state {}.", ctx.channel().remoteAddress(), client.getName(), state);
+			logger.info("Connection to {} with callsign {} closed in state {} using {} {}.",
+					ctx.channel().remoteAddress(), client.getName(), state,
+					client.getDeviceType(),client.getDeviceVersion());
 		} else {
 			logger.info("Connection to {} closed in state {}.", ctx.channel().remoteAddress(), state);
 		}

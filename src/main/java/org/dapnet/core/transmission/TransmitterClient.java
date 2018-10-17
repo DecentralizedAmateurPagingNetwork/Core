@@ -56,6 +56,36 @@ final class TransmitterClient {
 	}
 
 	/**
+	 * Returns the transmitter DeviceType if a transmitter instance is present or the
+	 * short channel ID.
+	 *
+	 * @return Transmitter DeviceType or short channel ID.
+	 */
+	public String getDeviceType() {
+		Transmitter theTransmitter = transmitter;
+		if (theTransmitter != null) {
+			return theTransmitter.getDeviceType();
+		} else {
+			return channel.id().asShortText();
+		}
+	}
+
+	/**
+	 * Returns the transmitter DeviceVersion if a transmitter instance is present or the
+	 * short channel ID.
+	 *
+	 * @return Transmitter DeviceVersion or short channel ID.
+	 */
+	public String getDeviceVersion() {
+		Transmitter theTransmitter = transmitter;
+		if (theTransmitter != null) {
+			return theTransmitter.getDeviceVersion();
+		} else {
+			return channel.id().asShortText();
+		}
+	}
+
+	/**
 	 * Gets the transmitter data.
 	 * 
 	 * @return Transmitter data
