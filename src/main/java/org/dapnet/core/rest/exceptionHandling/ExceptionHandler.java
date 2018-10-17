@@ -78,6 +78,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 			descriptor = new ExceptionDescriptor(4010, "Not Authorized", "Invalid or missing username or password");
 		} else if (e instanceof NotFoundException) {
 			descriptor = new ExceptionDescriptor(4040, "Not Found", "The requested resource could not be found");
+			logger.error(request.getMethod() + " " + uri.getPath() + " - " + descriptor.getLogMessage(), e);
 		} else if (e instanceof NotSupportedException) {
 			descriptor = new ExceptionDescriptor(4150, "Not Supported",
 					"The request entity media type is not supported");
