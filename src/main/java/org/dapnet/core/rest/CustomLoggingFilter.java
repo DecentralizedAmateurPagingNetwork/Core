@@ -98,9 +98,9 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 
 		if (responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
 				|| responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR) {
-			logger.info("REST " + requestContext.getMethod() + " Response : " + sb.toString());
+			logger.info(requestContext.getHeaderString("X-Forwarded-For") + " REST " + requestContext.getMethod() + " Response : " + sb.toString());
 		} else {
-			logger.error("REST " + requestContext.getMethod() + " Response : " + sb.toString());
+			logger.error(requestContext.getHeaderString("X-Forwarded-For") + " REST " + requestContext.getMethod() + " Response : " + sb.toString());
 		}
 	}
 
