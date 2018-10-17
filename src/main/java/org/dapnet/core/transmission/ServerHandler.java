@@ -85,7 +85,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		logger.info("Connection to {} closed.", ctx.channel().remoteAddress());
+		logger.info("Connection to {} closed in state {}.", ctx.channel().remoteAddress(), state);
 
 		if (handshakePromise != null) {
 			handshakePromise.trySuccess();
