@@ -94,7 +94,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		if (client != null) {
 			int count = client.getPendingMessageCount();
 			if (count > 0) {
-				logger.warn("Client has {} pending messages.", count);
+				logger.warn("Client {] has {} pending messages.", client.getName(), count);
 			}
 
 			manager.onDisconnect(client);
