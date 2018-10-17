@@ -6,7 +6,6 @@ import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.Settings;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -30,7 +29,7 @@ public class TransmitterServer {
 			b.group(bossGroup, workerGroup);
 			b.channel(NioServerSocketChannel.class);
 			b.childHandler(new ServerInitializer(manager));
-			b.childOption(ChannelOption.SO_KEEPALIVE, true);
+			// b.childOption(ChannelOption.SO_KEEPALIVE, true);
 			b.bind(port).sync();
 
 			LOGGER.info("Server started on port: {}", port);
