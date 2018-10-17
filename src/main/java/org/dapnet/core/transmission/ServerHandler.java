@@ -170,7 +170,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		Matcher authMatcher = AUTH_PATTERN.matcher(msg);
 		if (!authMatcher.matches()) {
 			logger.error("Invalid welcome message format: " + msg);
-			ctx.writeAndFlush("07 Invalid welcom message format").addListener(ChannelFutureListener.CLOSE);
+			ctx.writeAndFlush("07 Invalid welcome message format").addListener(ChannelFutureListener.CLOSE);
 			return;
 //			throw new TransmitterException("Invalid welcome message format: " + msg);
 		}
