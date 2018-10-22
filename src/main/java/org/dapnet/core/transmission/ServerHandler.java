@@ -176,7 +176,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		Matcher authMatcher = AUTH_PATTERN.matcher(msg);
 		if (!authMatcher.matches()) {
 			logger.error("Invalid welcome message format: " + msg);
-			ctx.writeAndFlush("07 Invalid welcome message format").addListener(ChannelFutureListener.CLOSE);
+			ctx.writeAndFlush("7 Invalid welcome message format").addListener(ChannelFutureListener.CLOSE);
 			return;
 //			throw new TransmitterException("Invalid welcome message format: " + msg);
 		}
@@ -189,19 +189,19 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		Transmitter t = manager.getTransmitter(name);
 		if (t == null) {
 			logger.error("The transmitter name is not registered: " + name);
-			ctx.writeAndFlush("07 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
+			ctx.writeAndFlush("7 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
 			return;
 //			throw new TransmitterException("The transmitter name is not registered: " + name);
 		} else if (t.getStatus() == Status.DISABLED) {
 			logger.error("Transmitter is disabled and not allowed to connect: " + name);
-			ctx.writeAndFlush("07 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
+			ctx.writeAndFlush("7 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
 
 		// Test authentication key
 		if (!t.getAuthKey().equals(key)) {
 			logger.error("Wrong authentication key supplied for transmitter: " + name);
-			ctx.writeAndFlush("07 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
+			ctx.writeAndFlush("7 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
 
