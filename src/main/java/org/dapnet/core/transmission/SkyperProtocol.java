@@ -107,9 +107,22 @@ public class SkyperProtocol implements PagerProtocol {
 	}
 
 	@Override
+	public PagerMessage createMessageFromLocalTimeSwissphone(LocalDateTime localTime) {
+		String s = DATE_FORMATTER_SWISSPHONE.format(localTime);
+		String s2 = s + s;
+		return new PagerMessage(s2, 165857, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
+	}
+
+	@Override
 	public PagerMessage createMessageFromTimeAlphaPoc(LocalDateTime time) {
 		String s = DATE_FORMATTER_ALPHAPOC.format(time);
 		return new PagerMessage(s, 165866, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
+	}
+
+	@Override
+	public PagerMessage createMessageFromLocalTimeAlphaPoc(LocalDateTime time) {
+		String s = DATE_FORMATTER_ALPHAPOC.format(time);
+		return new PagerMessage(s, 165867, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
 	}
 
 	@Override

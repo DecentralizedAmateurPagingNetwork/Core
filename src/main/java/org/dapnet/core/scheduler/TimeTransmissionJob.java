@@ -41,6 +41,8 @@ public class TimeTransmissionJob implements Job {
 			// TransmitterGroup
 			LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 			transmissionManager.handleTime(now);
+			LocalDateTime localtime = LocalDateTime.now();
+			transmissionManager.handleLocalTime(localtime);
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute TimeTransmissionJob", e);
 		}

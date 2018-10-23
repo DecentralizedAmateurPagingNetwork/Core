@@ -66,6 +66,29 @@ public class TransmissionManager {
 
 	}
 
+	public void handleLocalTime(LocalDateTime time) {
+		// Swissphone Time in local time
+		try {
+			PagerMessage message = protocol.createMessageFromLocalTimeSwissphone(time);
+			transmitterManager.sendMessage(message);
+
+			logger.info("Local time sent to transmitters in Swissphone format.");
+		} catch (Exception e) {
+			logger.error("Failed to send local time in Swissphone format.", e);
+		}
+
+		// AlphaPoc Time in local time
+		try {
+			PagerMessage message = protocol.createMessageFromLocalTimeAlphaPoc(time);
+			transmitterManager.sendMessage(message);
+
+			logger.info("Local time sent to transmitters in AlphaPoc format.");
+		} catch (Exception e) {
+			logger.error("Failed to send local time in AlphaPoc format.", e);
+		}
+
+	}
+
 	public void handleNews(News news) {
 		try {
 			PagerMessage message = protocol.createMessageFromNews(news);
