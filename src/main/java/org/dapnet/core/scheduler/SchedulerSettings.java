@@ -19,6 +19,7 @@ import java.io.Serializable;
 public class SchedulerSettings implements Serializable {
 	private static final long serialVersionUID = -8720953587062509265L;
 	private String timeTransmissionCron = "0 0/20 * * * ?";
+	private String localTimeTransmissionCron = "0 10/20 * * * ?";
 	private String rubricNameTransmissionCron = "15 0/20 * * * ?";
 	private String newsTransmissionCron = "45 0 * * * ?";
 	private String stateSavingCron = "30 0/10 * * * ?";
@@ -27,6 +28,10 @@ public class SchedulerSettings implements Serializable {
 
 	public String getTimeTransmissionCron() {
 		return timeTransmissionCron;
+	}
+
+	public String getLocalTimeTransmissionCron() {
+		return localTimeTransmissionCron;
 	}
 
 	public String getRubricNameTransmissionCron() {

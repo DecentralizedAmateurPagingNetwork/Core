@@ -26,7 +26,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.SchedulerContext;
 import org.quartz.SchedulerException;
 
-public class TimeTransmissionJob implements Job {
+public class LocalTimeTransmissionJob implements Job {
 	private static final Logger logger = LogManager.getLogger();
 
 	@Override
@@ -39,8 +39,8 @@ public class TimeTransmissionJob implements Job {
 
 			// Possibility to implement TimeZones by adding here a
 			// TransmitterGroup
-			LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-			transmissionManager.handleTime(now);
+			LocalDateTime localtime = LocalDateTime.now();
+			transmissionManager.handleLocalTime(localtime);
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute TimeTransmissionJob", e);
 		}
