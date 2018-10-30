@@ -30,7 +30,7 @@
   "schedulerSettings": {
     "timeTransmissionCron": "0 0/2 * * * ?",
     "localTimeTransmissionCron": "0 1/1 * * * ?",
-    "rubricNameTransmissionCron": "15 0/5 * * * ?",
+    "rubricNameTransmissionCron": "0 3 0/2 * * ?",
     "stateSavingCron": "30 0/10 * * * ?",
     "stateCleaningCron": "0 0 0 * * ?"
   }
