@@ -3,7 +3,7 @@
     "pagingProtocolSettings": {
       "numberOfSyncLoops": 5,
       "sendSpeed": 1,
-      "activationCode": "0 7 50,0 7 34,0 7 53,0 7 51,0 7 51,0 7 52,0 7 52,0 7 52"
+      "activationCode": "0 7 50,0 7 34,0 7 53,0 7 51,0 7 51,0 7 52,0 7 52,0 7 56"
     },
     "raspagerSettings": {
       "maxNumberOfReconnects": -1,
