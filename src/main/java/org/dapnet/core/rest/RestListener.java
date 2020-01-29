@@ -14,10 +14,10 @@
 
 package org.dapnet.core.rest;
 
+import java.util.Collection;
+
 import org.dapnet.core.model.State;
 import org.jgroups.Address;
-
-import java.util.Collection;
 
 public interface RestListener {
 	// Give (ReadOnly) Access to the State

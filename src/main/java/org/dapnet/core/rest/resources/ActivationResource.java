@@ -14,9 +14,7 @@
 
 package org.dapnet.core.rest.resources;
 
-import org.dapnet.core.model.Activation;
-import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
+import java.util.Date;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,7 +22,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Date;
+
+import org.dapnet.core.model.Activation;
+import org.dapnet.core.rest.RestSecurity;
+import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
 @Path("/activation")
 @Produces(MediaType.APPLICATION_JSON)

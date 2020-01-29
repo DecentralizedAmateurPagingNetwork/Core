@@ -14,9 +14,10 @@
 
 package org.dapnet.core.model.validator;
 
+import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.regex.Pattern;
 
 public class EMailValidator implements ConstraintValidator<EMail, String> {
 	public static final Pattern EMAIL_ADDRESS_REGEX = Pattern.compile(

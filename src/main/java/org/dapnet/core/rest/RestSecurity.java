@@ -14,12 +14,12 @@
 
 package org.dapnet.core.rest;
 
+import javax.ws.rs.core.HttpHeaders;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.User;
-
-import javax.ws.rs.core.HttpHeaders;
 
 public class RestSecurity {
 	public enum SecurityLevel {

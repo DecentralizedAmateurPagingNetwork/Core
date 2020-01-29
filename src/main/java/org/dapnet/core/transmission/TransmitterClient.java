@@ -56,8 +56,8 @@ final class TransmitterClient {
 	}
 
 	/**
-	 * Returns the transmitter DeviceType if a transmitter instance is present or the
-	 * short channel ID.
+	 * Returns the transmitter DeviceType if a transmitter instance is present or
+	 * the short channel ID.
 	 *
 	 * @return Transmitter DeviceType or short channel ID.
 	 */
@@ -71,8 +71,8 @@ final class TransmitterClient {
 	}
 
 	/**
-	 * Returns the transmitter DeviceVersion if a transmitter instance is present or the
-	 * short channel ID.
+	 * Returns the transmitter DeviceVersion if a transmitter instance is present or
+	 * the short channel ID.
 	 *
 	 * @return Transmitter DeviceVersion or short channel ID.
 	 */

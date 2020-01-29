@@ -14,6 +14,13 @@
 
 package org.dapnet.core;
 
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /*
  * Password Hashing With PBKDF2 (http://crackstation.net/hashing-security.htm).
  * Copyright (c) 2013, Taylor Hornby
@@ -44,12 +51,6 @@ package org.dapnet.core;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * PBKDF2 salted password hashing.

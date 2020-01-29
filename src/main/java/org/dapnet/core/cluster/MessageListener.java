@@ -14,21 +14,22 @@
 
 package org.dapnet.core.cluster;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.model.State;
 import org.jgroups.Message;
 import org.jgroups.util.Util;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Set;
 
 public class MessageListener implements org.jgroups.MessageListener {
 	private static final Logger logger = LogManager.getLogger();

@@ -14,10 +14,10 @@
 
 package org.dapnet.core.rest.exceptionHandling;
 
+import java.io.Serializable;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import java.io.Serializable;
 
 public class ExceptionDescriptor implements Serializable {
 	private static final long serialVersionUID = 7205168715512923074L;

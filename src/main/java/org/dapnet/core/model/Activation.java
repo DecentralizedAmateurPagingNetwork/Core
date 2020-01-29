@@ -14,16 +14,17 @@
 
 package org.dapnet.core.model;
 
-import org.dapnet.core.model.validator.ValidName;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import org.dapnet.core.model.validator.ValidName;
 
 public class Activation implements Serializable {
 	private static final long serialVersionUID = 2653692303199008619L;

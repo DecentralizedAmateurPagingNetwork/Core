@@ -14,9 +14,14 @@
 
 package org.dapnet.core.rest.exceptionHandling;
 
-import javax.validation.ConstraintViolation;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
 
 public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor {
 	private static final long serialVersionUID = -3338439259161824779L;
