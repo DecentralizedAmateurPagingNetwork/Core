@@ -188,19 +188,19 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		Transmitter t = manager.getTransmitter(name);
 		if (t == null) {
-			logger.error("The transmitter name is not registered: " + name + " " + ctx.channel().remoteAddress());
+			logger.error("The transmitter name is not registered: " + name + " connecting from " + ctx.channel().remoteAddress());
 			ctx.writeAndFlush("7 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
 			return;
 //			throw new TransmitterException("The transmitter name is not registered: " + name);
 		} else if (t.getStatus() == Status.DISABLED) {
-			logger.error("Transmitter is disabled and not allowed to connect: " + name + " " + ctx.channel().remoteAddress());
+			logger.error("Transmitter is disabled and not allowed to connect: " + name + " connecting from " + ctx.channel().remoteAddress());
 			ctx.writeAndFlush("7 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
 
 		// Test authentication key
 		if (!t.getAuthKey().equals(key)) {
-			logger.error("Wrong authentication key supplied for transmitter: " + name + " " + ctx.channel().remoteAddress());
+			logger.error("Wrong authentication key supplied for transmitter: " + name + " connecting from " + ctx.channel().remoteAddress());
 			ctx.writeAndFlush("7 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
