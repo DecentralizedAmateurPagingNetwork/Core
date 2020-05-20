@@ -11,7 +11,7 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 @PreMatching
-final class OptionsFilter implements ContainerRequestFilter {
+public class OptionsFilter implements ContainerRequestFilter {
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
