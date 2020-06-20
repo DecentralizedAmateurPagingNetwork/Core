@@ -1,6 +1,6 @@
 #!/bin/bash
 cd /opt/dapnet/Core/util/autodetermineexternalip/
-CurrentIP=`curl -s --noproxy "*" http://db0sda.ampr.org/ip.php`
+CurrentIP=`curl -s --noproxy "*" http://web.db0sda.ampr.org/ip.php`
 echo $CurrentIP
 LastIP=`cat ./lastip.hamnet.ipv4`
 if [ "$CurrentIP" != "$LastIP" ]
