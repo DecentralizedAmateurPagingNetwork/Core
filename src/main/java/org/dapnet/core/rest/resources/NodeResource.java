@@ -14,9 +14,12 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.concurrent.locks.Lock;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -25,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.State;
 import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -34,8 +38,15 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NodeResource extends AbstractResource {
 	@GET
 	public Response getNodes() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getNodes().values(), status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			return getObject(restListener.getState().getNodes().values(), status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@GET
@@ -45,8 +56,15 @@ public class NodeResource extends AbstractResource {
 			nodeName = nodeName.toLowerCase();
 		}
 
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getNodes().get(nodeName), status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			return getObject(restListener.getState().getNodes().get(nodeName), status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@PUT
@@ -57,21 +75,31 @@ public class NodeResource extends AbstractResource {
 			nodeName = nodeName.toLowerCase();
 		}
 
-		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+		Node node = null;
+		Node oldNode = null;
 
-		final Node node = gson.fromJson(nodeJSON, Node.class);
-		if (node != null) {
-			node.setName(nodeName);
-			node.setStatus(Node.Status.SUSPENDED);
-		} else {
-			throw new EmptyBodyException();
-		}
+		Lock lock = State.getReadLock();
+		lock.lock();
 
-		// Preserve old status
-		Node oldNode = restListener.getState().getNodes().get(nodeName);
-		if (oldNode != null && oldNode.getStatus() == Status.ONLINE) {
-			node.setStatus(Status.ONLINE);
-			node.setAddress(oldNode.getAddress());
+		try {
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+
+			node = gson.fromJson(nodeJSON, Node.class);
+			if (node != null) {
+				node.setName(nodeName);
+				node.setStatus(Node.Status.SUSPENDED);
+			} else {
+				throw new EmptyBodyException();
+			}
+
+			// Preserve old status
+			oldNode = restListener.getState().getNodes().get(nodeName);
+			if (oldNode != null && oldNode.getStatus() == Status.ONLINE) {
+				node.setStatus(Status.ONLINE);
+				node.setAddress(oldNode.getAddress());
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return handleObject(node, "putNode", oldNode == null, true);
@@ -84,7 +112,21 @@ public class NodeResource extends AbstractResource {
 			node = node.toLowerCase();
 		}
 
-		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		return deleteObject(restListener.getState().getNodes().get(node), "deleteNode", true);
+		Node oldNode = null;
+
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			oldNode = restListener.getState().getNodes().get(node);
+			if (oldNode == null) {
+				throw new NotFoundException();
+			}
+		} finally {
+			lock.unlock();
+		}
+
+		return deleteObject(oldNode, "deleteNode", true);
 	}
 }

@@ -5,6 +5,8 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.concurrent.locks.Lock;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,8 +25,15 @@ public class StatisticsResource extends AbstractResource {
 
 	@GET
 	public Response get() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		return getObject(new ObjectCounts(restListener.getState()), status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+			return getObject(new ObjectCounts(restListener.getState()), status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	public static final class ObjectCounts {

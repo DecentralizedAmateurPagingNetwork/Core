@@ -17,7 +17,7 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -94,7 +94,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 			return null;
 		}
 
-		ConcurrentMap<String, User> users = state.getUsers();
+		Map<String, User> users = state.getUsers();
 		ArrayList<User> result = new ArrayList<>();
 		for (String owner : ownerNames) {
 			User u = users.get(owner.toLowerCase());
@@ -119,7 +119,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 			return null;
 		}
 
-		ConcurrentMap<String, Transmitter> transmitters = state.getTransmitters();
+		Map<String, Transmitter> transmitters = state.getTransmitters();
 		ArrayList<Transmitter> result = new ArrayList<>();
 		for (String transmitterName : transmitterNames) {
 			Transmitter t = transmitters.get(transmitterName.toLowerCase());

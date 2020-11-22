@@ -14,6 +14,8 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.concurrent.locks.Lock;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -25,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.HashUtil;
+import org.dapnet.core.model.State;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -34,8 +37,15 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class UserResource extends AbstractResource {
 	@GET
 	public Response getUsers() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getUsers().values(), status);
+		final Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			return getObject(restListener.getState().getUsers().values(), status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@GET
@@ -45,47 +55,64 @@ public class UserResource extends AbstractResource {
 			userName = userName.toLowerCase();
 		}
 
-		User user = restListener.getState().getUsers().get(userName);
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, user);
-		return getObject(user, status);
+		final Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			User user = restListener.getState().getUsers().get(userName);
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, user);
+			return getObject(user, status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@PUT
 	@Path("{user}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putUser(@PathParam("user") String userName, String userJSON) throws Exception {
-		// Start request processing only if at least USER
-		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-
 		if (userName != null) {
 			userName = userName.toLowerCase();
 		}
 
-		final User oldUser = restListener.getState().getUsers().get(userName);
+		User user = null;
+		User oldUser = null;
 
-		// Create User from received data
-		final User user = gson.fromJson(userJSON, User.class);
-		if (user != null) {
-			String hash = user.getHash();
-			if ((hash == null || hash.isEmpty()) && oldUser != null) {
-				user.setHash(oldUser.getHash());
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			// Start request processing only if at least USER
+			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+
+			oldUser = restListener.getState().getUsers().get(userName);
+
+			// Create User from received data
+			user = gson.fromJson(userJSON, User.class);
+			if (user != null) {
+				String hash = user.getHash();
+				if ((hash == null || hash.isEmpty()) && oldUser != null) {
+					user.setHash(oldUser.getHash());
+				} else {
+					user.setHash(HashUtil.createHash(user.getHash()));
+				}
+
+				user.setName(userName);
 			} else {
-				user.setHash(HashUtil.createHash(user.getHash()));
+				throw new EmptyBodyException();
 			}
 
-			user.setName(userName);
-		} else {
-			throw new EmptyBodyException();
-		}
-
-		if (user.isAdmin()) {
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		} else {
-			if (oldUser != null) {
-				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);
-			} else {
+			if (user.isAdmin()) {
 				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			} else {
+				if (oldUser != null) {
+					checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);
+				} else {
+					checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+				}
 			}
+		} finally {
+			lock.unlock();
 		}
 
 		return handleObject(user, "putUser", oldUser == null, true);
@@ -98,13 +125,22 @@ public class UserResource extends AbstractResource {
 			user = user.toLowerCase();
 		}
 
-		final User oldUser = restListener.getState().getUsers().get(user);
-		if (oldUser != null) {
-			// only owner can delete object
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);
-		} else {
-			// only user will get message that object does not exist
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+		User oldUser = null;
+
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			oldUser = restListener.getState().getUsers().get(user);
+			if (oldUser != null) {
+				// only owner can delete object
+				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);
+			} else {
+				// only user will get message that object does not exist
+				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return deleteObject(oldUser, "deleteUser", true);

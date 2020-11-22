@@ -14,6 +14,8 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.concurrent.locks.Lock;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -21,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.model.State;
 import org.dapnet.core.rest.RestSecurity;
 
 @Path("/core")
@@ -32,24 +35,45 @@ public class CoreResource extends AbstractResource {
 	@Path("/core_version")
 	@GET
 	public Response getCoreVersion() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		VersionWrapper version = new VersionWrapper(DAPNETCore.getCoreVersion());
-		return getObject(version, status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+			VersionWrapper version = new VersionWrapper(DAPNETCore.getCoreVersion());
+			return getObject(version, status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Path("/api_version")
 	@GET
 	public Response getApiVersion() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		VersionWrapper version = new VersionWrapper(DAPNETCore.getApiVersion());
-		return getObject(version, status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+			VersionWrapper version = new VersionWrapper(DAPNETCore.getApiVersion());
+			return getObject(version, status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Path("/version")
 	@GET
 	public Response getVersion() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		return getObject(version, status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+			return getObject(version, status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	// Workaround to get a proper JSON object

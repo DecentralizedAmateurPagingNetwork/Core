@@ -14,6 +14,8 @@
 
 package org.dapnet.core.rest.resources;
 
+import java.util.concurrent.locks.Lock;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -25,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.State;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -33,8 +36,15 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class CallSignResource extends AbstractResource {
 	@GET
 	public Response getCallSigns() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-		return getObject(restListener.getState().getCallSigns().values(), status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+			return getObject(restListener.getState().getCallSigns().values(), status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@GET
@@ -44,9 +54,16 @@ public class CallSignResource extends AbstractResource {
 			callSignName = callSignName.toLowerCase();
 		}
 
-		CallSign obj = restListener.getState().getCallSigns().get(callSignName);
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
-		return getObject(obj, status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			CallSign obj = restListener.getState().getCallSigns().get(callSignName);
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
+			return getObject(obj, status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@PUT
@@ -57,20 +74,30 @@ public class CallSignResource extends AbstractResource {
 			callSignName = callSignName.toLowerCase();
 		}
 
-		final CallSign oldCallSign = restListener.getState().getCallSigns().get(callSignName);
-		if (oldCallSign != null) {
-			// Overwrite
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
-		} else {
-			// Create
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		}
+		CallSign oldCallSign = null;
+		CallSign callSign = null;
 
-		final CallSign callSign = gson.fromJson(callSignJSON, CallSign.class);
-		if (callSign != null) {
-			callSign.setName(callSignName);
-		} else {
-			throw new EmptyBodyException();
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			oldCallSign = restListener.getState().getCallSigns().get(callSignName);
+			if (oldCallSign != null) {
+				// Overwrite
+				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
+			} else {
+				// Create
+				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			}
+
+			callSign = gson.fromJson(callSignJSON, CallSign.class);
+			if (callSign != null) {
+				callSign.setName(callSignName);
+			} else {
+				throw new EmptyBodyException();
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return handleObject(callSign, "putCallSign", oldCallSign == null, true);
@@ -83,13 +110,23 @@ public class CallSignResource extends AbstractResource {
 			callSign = callSign.toLowerCase();
 		}
 
-		final CallSign oldCallSign = restListener.getState().getCallSigns().get(callSign);
-		if (oldCallSign != null) {
-			// only owner can delete object
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
-		} else {
-			// only user will get message that object does not exist
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+		CallSign oldCallSign = null;
+
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+
+			oldCallSign = restListener.getState().getCallSigns().get(callSign);
+			if (oldCallSign != null) {
+				// only owner can delete object
+				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
+			} else {
+				// only user will get message that object does not exist
+				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return deleteObject(oldCallSign, "deleteCallSign", true);

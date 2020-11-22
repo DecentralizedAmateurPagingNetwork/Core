@@ -18,7 +18,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -111,7 +111,7 @@ public class Call implements Serializable {
 			throw new Exception("StateNotSetException");
 		}
 
-		ConcurrentMap<String, CallSign> callSigns = state.getCallSigns();
+		Map<String, CallSign> callSigns = state.getCallSigns();
 		ArrayList<CallSign> result = new ArrayList<>();
 		for (String callSign : callSignNames) {
 			CallSign s = callSigns.get(callSign.toLowerCase());
@@ -136,7 +136,7 @@ public class Call implements Serializable {
 			throw new Exception("StateNotSetException");
 		}
 
-		ConcurrentMap<String, TransmitterGroup> groups = state.getTransmitterGroups();
+		Map<String, TransmitterGroup> groups = state.getTransmitterGroups();
 		ArrayList<TransmitterGroup> result = new ArrayList<>();
 		for (String transmitterGroup : transmitterGroupNames) {
 			TransmitterGroup g = groups.get(transmitterGroup.toLowerCase());

@@ -15,6 +15,7 @@
 package org.dapnet.core.rest.resources;
 
 import java.time.Instant;
+import java.util.concurrent.locks.Lock;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -26,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.News;
+import org.dapnet.core.model.State;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -35,35 +37,51 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NewsResource extends AbstractResource {
 	@GET
 	public Response getNews(@QueryParam("rubricName") String rubricName) throws Exception {
-		if (rubricName == null || rubricName.isEmpty()) {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(restListener.getState().getNews(), status);
-		} else {
-			rubricName = rubricName.toLowerCase();
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY,
-					restListener.getState().getRubrics().get(rubricName));
-			return getObject(restListener.getState().getNews().get(rubricName), status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			if (rubricName == null || rubricName.isEmpty()) {
+				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+				return getObject(restListener.getState().getNews(), status);
+			} else {
+				rubricName = rubricName.toLowerCase();
+				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY,
+						restListener.getState().getRubrics().get(rubricName));
+				return getObject(restListener.getState().getNews().get(rubricName), status);
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postNews(String newsJSON) throws Exception {
-		// Start request processing only if at least USER
-		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		News news = null;
 
-		// Create News
-		final News news = gson.fromJson(newsJSON, News.class);
-		if (news != null) {
-			news.setTimestamp(Instant.now());
-			news.setOwnerName(new LoginData(httpHeaders).getUsername());
-		} else {
-			throw new EmptyBodyException();
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			// Start request processing only if at least USER
+			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+
+			// Create News
+			news = gson.fromJson(newsJSON, News.class);
+			if (news != null) {
+				news.setTimestamp(Instant.now());
+				news.setOwnerName(new LoginData(httpHeaders).getUsername());
+			} else {
+				throw new EmptyBodyException();
+			}
+
+			// Check if user is OWNER of rubric
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
+					restListener.getState().getRubrics().get(news.getRubricName()));
+		} finally {
+			lock.unlock();
 		}
-
-		// Check if user is OWNER of rubric
-		checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-				restListener.getState().getRubrics().get(news.getRubricName()));
 
 		return handleObject(news, "postNews", true, false);
 	}

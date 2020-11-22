@@ -15,6 +15,7 @@
 package org.dapnet.core.rest.resources;
 
 import java.time.Instant;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,6 +30,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.model.State;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -40,8 +42,15 @@ public class TransmitterResource extends AbstractResource {
 
 	@GET
 	public Response getTransmitters() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		return getObject(restListener.getState().getTransmitters().values(), status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+			return getObject(restListener.getState().getTransmitters().values(), status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@GET
@@ -51,9 +60,16 @@ public class TransmitterResource extends AbstractResource {
 			transmitterName = transmitterName.toLowerCase();
 		}
 
-		Transmitter obj = restListener.getState().getTransmitters().get(transmitterName);
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY, obj);
-		return getObject(obj, status);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			Transmitter obj = restListener.getState().getTransmitters().get(transmitterName);
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY, obj);
+			return getObject(obj, status);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@PUT
@@ -65,33 +81,43 @@ public class TransmitterResource extends AbstractResource {
 			transmitterName = transmitterName.toLowerCase();
 		}
 
-		final Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitterName);
-		if (oldTransmitter != null) {
-			// Overwrite
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
-		} else {
-			// Create
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-		}
+		Transmitter oldTransmitter = null;
+		Transmitter transmitter = null;
 
-		// Create Transmitter
-		final Transmitter transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
-		if (transmitter != null) {
-			// Only Status OFFLINE or DISABLED is accepted:
-			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
-				transmitter.setStatus(Transmitter.Status.OFFLINE);
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			oldTransmitter = restListener.getState().getTransmitters().get(transmitterName);
+			if (oldTransmitter != null) {
+				// Overwrite
+				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
+			} else {
+				// Create
+				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			}
 
-			transmitter.setName(transmitterName);
-			transmitter.setLastUpdate(Instant.now());
-		} else {
-			throw new EmptyBodyException();
-		}
+			// Create Transmitter
+			transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
+			if (transmitter != null) {
+				// Only Status OFFLINE or DISABLED is accepted:
+				if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
+					transmitter.setStatus(Transmitter.Status.OFFLINE);
+				}
 
-		// Test auth key
-		Matcher m = authKeyPattern.matcher(transmitter.getAuthKey());
-		if (!m.matches()) {
-			throw new NotAcceptableException("Auth key contains invalid characters.");
+				transmitter.setName(transmitterName);
+				transmitter.setLastUpdate(Instant.now());
+			} else {
+				throw new EmptyBodyException();
+			}
+
+			// Test auth key
+			Matcher m = authKeyPattern.matcher(transmitter.getAuthKey());
+			if (!m.matches()) {
+				throw new NotAcceptableException("Auth key contains invalid characters.");
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return handleObject(transmitter, "putTransmitter", oldTransmitter == null, true);
@@ -104,11 +130,20 @@ public class TransmitterResource extends AbstractResource {
 			transmitter = transmitter.toLowerCase();
 		}
 
-		final Transmitter oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
-		if (oldTransmitter != null) {
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
-		} else {
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+		Transmitter oldTransmitter = null;
+
+		Lock lock = State.getReadLock();
+		lock.lock();
+
+		try {
+			oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
+			if (oldTransmitter != null) {
+				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
+			} else {
+				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);

@@ -23,8 +23,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -42,6 +45,7 @@ public class State implements Serializable {
 	private static final long serialVersionUID = 7604901183837032119L;
 	private static final Logger logger = LogManager.getLogger();
 	private static final Gson gson;
+	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	static {
 		GsonBuilder builder = new GsonBuilder();
@@ -52,15 +56,15 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private ConcurrentMap<String, CallSign> callSigns = new ConcurrentHashMap<>();
+	private Map<String, CallSign> callSigns = new HashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private ConcurrentMap<String, Node> nodes = new ConcurrentHashMap<>();
+	private Map<String, Node> nodes = new HashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private ConcurrentMap<String, User> users = new ConcurrentHashMap<>();
+	private Map<String, User> users = new HashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
@@ -68,19 +72,19 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private ConcurrentMap<String, Transmitter> transmitters = new ConcurrentHashMap<>();
+	private Map<String, Transmitter> transmitters = new HashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private ConcurrentMap<String, TransmitterGroup> transmitterGroups = new ConcurrentHashMap<>();
+	private Map<String, TransmitterGroup> transmitterGroups = new HashMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private ConcurrentMap<String, Rubric> rubrics = new ConcurrentHashMap<>();
+	private Map<String, Rubric> rubrics = new HashMap<>();
 
 	@NotNull(message = "nicht vorhande")
 	@Valid
-	private ConcurrentMap<String, NewsList> news = new ConcurrentHashMap<>();
+	private Map<String, NewsList> news = new HashMap<>();
 
 	@NotNull
 	@Valid
@@ -90,6 +94,14 @@ public class State implements Serializable {
 		calls = Collections.synchronizedList(new ArrayList<>());
 
 		setModelReferences();
+	}
+
+	public static Lock getReadLock() {
+		return lock.readLock();
+	}
+
+	public static Lock getWriteLock() {
+		return lock.writeLock();
 	}
 
 	public void setModelReferences() {
@@ -106,9 +118,12 @@ public class State implements Serializable {
 	}
 
 	public static State readFromFile() throws Exception {
+		lock.writeLock().lock();
 		try (InputStreamReader reader = new InputStreamReader(
 				new FileInputStream(Settings.getModelSettings().getStateFile()), "UTF-8")) {
 			return gson.fromJson(reader, State.class);
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 
@@ -119,9 +134,12 @@ public class State implements Serializable {
 				file.getParentFile().mkdirs();
 			}
 
+			lock.readLock().lock();
 			try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8")) {
 				writer.write(gson.toJson(this));
 				writer.flush();
+			} finally {
+				lock.readLock().unlock();
 			}
 
 			logger.info("Successfully wrote state to file");
@@ -134,31 +152,31 @@ public class State implements Serializable {
 		return calls;
 	}
 
-	public ConcurrentMap<String, CallSign> getCallSigns() {
+	public Map<String, CallSign> getCallSigns() {
 		return callSigns;
 	}
 
-	public ConcurrentMap<String, Node> getNodes() {
+	public Map<String, Node> getNodes() {
 		return nodes;
 	}
 
-	public ConcurrentMap<String, User> getUsers() {
+	public Map<String, User> getUsers() {
 		return users;
 	}
 
-	public ConcurrentMap<String, Transmitter> getTransmitters() {
+	public Map<String, Transmitter> getTransmitters() {
 		return transmitters;
 	}
 
-	public ConcurrentMap<String, TransmitterGroup> getTransmitterGroups() {
+	public Map<String, TransmitterGroup> getTransmitterGroups() {
 		return transmitterGroups;
 	}
 
-	public ConcurrentMap<String, Rubric> getRubrics() {
+	public Map<String, Rubric> getRubrics() {
 		return rubrics;
 	}
 
-	public ConcurrentMap<String, NewsList> getNews() {
+	public Map<String, NewsList> getNews() {
 		return news;
 	}
 

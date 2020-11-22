@@ -17,6 +17,7 @@ package org.dapnet.core.rest.resources;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -28,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Call;
+import org.dapnet.core.model.State;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -37,38 +39,54 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class CallResource extends AbstractResource {
 	@GET
 	public Response getCalls(@QueryParam("ownerName") String ownerName) throws Exception {
-		if (ownerName == null || ownerName.isEmpty()) {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-			return getObject(restListener.getState().getCalls(), status);
-		} else {
-			ownerName = ownerName.toLowerCase();
+		Lock lock = State.getReadLock();
+		lock.lock();
 
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getUsers().get(ownerName));
+		try {
+			if (ownerName == null || ownerName.isEmpty()) {
+				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+				return getObject(restListener.getState().getCalls(), status);
+			} else {
+				ownerName = ownerName.toLowerCase();
 
-			List<Call> calls = new ArrayList<>();
-			for (Call call : restListener.getState().getCalls()) {
-				if (call.getOwnerName().equalsIgnoreCase(ownerName)) {
-					calls.add(call);
+				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
+						restListener.getState().getUsers().get(ownerName));
+
+				List<Call> calls = new ArrayList<>();
+				for (Call call : restListener.getState().getCalls()) {
+					if (call.getOwnerName().equalsIgnoreCase(ownerName)) {
+						calls.add(call);
+					}
 				}
-			}
 
-			return getObject(calls, status);
+				return getObject(calls, status);
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response postCall(String callJSON) throws Exception {
-		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		Lock lock = State.getReadLock();
+		lock.lock();
 
-		// Create Call
-		Call call = gson.fromJson(callJSON, Call.class);
-		if (call != null) {
-			call.setTimestamp(Instant.now());
-			call.setOwnerName(new LoginData(httpHeaders).getUsername());
-		} else {
-			throw new EmptyBodyException();
+		Call call = null;
+
+		try {
+			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+
+			// Create Call
+			call = gson.fromJson(callJSON, Call.class);
+			if (call != null) {
+				call.setTimestamp(Instant.now());
+				call.setOwnerName(new LoginData(httpHeaders).getUsername());
+			} else {
+				throw new EmptyBodyException();
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		return handleObject(call, "postCall", true, false);

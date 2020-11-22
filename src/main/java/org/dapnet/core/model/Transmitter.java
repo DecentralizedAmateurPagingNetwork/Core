@@ -18,7 +18,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.validation.constraints.Digits;
@@ -442,7 +442,7 @@ public class Transmitter implements Serializable, RestAuthorizable, Searchable {
 			return null;
 		}
 
-		ConcurrentMap<String, User> users = state.getUsers();
+		Map<String, User> users = state.getUsers();
 		ArrayList<User> result = new ArrayList<>();
 		for (String owner : ownerNames) {
 			User u = users.get(owner);

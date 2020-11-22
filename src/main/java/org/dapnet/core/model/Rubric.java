@@ -17,7 +17,7 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -112,7 +112,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 			return null;
 		}
 
-		ConcurrentMap<String, TransmitterGroup> groups = state.getTransmitterGroups();
+		Map<String, TransmitterGroup> groups = state.getTransmitterGroups();
 		ArrayList<TransmitterGroup> result = new ArrayList<>();
 		for (String transmitterGroup : transmitterGroupNames) {
 			TransmitterGroup g = groups.get(transmitterGroup.toLowerCase());
@@ -138,7 +138,7 @@ public class Rubric implements Serializable, RestAuthorizable, Searchable {
 			return null;
 		}
 
-		ConcurrentMap<String, User> users = state.getUsers();
+		Map<String, User> users = state.getUsers();
 		ArrayList<User> results = new ArrayList<>();
 		for (String owner : ownerNames) {
 			User u = users.get(owner.toLowerCase());
