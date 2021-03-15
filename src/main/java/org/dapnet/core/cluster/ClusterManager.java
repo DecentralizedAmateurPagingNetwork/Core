@@ -17,7 +17,10 @@ package org.dapnet.core.cluster;
 import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -33,6 +36,7 @@ import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.State;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.transmission.TransmissionManager;
@@ -50,6 +54,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
+	private final StateManager stateManager;
 	private final JChannel channel;
 	private final ChannelListener channelListener;
 	private final MembershipListener membershipListener;
@@ -58,11 +63,13 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private final RequestOptions requestOptions;
 	private final TransmissionManager transmissionManager;
 	private final TransmitterManager transmitterManager;
-	private volatile State state;
 	private volatile boolean quorum = true;
 	private volatile boolean stopping = false;
 
-	public ClusterManager(TransmissionManager transmissionManager, boolean enforceStartup) throws Exception {
+	public ClusterManager(StateManager stateManager, TransmissionManager transmissionManager, boolean enforceStartup)
+			throws Exception {
+		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+
 		// Register Transmission
 		this.transmissionManager = transmissionManager;
 		transmitterManager = transmissionManager.getTransmitterManager();
@@ -90,7 +97,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		membershipListener = new org.dapnet.core.cluster.MembershipListener(this);
 		dispatcher.setMembershipListener(membershipListener);
 
-		messageListener = new org.dapnet.core.cluster.MessageListener(this);
+		messageListener = new org.dapnet.core.cluster.MessageListener(stateManager, this);
 		dispatcher.setMessageListener(messageListener);
 
 		// Create default RequestOptions
@@ -105,55 +112,68 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void initState(boolean enforceStartup) {
-		try {
-			state = State.readFromFile();
-		} catch (FileNotFoundException ex) {
-			logger.warn("State file not found.");
-		} catch (Exception ex) {
-			throw new CoreStartupException(ex);
-		}
-
-		if (state == null) {
-			state = new State();
-			logger.warn("Creating new empty State");
-		}
-
 		registerNewsList();
 		resetNodeStates();
 
-		// Validate state
-		Set<ConstraintViolation<Object>> violations = validator.validate(state);
-		if (!violations.isEmpty()) {
-			violations.forEach(v -> {
-				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
-			});
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
 
-			if (!enforceStartup) {
-				throw new CoreStartupException("State validation failed.");
-			} else {
-				logger.warn("Startup enforced, ignoring state validation errors.");
+		try {
+
+			// Validate state
+			Set<ConstraintViolation<Object>> violations = validator.validate(stateManager.getRepository());
+			if (!violations.isEmpty()) {
+				violations.forEach(v -> {
+					logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
+				});
+
+				if (!enforceStartup) {
+					throw new CoreStartupException("State validation failed.");
+				} else {
+					logger.warn("Startup enforced, ignoring state validation errors.");
+				}
 			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
 	private void registerNewsList() {
-		for (Rubric r : state.getRubrics().values()) {
-			String rubricName = r.getName().toLowerCase();
+		Lock lock = stateManager.getLock().writeLock();
+		lock.lock();
 
-			NewsList nl = state.getNews().get(rubricName);
-			if (nl == null) {
-				nl = new NewsList();
-				state.getNews().put(rubricName, nl);
+		try {
+			Map<String, Rubric> rubrics = stateManager.getRepository().getRubrics();
+			Map<String, NewsList> news = stateManager.getRepository().getNews();
+
+			for (Rubric r : rubrics.values()) {
+				String rubricName = r.getName().toLowerCase();
+
+				NewsList nl = news.get(rubricName);
+				if (nl == null) {
+					nl = new NewsList();
+					news.put(rubricName, nl);
+				}
+
+				nl.setHandler(transmissionManager::handleNews);
+				nl.setAddHandler(transmissionManager::handleNewsAsCall);
 			}
-
-			nl.setHandler(transmissionManager::handleNews);
-			nl.setAddHandler(transmissionManager::handleNewsAsCall);
+		} finally {
+			lock.unlock();
 		}
 	}
 
 	private void resetNodeStates() {
-		for (Node n : state.getNodes().values()) {
-			n.setStatus(Status.SUSPENDED);
+		Lock lock = stateManager.getLock().writeLock();
+		lock.lock();
+
+		try {
+			Map<String, Node> nodes = stateManager.getRepository().getNodes();
+			for (Node n : nodes.values()) {
+				n.setStatus(Status.SUSPENDED);
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 
@@ -190,12 +210,24 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		int activeNodeCount = 0; // Count of online and unknown Nodes
 		int onlineNodeCount = 0;
 
-		for (Node node : state.getNodes().values()) {
-			if (node.getStatus() != Node.Status.SUSPENDED)// Node is in UNKNOWN
-															// oder ONLINE state
-				activeNodeCount++;
-			if (node.getStatus() == Node.Status.ONLINE)
-				onlineNodeCount++;
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
+
+		try {
+			Map<String, Node> nodes = stateManager.getRepository().getNodes();
+			for (Node node : nodes.values()) {
+				if (node.getStatus() != Node.Status.SUSPENDED) {
+					// Node is in UNKNOWN
+					// oder ONLINE state
+					activeNodeCount++;
+				}
+
+				if (node.getStatus() == Node.Status.ONLINE) {
+					onlineNodeCount++;
+				}
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		if (onlineNodeCount == 0) {
@@ -275,7 +307,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	public void handleTransmitterStatusChanged(Transmitter transmitter) {
 		transmitter.setNodeName(channel.getName());
 
-		if (state.getTransmitters().containsKey(transmitter.getName())) {
+		Map<String, Transmitter> transmitters = stateManager.getRepository().getTransmitters();
+		if (transmitters.containsKey(transmitter.getName())) {
 			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },
 					new Class[] { Transmitter.class });
 		}
@@ -312,13 +345,5 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	@Override
 	public State getState() {
 		return state;
-	}
-
-	public void setState(State state) {
-		this.state = state;
-
-		if (state != null) {
-			registerNewsList();
-		}
 	}
 }

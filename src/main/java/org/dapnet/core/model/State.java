@@ -42,7 +42,7 @@ import com.google.gson.GsonBuilder;
 
 public class State implements Serializable {
 
-	private static final long serialVersionUID = 7604901183837032119L;
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LogManager.getLogger();
 	private static final Gson gson;
 	private static final ReadWriteLock lock = new ReentrantReadWriteLock();

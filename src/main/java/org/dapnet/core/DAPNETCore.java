@@ -14,6 +14,7 @@
 
 package org.dapnet.core;
 
+import java.io.FileNotFoundException;
 import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterManager;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.scheduler.SchedulerManager;
 import org.dapnet.core.transmission.TransmissionManager;
@@ -35,6 +37,7 @@ public class DAPNETCore {
 	private static final String CORE_VERSION;
 	private static final String API_VERSION;
 	private static volatile DAPNETCore dapnetCore;
+	private final StateManager stateManager = new StateManager();
 	private volatile ClusterManager clusterManager;
 	private volatile RestManager restManager;
 	private volatile TransmissionManager transmissionManager;
@@ -60,22 +63,38 @@ public class DAPNETCore {
 		}
 	}
 
+	private void initState(boolean enforceStartup) {
+		try {
+			logger.info("Loading state file");
+
+			final String fileName = Settings.getModelSettings().getStateFile();
+			stateManager.loadStateFromFile(fileName);
+		} catch (FileNotFoundException ex) {
+			logger.error("State file does not exists, using new empty state.");
+		} catch (Exception ex) {
+			throw new CoreStartupException(ex);
+		}
+	}
+
 	private void start(boolean enforceStartup) {
 		try {
 			logger.info("Starting DAPNETCore Version {} ...", CORE_VERSION);
 
+			// TODO Use proper parameter
+			initState(true);
+
 			logger.info("Starting TransmissionManager");
-			transmissionManager = new TransmissionManager();
+			transmissionManager = new TransmissionManager(stateManager);
 
 			logger.info("Starting Cluster");
-			clusterManager = new ClusterManager(transmissionManager, enforceStartup);
+			clusterManager = new ClusterManager(stateManager, transmissionManager, enforceStartup);
 
 			logger.info("Starting Transmitter Server");
 			transmitterServer = new TransmitterServer(transmissionManager.getTransmitterManager());
 			transmitterServer.start();
 
 			logger.info("Starting SchedulerManager");
-			schedulerManager = new SchedulerManager(transmissionManager, clusterManager);
+			schedulerManager = new SchedulerManager(stateManager, transmissionManager, clusterManager);
 
 			logger.info("Starting RestManager");
 			restManager = new RestManager(clusterManager);

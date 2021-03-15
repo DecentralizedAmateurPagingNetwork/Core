@@ -20,11 +20,11 @@ import javax.validation.ConstraintValidatorContext;
 public class ValidNameValidator implements ConstraintValidator<ValidName, Object> {
 	@Override
 	public void initialize(ValidName constraintAnnotation) {
-		return;
 	}
 
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
+		// TODO That is basically the same as @NotNull so why do we need this?
 		return value != null;
 	}
 }

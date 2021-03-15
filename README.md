@@ -1,19 +1,19 @@
-# DAPNET CORE #
-# At the moment, there is no need for new instations of DAPNET Cores of this version. A second one is under development. So please wait. #
+# DAPNET CORE
+# At the moment, there is no need for new installations of DAPNET Cores of this version. A second one is under development. So please wait.
 
-## Introduction ##
+## Introduction
 The DAPNET CORE offers the main functionality of the Decentralized Amateur Paging Network.
 It builds up a cluster together with other DAPNET Core instances over the HAMNET and
 controls connected paging transmitter. All functions can be accessed via the REST API.
 
-## Installation and Requirements ##
+## Installation and Requirements
 Using the packed release version no installation is required. All external libraries are
 included. Just make sure a JAVA 8+ runtime environment is available.
 
 
-## Usage ##
-### Basic Configuration ###
-#### Cluster Configuration ####
+## Usage
+### Basic Configuration
+#### Cluster Configuration
 If you would like to join an existing cluster contact an admin. He will register your
 DAPNET Core instance and inform you about the configuration. If you want to create a new
 cluster feel free to set your own configuration. In each case set the following parameters
@@ -28,17 +28,17 @@ in the `local/config/ClusterConfig.xml`:
 * Initial hosts (if you want to join an existing cluster at least one node have to be
   known... ) at `<TCPPING initial_hosts="HostA[7800],HostB[7800]\>`
 
-#### Log Settings ####
+#### Log Settings
 The DAPNET Core uses Log4j2 for logging, which can be configured in the
 `config/LogSettings.xml`. The default setting will inform you about nearly all events in
 the console and additionally will store all logs in a file.
 
-#### General Settings ####
+#### General Settings
 In the `Setting.json` file various parameters can be set. The default settings should fit
 for most use cases. However, important could be the `"port": 8080"` line to configure the
 port of the REST API.
 
-### First Start ###
+### First Start
 1. Make sure you performed the basic configuration as described above.
 2. Start the application with `java -Dlog4j.configurationFile=../local/config/LogSettings_REST.xml -jar dapnet-core-x.x.x.jar`
 3. In case you connect to an existing cluster all current data will be automatically
@@ -52,13 +52,13 @@ port of the REST API.
    longitude and latitude), set the `admin` user's mail address and especially set a new
    password.
 
-## Used Software ##
+## Used Software
 TODO
 
-## Contribution ##
+## Contribution
 TODO
 
-## More Information ##
+## More Information
 TODO
 
 **DAPNET CORE PROJECT | Copyright (C) 2017**

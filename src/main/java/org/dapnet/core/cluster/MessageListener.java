@@ -14,29 +14,27 @@
 
 package org.dapnet.core.cluster;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
-import org.dapnet.core.model.State;
+import org.dapnet.core.Settings;
+import org.dapnet.core.model.StateManager;
 import org.jgroups.Message;
-import org.jgroups.util.Util;
 
 public class MessageListener implements org.jgroups.MessageListener {
 	private static final Logger logger = LogManager.getLogger();
-	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
 
-	public MessageListener(ClusterManager clusterManager) {
+	public MessageListener(StateManager stateManager, ClusterManager clusterManager) {
+		this.stateManager = stateManager;
 		this.clusterManager = clusterManager;
 	}
 
@@ -48,8 +46,7 @@ public class MessageListener implements org.jgroups.MessageListener {
 	public void getState(OutputStream outputStream) throws Exception {
 		logger.info("Start sending State to other Node");
 
-		State state = clusterManager.getState();
-		Util.objectToStream(state, new DataOutputStream(outputStream));
+		stateManager.writeStateToStream(outputStream);
 
 		logger.info("Finished sending State to other Node");
 	}
@@ -58,14 +55,13 @@ public class MessageListener implements org.jgroups.MessageListener {
 	public void setState(InputStream inputStream) throws Exception {
 		logger.info("Receiving State from other Node");
 
-		State state = (State) Util.objectFromStream(new DataInputStream(inputStream));
-		clusterManager.setState(state);
-		state.setModelReferences();
+		stateManager.loadStateFromStream(inputStream);
+		// state.setModelReferences();
 
 		// Validate state
-		Set<ConstraintViolation<Object>> violations = validator.validate(state);
+		Set<ConstraintViolation<Object>> violations = stateManager.validateState();
 		if (violations.isEmpty()) {
-			state.writeToFile();
+			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 
 			logger.info("State successfully received");
 		} else {
@@ -80,9 +76,17 @@ public class MessageListener implements org.jgroups.MessageListener {
 
 		// Check if node name is in received state.
 		String nodeName = clusterManager.getChannel().getName();
-		if (!state.getNodes().containsKey(nodeName)) {
-			logger.fatal("Current node name does not exist in received state: {}", nodeName);
-			DAPNETCore.shutdown();
+
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
+
+		try {
+			if (!stateManager.getRepository().getNodes().containsKey(nodeName)) {
+				logger.fatal("Current node name does not exist in received state: {}", nodeName);
+				DAPNETCore.shutdown();
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 }

@@ -14,19 +14,18 @@
 
 package org.dapnet.core.scheduler;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
-import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.model.Call;
-import org.dapnet.core.model.State;
-import org.dapnet.core.model.Transmitter;
+import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.StateManager;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -40,25 +39,35 @@ public class StateCleaningJob implements Job {
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
 			SchedulerContext schedulerContext = context.getScheduler().getContext();
-			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
+			StateManager stateManager = (StateManager) schedulerContext.get("stateManager");
 
-			State state = clusterManager.getState();
-			Instant now = Instant.now();
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-			cleanCalls(state, now);
-			cleanNews(state, now);
-			// FIXME This is broken
-			// cleanTransmitters(clusterManager, now);
+			try {
+				Repository repo = stateManager.getRepository();
+				Instant now = Instant.now();
 
-			state.writeToFile();
+				cleanCalls(repo, now);
+				cleanNews(repo, now);
+				// FIXME This is broken
+				// cleanTransmitters(clusterManager, now);
+			} finally {
+				lock.unlock();
+			}
+
+			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute StateCleaningJob", e);
+		} catch (IOException e) {
+			logger.fatal("Failed to write the state file", e);
 		}
 	}
 
-	private static void cleanCalls(State state, Instant now) {
+	private static void cleanCalls(Repository repo, Instant now) {
 		Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
-		Iterator<Call> it = state.getCalls().iterator();
+
+		Iterator<Call> it = repo.getCalls().iterator();
 		while (it.hasNext()) {
 			Call call = it.next();
 			if (now.isAfter(call.getTimestamp().plus(exp))) {
@@ -67,26 +76,26 @@ public class StateCleaningJob implements Job {
 		}
 	}
 
-	private static void cleanNews(State state, Instant now) {
+	private static void cleanNews(Repository repo, Instant now) {
 		Duration ttl = Duration.ofMinutes(Settings.getModelSettings().getNewsExpirationTimeInMinutes());
-		state.getNews().values().forEach(nl -> nl.removeExpired(now, ttl));
+		repo.getNews().values().forEach(nl -> nl.removeExpired(now, ttl));
 	}
 
-	private static void cleanTransmitters(ClusterManager manager, Instant now) {
-		Duration exp = Duration.ofDays(Settings.getModelSettings().getTransmitterExpirationDays());
-
-		Collection<Transmitter> transmitters = new ArrayList<>(manager.getState().getTransmitters().values());
-		for (Transmitter t : transmitters) {
-			if (t != null && t.getLastConnected() != null && t.getStatus() != Transmitter.Status.ONLINE
-					&& now.isAfter(t.getLastConnected().plus(exp))) {
-				logger.info("Removing transmitter due to inactivity: {}", t.getName());
-				deleteTransmitter(manager, t.getName().toLowerCase());
-			}
-		}
-	}
-
-	private static void deleteTransmitter(ClusterManager manager, String name) {
-		manager.handleStateOperation(null, "deleteTransmitter", new Object[] { name }, new Class[] { String.class });
-	}
+//	private static void cleanTransmitters(ClusterManager manager, Instant now) {
+//		Duration exp = Duration.ofDays(Settings.getModelSettings().getTransmitterExpirationDays());
+//
+//		Collection<Transmitter> transmitters = new ArrayList<>(manager.getState().getTransmitters().values());
+//		for (Transmitter t : transmitters) {
+//			if (t != null && t.getLastConnected() != null && t.getStatus() != Transmitter.Status.ONLINE
+//					&& now.isAfter(t.getLastConnected().plus(exp))) {
+//				logger.info("Removing transmitter due to inactivity: {}", t.getName());
+//				deleteTransmitter(manager, t.getName().toLowerCase());
+//			}
+//		}
+//	}
+//
+//	private static void deleteTransmitter(ClusterManager manager, String name) {
+//		manager.handleStateOperation(null, "deleteTransmitter", new Object[] { name }, new Class[] { String.class });
+//	}
 
 }

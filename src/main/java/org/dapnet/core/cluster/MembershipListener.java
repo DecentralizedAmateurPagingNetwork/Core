@@ -14,12 +14,17 @@
 
 package org.dapnet.core.cluster;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.StateManager;
 import org.jgroups.Address;
 import org.jgroups.Event;
 import org.jgroups.MergeView;
@@ -30,10 +35,12 @@ import org.jgroups.util.ExtendedUUID;
 
 public class MembershipListener implements org.jgroups.MembershipListener {
 	private static final Logger logger = LogManager.getLogger();
+	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
 
-	public MembershipListener(ClusterManager clusterManager) {
-		this.clusterManager = clusterManager;
+	public MembershipListener(StateManager stateManager, ClusterManager clusterManager) {
+		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
 	}
 
 	@Override
@@ -77,36 +84,49 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 				}
 			}
 
-			for (Address add : view.getMembers()) {
-				Node node = clusterManager.getState().getNodes().get(add.toString());
-				if (node == null) {
-					logger.warn("Unknown node in view: " + add);
-					continue;
-				}
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-				// Try to set version information
-				if (add instanceof ExtendedUUID) {
-					ExtendedUUID extaddr = (ExtendedUUID) add;
-					byte[] buff = extaddr.get("version");
-					if (buff != null) {
-						node.setVersion(new String(buff, StandardCharsets.UTF_8));
+			try {
+				for (Address addr : view.getMembers()) {
+					Node node = stateManager.getRepository().getNodes().get(addr.toString());
+					if (node == null) {
+						logger.warn("Unknown node in view: " + addr);
+						continue;
+					}
+
+					// Try to set version information
+					if (addr instanceof ExtendedUUID) {
+						ExtendedUUID extaddr = (ExtendedUUID) addr;
+						byte[] buff = extaddr.get("version");
+						if (buff != null) {
+							node.setVersion(new String(buff, StandardCharsets.UTF_8));
+						}
+					}
+
+					// Try to set IP address for node
+					PhysicalAddress physicalAddress = (PhysicalAddress) clusterManager.getChannel()
+							.down(new Event(Event.GET_PHYSICAL_ADDRESS, addr));
+					if (physicalAddress instanceof IpAddress) {
+						node.setAddress((IpAddress) physicalAddress);
 					}
 				}
 
-				// Try to set IP address for node
-				PhysicalAddress physicalAddress = (PhysicalAddress) clusterManager.getChannel()
-						.down(new Event(Event.GET_PHYSICAL_ADDRESS, add));
-				if (physicalAddress instanceof IpAddress) {
-					node.setAddress((IpAddress) physicalAddress);
-				}
+				// Update node states:
+				updateNodeStates();
+			} finally {
+				lock.unlock();
 			}
-
-			// Update node states:
-			updateNodeStates();
 
 			// Save and check for quorum:
 			clusterManager.checkQuorum();
-			clusterManager.getState().writeToFile();
+
+			try {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			} catch (IOException ex) {
+				// Forward the exception
+				throw new RuntimeException(ex);
+			}
 		}
 
 		private void handleMerge(MergeView view) throws Exception {
@@ -167,7 +187,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			// otherwise rejected while authorization
 			// (expect of first node, which might not be in the state, but will
 			// add itself immediately)
-			for (Node node : clusterManager.getState().getNodes().values()) {
+			for (Node node : stateManager.getRepository().getNodes().values()) {
 				Node.Status oldStatus = node.getStatus();
 				if (view.getMembers().stream().filter(m -> m.toString().equalsIgnoreCase(node.getName())).findFirst()
 						.isPresent()) {

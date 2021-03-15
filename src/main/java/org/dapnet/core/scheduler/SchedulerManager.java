@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
 import org.dapnet.core.cluster.ClusterManager;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
@@ -33,10 +34,11 @@ public class SchedulerManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final Scheduler scheduler;
 
-	public SchedulerManager(TransmissionManager transmissionManager, ClusterManager clusterManager)
-			throws SchedulerException {
+	public SchedulerManager(StateManager stateManager, TransmissionManager transmissionManager,
+			ClusterManager clusterManager) throws SchedulerException {
 		this.scheduler = StdSchedulerFactory.getDefaultScheduler();
 
+		scheduler.getContext().put("stateManager", stateManager);
 		scheduler.getContext().put("transmissionManager", transmissionManager);
 		scheduler.getContext().put("clusterManager", clusterManager);
 		scheduler.start();

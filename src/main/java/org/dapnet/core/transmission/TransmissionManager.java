@@ -25,13 +25,18 @@ import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
 
 public class TransmissionManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final PagerProtocol protocol = new SkyperProtocol();
-	private final TransmitterManager transmitterManager = new TransmitterManager();
+	private final TransmitterManager transmitterManager;
+
+	public TransmissionManager(StateManager stateManager) {
+		transmitterManager = new TransmitterManager();
+	}
 
 	public void handleTime(LocalDateTime time) {
 		// Skyper Time

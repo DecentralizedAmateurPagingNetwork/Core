@@ -14,9 +14,12 @@
 
 package org.dapnet.core.scheduler;
 
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.cluster.ClusterManager;
+import org.dapnet.core.Settings;
+import org.dapnet.core.model.StateManager;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -31,11 +34,13 @@ public class StateSavingJob implements Job {
 		SchedulerContext schedulerContext = null;
 		try {
 			schedulerContext = context.getScheduler().getContext();
-			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
+			StateManager stateManager = (StateManager) schedulerContext.get("stateManager");
 
-			clusterManager.getState().writeToFile();
+			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 		} catch (SchedulerException e) {
 			logger.fatal("Failed to execute StateSavingJob", e);
+		} catch (IOException e) {
+			logger.fatal("Failed to write state file", e);
 		}
 	}
 }
