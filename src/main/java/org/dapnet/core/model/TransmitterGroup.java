@@ -25,7 +25,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
-public class TransmitterGroup implements Serializable, RestAuthorizable, Searchable {
+public class TransmitterGroup implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 2641698714366327412L;
 	private static volatile State state;
 
@@ -137,7 +137,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, Searcha
 
 	public boolean contains(String transmitter) {
 		for (String transmitterName : transmitterNames) {
-			if (transmitter.equalsIgnoreCase(transmitterName)) {
+			if (transmitterName.equalsIgnoreCase(transmitter)) {
 				return true;
 			}
 		}

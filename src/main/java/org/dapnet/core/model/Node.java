@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 import org.jgroups.stack.IpAddress;
 
-public class Node implements Serializable, Searchable {
+public class Node implements Serializable, NamedObject {
 	private static final long serialVersionUID = -4104175163845286560L;
 	private static volatile State state;
 

@@ -147,7 +147,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			Map<String, NewsList> news = stateManager.getRepository().getNews();
 
 			for (Rubric r : rubrics.values()) {
-				String rubricName = r.getName().toLowerCase();
+				String rubricName = r.getNormalizedName();
 
 				NewsList nl = news.get(rubricName);
 				if (nl == null) {
@@ -262,7 +262,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 		try {
 			RspList rspList = dispatcher.callRemoteMethods(destination, methodName, args, types, requestOptions);
-			if (isRspSuccessful(rspList)) {
+			if (isSuccessful(rspList)) {
 				return true;
 			} else {
 				logger.error("Response: {}", rspList);
@@ -282,7 +282,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	@SuppressWarnings("rawtypes")
-	private boolean isRspSuccessful(RspList list) {
+	private boolean isSuccessful(RspList list) {
 		if (list == null || list.getResults() == null || list.getResults().isEmpty()) {
 			return false;
 		}
@@ -305,10 +305,30 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// #############################################################################
 	@Override
 	public void handleTransmitterStatusChanged(Transmitter transmitter) {
-		transmitter.setNodeName(channel.getName());
+		Lock lock = stateManager.getLock().writeLock();
+		lock.lock();
 
-		Map<String, Transmitter> transmitters = stateManager.getRepository().getTransmitters();
-		if (transmitters.containsKey(transmitter.getName())) {
+		try {
+			transmitter.setNodeName(channel.getName());
+		} finally {
+			lock.unlock();
+		}
+
+		// XXX I'm not sure if holding the lock could lead to a deadlock, that's it is a
+		// bit awkward looking here...
+		boolean contains = false;
+
+		lock = stateManager.getLock().readLock();
+		lock.lock();
+
+		try {
+			Map<String, Transmitter> transmitters = stateManager.getRepository().getTransmitters();
+			contains = transmitters.containsKey(transmitter.getNormalizedName());
+		} finally {
+			lock.unlock();
+		}
+
+		if (contains) {
 			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },
 					new Class[] { Transmitter.class });
 		}
@@ -319,7 +339,12 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		if (stopping) {
 			updateNodeStatus(Node.Status.SUSPENDED);
 			channel.close();
-			getState().writeToFile();
+
+			try {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			} catch (Exception ex) {
+				logger.fatal("Failed to write state file.", ex);
+			}
 		}
 	}
 

@@ -35,7 +35,7 @@ import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
 import org.dapnet.core.transmission.PagerMessage.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
-public class Transmitter implements Serializable, RestAuthorizable, Searchable {
+public class Transmitter implements Serializable, RestAuthorizable, NamedObject {
 
 	private static final long serialVersionUID = -8142160974834002456L;
 	private static volatile State state;

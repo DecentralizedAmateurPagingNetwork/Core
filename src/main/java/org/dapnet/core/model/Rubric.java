@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
-public class Rubric implements Serializable, RestAuthorizable, Searchable {
+public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 6724514122275380520L;
 	private static volatile State state;
 

@@ -3,12 +3,14 @@ package org.dapnet.core.transmission;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.model.TransmitterGroup;
@@ -21,7 +23,12 @@ import org.dapnet.core.model.TransmitterGroup;
 public class TransmitterManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
+	private final StateManager stateManager;
 	private volatile TransmitterManagerListener listener;
+
+	public TransmitterManager(StateManager stateManager) {
+		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	}
 
 	/**
 	 * Gets a transmitter by its name.
@@ -159,7 +166,7 @@ public class TransmitterManager {
 		t.setLastConnected(lastConnected);
 		t.setConnectedSince(lastConnected);
 
-		connectedClients.put(t.getName().toLowerCase(), client);
+		connectedClients.put(t.getNormalizedName(), client);
 
 		notifyStatusChanged(listener, t);
 	}
@@ -181,7 +188,7 @@ public class TransmitterManager {
 
 		t.setConnectedSince(null);
 
-		connectedClients.remove(t.getName().toLowerCase());
+		connectedClients.remove(t.getNormalizedName());
 
 		notifyStatusChanged(listener, t);
 	}
@@ -219,7 +226,7 @@ public class TransmitterManager {
 	 * @param t Transmitter to disconnect from.
 	 */
 	public void disconnectFrom(Transmitter t) {
-		TransmitterClient cl = connectedClients.remove(t.getName().toLowerCase());
+		TransmitterClient cl = connectedClients.remove(t.getNormalizedName());
 		if (cl != null) {
 			cl.close();
 		}

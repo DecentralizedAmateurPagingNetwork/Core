@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
-public class CallSign implements Serializable, RestAuthorizable, Searchable {
+public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 1884808852367562476L;
 	private static volatile State state;
 

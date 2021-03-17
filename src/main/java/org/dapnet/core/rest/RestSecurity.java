@@ -87,7 +87,7 @@ public class RestSecurity {
 		}
 
 		for (String ownerName : restAuthorizable.getOwnerNames()) {
-			if (name.equalsIgnoreCase(ownerName)) {
+			if (ownerName.equalsIgnoreCase(name)) {
 				return true;
 			}
 		}

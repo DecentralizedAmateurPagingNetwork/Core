@@ -24,7 +24,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.EMail;
 import org.dapnet.core.rest.RestAuthorizable;
 
-public class User implements Serializable, RestAuthorizable, Searchable {
+public class User implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 8927103398113377284L;
 
 	// ID
