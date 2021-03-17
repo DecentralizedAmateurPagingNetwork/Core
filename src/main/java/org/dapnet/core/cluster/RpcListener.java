@@ -15,6 +15,10 @@
 package org.dapnet.core.cluster;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -29,8 +33,10 @@ import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.State;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
@@ -38,11 +44,12 @@ import org.dapnet.core.transmission.TransmissionManager;
 
 public class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
-	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
 
-	public RpcListener(ClusterManager clusterManager) {
-		this.clusterManager = clusterManager;
+	public RpcListener(StateManager stateManager, ClusterManager clusterManager) {
+		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
 	}
 
 	private static void logResponse(String methodName, Object object, RpcResponse response) {
@@ -71,8 +78,9 @@ public class RpcListener {
 
 	// ### Call
 	// #########################################################################################################
-	public synchronized RpcResponse postCall(Call call) {
+	public RpcResponse postCall(Call call) {
 		RpcResponse response = null;
+
 		try {
 			// Check Arguments
 			if (call == null) {
@@ -80,16 +88,24 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(call).isEmpty()) {
+			if (!stateManager.validate(call).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
 			// Add new Object
-			State state = clusterManager.getState();
-			state.getCalls().add(call);
-			state.getCoreStats().incrementCalls();
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				Repository repo = stateManager.getRepository();
+				repo.getCalls().add(call);
+				stateManager.getStatistics().incrementCalls();
+			} finally {
+				lock.unlock();
+			}
+
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				state.writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			// Transmit new Call
@@ -106,8 +122,9 @@ public class RpcListener {
 
 	// ### Activation
 	// ###################################################################################################
-	public synchronized RpcResponse postActivation(Activation activation) {
+	public RpcResponse postActivation(Activation activation) {
 		RpcResponse response = null;
+
 		try {
 			// Check Arguments
 			if (activation == null) {
@@ -115,7 +132,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(activation).isEmpty()) {
+			if (!stateManager.validate(activation).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -133,8 +150,9 @@ public class RpcListener {
 
 	// ### CallSign
 	// #####################################################################################################
-	public synchronized RpcResponse putCallSign(CallSign callSign) {
+	public RpcResponse putCallSign(CallSign callSign) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -147,14 +165,22 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(callSign).isEmpty()) {
+			if (!stateManager.validate(callSign).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
 			// Add new Object (will replace old one if present)
-			clusterManager.getState().getCallSigns().put(callSign.getName(), callSign);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				stateManager.getRepository().getCallSigns().put(callSign.getName(), callSign);
+			} finally {
+				lock.unlock();
+			}
+
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			return response = RpcResponse.OK;
@@ -166,8 +192,9 @@ public class RpcListener {
 		}
 	}
 
-	public synchronized RpcResponse deleteCallSign(String callSign) {
+	public RpcResponse deleteCallSign(String callSign) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -179,33 +206,42 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Delete depended Objects
-			// Delete Calls
-			ArrayList<Call> deleteCalls = new ArrayList<>();
-			clusterManager.getState().getCalls().stream().filter(call -> call.getCallSignNames().contains(callSign))
-					.forEach(call -> {
-						if (call.getCallSignNames().size() == 1) {
-							// Delete all Calls using only this CallSign
-							deleteCalls.add(call);
-						} else {
-							// Remove this CallSign from Calls using more than
-							// this CallSign
-							call.getCallSignNames().remove(callSign);
-						}
-					});
-			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-			// Delete Object with same Name, if existing
-			if (clusterManager.getState().getCallSigns().remove(callSign) == null) {
-				// Object not found
-				return response = RpcResponse.BAD_REQUEST;
-			} else {
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+			try {
+				Repository repo = stateManager.getRepository();
+
+				// Delete depended Objects
+				// Delete Calls
+				Collection<Call> deleteCalls = new LinkedList<>();
+				repo.getCalls().stream().filter(call -> call.getCallSignNames().contains(callSign)).forEach(call -> {
+					if (call.getCallSignNames().size() == 1) {
+						// Delete all Calls using only this CallSign
+						deleteCalls.add(call);
+					} else {
+						// Remove this CallSign from Calls using more than
+						// this CallSign
+						call.getCallSignNames().remove(callSign);
+					}
+				});
+
+				deleteCalls.stream().forEach(call -> repo.getCalls().remove(call));
+
+				// Delete Object with same Name, if existing
+				if (repo.getCallSigns().remove(callSign) == null) {
+					// Object not found
+					return response = RpcResponse.BAD_REQUEST;
 				}
-
-				return response = RpcResponse.OK;
+			} finally {
+				lock.unlock();
 			}
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			return response = RpcResponse.OK;
 		} catch (Exception e) {
 			logger.error("Exception : ", e);
 			return response = RpcResponse.INTERNAL_ERROR;
@@ -225,7 +261,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(news).isEmpty()) {
+			if (!stateManager.validate(news).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -295,7 +331,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(node).isEmpty()) {
+			if (!stateManager.validate(node).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -376,7 +412,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(rubric).isEmpty()) {
+			if (!stateManager.validate(rubric).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -492,7 +528,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(transmitter).isEmpty()) {
+			if (!stateManager.validate(transmitter).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -586,7 +622,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(transmitterGroup).isEmpty()) {
+			if (!stateManager.validate(transmitterGroup).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
@@ -685,7 +721,7 @@ public class RpcListener {
 			}
 
 			// Validation
-			if (!validator.validate(user).isEmpty()) {
+			if (!stateManager.validate(user).isEmpty()) {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 

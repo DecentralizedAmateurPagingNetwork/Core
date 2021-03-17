@@ -111,4 +111,8 @@ public final class StateManager {
 		}
 	}
 
+	public <T> Set<ConstraintViolation<T>> validate(T object) {
+		return validator.validate(object);
+	}
+
 }
