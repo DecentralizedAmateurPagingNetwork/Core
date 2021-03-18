@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -26,13 +25,29 @@ import org.jgroups.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * The state manager is responsible for managing the DAPNET Core state and
+ * provides load/save state functionality as well as validation.
+ * 
+ * @author Philipp Thiel
+ */
 public final class StateManager implements Repository {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final Gson gson;
 	private final Validator validator;
 	private State state;
+	private ModelRepository<CallSign> callsigns;
+	private ModelRepository<Node> nodes;
+	private ModelRepository<User> users;
+	private ModelRepository<Transmitter> transmitters;
+	private ModelRepository<TransmitterGroup> transmitterGroups;
+	private ModelRepository<Rubric> rubrics;
+	private ModelRepository<NewsList> news;
 
+	/**
+	 * Constructs a new state manager instance.
+	 */
 	public StateManager() {
 		GsonBuilder builder = new GsonBuilder();
 		builder.setPrettyPrinting();
@@ -40,6 +55,9 @@ public final class StateManager implements Repository {
 		gson = builder.create();
 
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+		state = new State();
+		setModelRepositories();
 	}
 
 	public ReadWriteLock getLock() {
@@ -52,61 +70,81 @@ public final class StateManager implements Repository {
 	}
 
 	@Override
-	public Map<String, CallSign> getCallSigns() {
-		return state.getCallSigns();
+	public ModelRepository<CallSign> getCallSigns() {
+		return callsigns;
 	}
 
 	@Override
-	public Map<String, Node> getNodes() {
-		return state.getNodes();
+	public ModelRepository<Node> getNodes() {
+		return nodes;
 	}
 
 	@Override
-	public Map<String, User> getUsers() {
-		return state.getUsers();
+	public ModelRepository<User> getUsers() {
+		return users;
 	}
 
 	@Override
-	public Map<String, Transmitter> getTransmitters() {
-		return state.getTransmitters();
+	public ModelRepository<Transmitter> getTransmitters() {
+		return transmitters;
 	}
 
 	@Override
-	public Map<String, TransmitterGroup> getTransmitterGroups() {
-		return state.getTransmitterGroups();
+	public ModelRepository<TransmitterGroup> getTransmitterGroups() {
+		return transmitterGroups;
 	}
 
 	@Override
-	public Map<String, Rubric> getRubrics() {
-		return state.getRubrics();
+	public ModelRepository<Rubric> getRubrics() {
+		return rubrics;
 	}
 
 	@Override
-	public Map<String, NewsList> getNews() {
-		return state.getNews();
+	public ModelRepository<NewsList> getNews() {
+		return news;
 	}
 
+	@Override
 	public CoreStatistics getStatistics() {
 		return state.getStatistics();
 	}
 
-	public void loadStateFromFile(String fileName) throws IOException {
-		// We can load the state without locking first
+	/**
+	 * Loads the state from the given state file.
+	 * 
+	 * @param fileName State file name
+	 * @param force    Use the new state even if constraint violations are found
+	 * @return Constraint violations
+	 * @throws IOException on IO errors
+	 */
+	public Set<ConstraintViolation<Object>> loadStateFromFile(String fileName, boolean force) throws IOException {
 		State newState = null;
 
 		try (InputStreamReader reader = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
 			newState = gson.fromJson(reader, State.class);
 		}
 
-		lock.writeLock().lock();
+		Set<ConstraintViolation<Object>> violations = validate(newState);
+		if (violations.isEmpty() || force) {
+			lock.writeLock().lock();
 
-		try {
-			this.state = newState;
-		} finally {
-			lock.writeLock().unlock();
+			try {
+				state = newState;
+				setModelRepositories();
+			} finally {
+				lock.writeLock().unlock();
+			}
 		}
+
+		return violations;
 	}
 
+	/**
+	 * Writes the state to the state file.
+	 * 
+	 * @param fileName State file name
+	 * @throws IOException on IO errors
+	 */
 	public void writeStateToFile(String fileName) throws IOException {
 		File stateFile = new File(fileName);
 		if (stateFile.getParentFile() != null) {
@@ -116,25 +154,46 @@ public final class StateManager implements Repository {
 		lock.readLock().lock();
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(stateFile), "UTF-8")) {
-			writer.write(gson.toJson(state));
+			String json = gson.toJson(state);
+			writer.write(json);
 			writer.flush();
 		} finally {
 			lock.readLock().unlock();
 		}
 	}
 
-	public void loadStateFromStream(InputStream istream) throws Exception {
-		State newState = (State) Util.objectFromStream(new DataInputStream(istream));
+	/**
+	 * Loads the state from the given input stream.
+	 * 
+	 * @param istream Input stream
+	 * @param force   Use the new state even if constraint violations are found
+	 * @return Constraint violations
+	 * @throws Exception on errors
+	 */
+	public Set<ConstraintViolation<Object>> loadStateFromStream(InputStream istream, boolean force) throws Exception {
+		final State newState = (State) Util.objectFromStream(new DataInputStream(istream));
 
-		lock.writeLock().lock();
+		Set<ConstraintViolation<Object>> violations = validate(newState);
+		if (violations.isEmpty() || force) {
+			lock.writeLock().lock();
 
-		try {
-			this.state = newState;
-		} finally {
-			lock.writeLock().unlock();
+			try {
+				state = newState;
+				setModelRepositories();
+			} finally {
+				lock.writeLock().unlock();
+			}
 		}
+
+		return violations;
 	}
 
+	/**
+	 * Writes the state to the given output stream.
+	 * 
+	 * @param ostream Output stream
+	 * @throws Exception on errors
+	 */
 	public void writeStateToStream(OutputStream ostream) throws Exception {
 		lock.readLock().lock();
 
@@ -145,17 +204,25 @@ public final class StateManager implements Repository {
 		}
 	}
 
-	public Set<ConstraintViolation<Object>> validateState() {
-		lock.readLock().lock();
-		try {
-			return validator.validate(state);
-		} finally {
-			lock.readLock().unlock();
-		}
-	}
-
+	/**
+	 * Validates an object using the current validator instance.
+	 * 
+	 * @param <T>    Object type
+	 * @param object Object to validate
+	 * @return Constraint violations
+	 */
 	public <T> Set<ConstraintViolation<T>> validate(T object) {
 		return validator.validate(object);
+	}
+
+	private void setModelRepositories() {
+		callsigns = new MapModelRepository<>(state.getCallSigns());
+		nodes = new MapModelRepository<>(state.getNodes());
+		users = new MapModelRepository<>(state.getUsers());
+		transmitters = new MapModelRepository<>(state.getTransmitters());
+		transmitterGroups = new MapModelRepository<>(state.getTransmitterGroups());
+		rubrics = new MapModelRepository<>(state.getRubrics());
+		news = new MapModelRepository<>(state.getNews());
 	}
 
 }

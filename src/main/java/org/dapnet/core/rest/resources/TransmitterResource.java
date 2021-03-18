@@ -30,7 +30,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
@@ -59,8 +58,6 @@ public class TransmitterResource extends AbstractResource {
 	@GET
 	@Path("{transmitter}")
 	public Response getTransmitter(@PathParam("transmitter") String transmitterName) throws Exception {
-		transmitterName = NamedObject.normalizeName(transmitterName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
@@ -79,8 +76,6 @@ public class TransmitterResource extends AbstractResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putTransmitter(@PathParam("transmitter") String transmitterName, String transmitterJSON)
 			throws Exception {
-		transmitterName = NamedObject.normalizeName(transmitterName);
-
 		Transmitter oldTransmitter = null;
 
 		final Repository repo = getRepository();
@@ -126,8 +121,6 @@ public class TransmitterResource extends AbstractResource {
 	@DELETE
 	@Path("{transmitter}")
 	public Response deleteTransmitter(@PathParam("transmitter") String transmitter) throws Exception {
-		transmitter = NamedObject.normalizeName(transmitter);
-
 		Transmitter oldTransmitter = null;
 
 		final Repository repo = getRepository();

@@ -41,7 +41,7 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 		if (Instant.class.isAssignableFrom(rawType)) {
 			return (TypeAdapter<T>) new InstantTypeAdapter();
 		} else if (NewsList.class.isAssignableFrom(rawType)) {
-			return (TypeAdapter<T>) new NewListTypeAdapter(gson);
+			return (TypeAdapter<T>) new NewsListTypeAdapter(gson);
 		} else {
 			TypeAdapter<T> adapter = gson.getDelegateAdapter(this, tokenType);
 			return new GenericTypeAdapter<T>(adapter);
@@ -113,11 +113,11 @@ public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 
 	}
 
-	private static final class NewListTypeAdapter extends TypeAdapter<NewsList> {
+	private static final class NewsListTypeAdapter extends TypeAdapter<NewsList> {
 
 		private final Gson context;
 
-		public NewListTypeAdapter(Gson context) {
+		public NewsListTypeAdapter(Gson context) {
 			this.context = context;
 		}
 

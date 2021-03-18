@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.HashUtil;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
@@ -54,8 +53,6 @@ public class UserResource extends AbstractResource {
 	@GET
 	@Path("{user}")
 	public Response getUser(@PathParam("user") String userName) throws Exception {
-		userName = NamedObject.normalizeName(userName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
@@ -73,8 +70,6 @@ public class UserResource extends AbstractResource {
 	@Path("{user}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putUser(@PathParam("user") String userName, String userJSON) throws Exception {
-		userName = NamedObject.normalizeName(userName);
-
 		User user = null;
 		User oldUser = null;
 
@@ -122,8 +117,6 @@ public class UserResource extends AbstractResource {
 	@DELETE
 	@Path("{user}")
 	public Response deleteUser(@PathParam("user") String user) throws Exception {
-		user = NamedObject.normalizeName(user);
-
 		User oldUser = null;
 
 		final Repository repo = getRepository();

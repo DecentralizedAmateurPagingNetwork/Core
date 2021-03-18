@@ -27,7 +27,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.model.Repository;
@@ -54,8 +53,6 @@ public class NodeResource extends AbstractResource {
 	@GET
 	@Path("{node}")
 	public Response getNode(@PathParam("node") String nodeName) throws Exception {
-		nodeName = NamedObject.normalizeName(nodeName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
@@ -72,8 +69,6 @@ public class NodeResource extends AbstractResource {
 	@Path("{node}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putNode(@PathParam("node") String nodeName, String nodeJSON) throws Exception {
-		nodeName = NamedObject.normalizeName(nodeName);
-
 		Node node = null;
 		Node oldNode = null;
 
@@ -108,8 +103,6 @@ public class NodeResource extends AbstractResource {
 	@DELETE
 	@Path("{node}")
 	public Response deleteNode(@PathParam("node") String node) throws Exception {
-		node = NamedObject.normalizeName(node);
-
 		Node oldNode = null;
 
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);

@@ -20,10 +20,9 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.HashUtil;
+import org.dapnet.core.Program;
 import org.dapnet.core.Settings;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.User;
@@ -45,7 +44,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 			channel.getState(null, 0);
 		} catch (Exception e) {
 			logger.fatal("Could not get state from cluster.", e);
-			DAPNETCore.shutdown();
+			Program.shutdown();
 		}
 
 		// Creating Cluster?
@@ -66,7 +65,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 				createUser = sm.getUsers().isEmpty();
 
 				// Node already existing in State?
-				if (!sm.getNodes().containsKey(NamedObject.normalizeName(channel.getName()))) {
+				if (!sm.getNodes().containsKey(channel.getName())) {
 					createNode = true;
 				}
 			} finally {
@@ -112,7 +111,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 			logger.info("First node successfully created");
 		} else {
 			logger.fatal("First node could not been created");
-			DAPNETCore.shutdown();
+			Program.shutdown();
 		}
 	}
 
@@ -124,7 +123,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		lock.lock();
 
 		try {
-			Node node = stateManager.getNodes().get(NamedObject.normalizeName(clusterManager.getChannel().getName()));
+			Node node = stateManager.getNodes().get(clusterManager.getChannel().getName());
 			node.setAddress(address);
 			node.setStatus(Node.Status.ONLINE);
 		} finally {
@@ -149,14 +148,14 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		} catch (Exception e) {
 			logger.catching(e);
 			logger.fatal("First user could not been created");
-			DAPNETCore.shutdown();
+			Program.shutdown();
 		}
 
 		if (clusterManager.handleStateOperation(null, "putUser", new Object[] { user }, new Class[] { User.class })) {
 			logger.info("First user successfully updated");
 		} else {
 			logger.fatal("First user could not be created");
-			DAPNETCore.shutdown();
+			Program.shutdown();
 		}
 	}
 

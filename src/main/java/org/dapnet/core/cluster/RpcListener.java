@@ -17,7 +17,6 @@ package org.dapnet.core.cluster;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -29,7 +28,7 @@ import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
-import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
@@ -191,7 +190,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				stateManager.getCallSigns().put(callSign.getNormalizedName(), callSign);
+				stateManager.getCallSigns().put(callSign.getName(), callSign);
 			} finally {
 				lock.unlock();
 			}
@@ -247,7 +246,7 @@ public class RpcListener {
 				deleteCalls.stream().forEach(call -> repo.getCalls().remove(call));
 
 				// Delete Object with same Name, if existing
-				if (repo.getCallSigns().remove(NamedObject.normalizeName(callSign)) != null) {
+				if (repo.getCallSigns().remove(callSign) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -292,7 +291,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				NewsList nl = stateManager.getNews().get(NamedObject.normalizeName(news.getRubricName()));
+				NewsList nl = stateManager.getNews().get(news.getRubricName());
 				if (nl != null) {
 					nl.add(news);
 					stateManager.getStatistics().incrementNews();
@@ -331,7 +330,7 @@ public class RpcListener {
 
 			try {
 				// Check Arguments
-				Node node = stateManager.getNodes().get(NamedObject.normalizeName(nodeName));
+				Node node = stateManager.getNodes().get(nodeName);
 				if (node == null || status == null) {
 					return response = RpcResponse.BAD_REQUEST;
 				}
@@ -382,7 +381,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				stateManager.getNodes().put(node.getNormalizedName(), node);
+				stateManager.getNodes().put(node.getName(), node);
 			} finally {
 				lock.unlock();
 			}
@@ -416,8 +415,6 @@ public class RpcListener {
 			if (node == null || node.isEmpty()) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
-
-			node = NamedObject.normalizeName(node);
 
 			Lock lock = stateManager.getLock().writeLock();
 			lock.lock();
@@ -485,10 +482,10 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				final String rubricName = rubric.getNormalizedName();
+				final String rubricName = rubric.getName();
 				stateManager.getRubrics().put(rubricName, rubric);
 
-				Map<String, NewsList> news = stateManager.getNews();
+				ModelRepository<NewsList> news = stateManager.getNews();
 				if (!news.containsKey(rubricName)) {
 					NewsList nl = new NewsList();
 					nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
@@ -531,8 +528,6 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			rubricName = NamedObject.normalizeName(rubricName);
-
 			Lock lock = stateManager.getLock().writeLock();
 			lock.lock();
 
@@ -569,7 +564,7 @@ public class RpcListener {
 	// ##################################################################################################
 	public RpcResponse updateTransmitterStatus(Transmitter updated) {
 		RpcResponse response = null;
-		final String transmitterName = updated != null ? updated.getNormalizedName() : null;
+		final String transmitterName = updated != null ? updated.getName() : null;
 
 		try {
 			if (updated == null) {
@@ -635,7 +630,7 @@ public class RpcListener {
 
 			try {
 				// Replace object
-				final Transmitter oldTransmitter = stateManager.getTransmitters().put(transmitter.getNormalizedName(),
+				final Transmitter oldTransmitter = stateManager.getTransmitters().put(transmitter.getName(),
 						transmitter);
 				if (oldTransmitter != null) {
 					// Disconnect from old transmitter
@@ -687,7 +682,7 @@ public class RpcListener {
 							if (transmitterGroup.getTransmitterNames().size() == 1) {
 								// Delete all TransmitterGroups using only this
 								// Transmitter
-								deleteTransmitterGroupNames.add(transmitterGroup.getNormalizedName());
+								deleteTransmitterGroupNames.add(transmitterGroup.getName());
 							} else {
 								// Remove this Transmitter from TransmitterGroup
 								// using more than this Transmitter
@@ -696,7 +691,7 @@ public class RpcListener {
 						});
 				deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
 
-				transmitter = stateManager.getTransmitters().remove(NamedObject.normalizeName(transmitterName));
+				transmitter = stateManager.getTransmitters().remove(transmitterName);
 				if (transmitter != null) {
 					response = RpcResponse.OK;
 				} else {
@@ -752,7 +747,7 @@ public class RpcListener {
 
 			try {
 				// Replace object
-				stateManager.getTransmitterGroups().put(transmitterGroup.getNormalizedName(), transmitterGroup);
+				stateManager.getTransmitterGroups().put(transmitterGroup.getName(), transmitterGroup);
 			} finally {
 				lock.unlock();
 			}
@@ -823,7 +818,7 @@ public class RpcListener {
 				deleteCalls.stream().forEach(call -> stateManager.getCalls().remove(call));
 
 				// Delete Object with same Name, if existing
-				if (stateManager.getTransmitterGroups().remove(NamedObject.normalizeName(transmitterGroup)) != null) {
+				if (stateManager.getTransmitterGroups().remove(transmitterGroup) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -873,7 +868,7 @@ public class RpcListener {
 
 			try {
 				// Add new Object
-				stateManager.getUsers().put(user.getNormalizedName(), user);
+				stateManager.getUsers().put(user.getName(), user);
 			} finally {
 				lock.unlock();
 			}
@@ -917,7 +912,7 @@ public class RpcListener {
 						.filter(callSign -> callSign.getOwnerNames().contains(user)).forEach(callSign -> {
 							if (callSign.getOwnerNames().size() == 1) {
 								// Delete all CallSigns which have only this Owner
-								deleteCallSignNames.add(callSign.getNormalizedName());
+								deleteCallSignNames.add(callSign.getName());
 							} else {
 								// Remove this Owner from Calls which have more than
 								// this Owner
@@ -939,7 +934,7 @@ public class RpcListener {
 						.forEach(rubric -> {
 							if (rubric.getOwnerNames().size() == 1) {
 								// Delete all Rubrics which have only this Owner
-								deleteRubricNames.add(rubric.getNormalizedName());
+								deleteRubricNames.add(rubric.getName());
 							} else {
 								// Remove this Owner from Rubric which have more
 								// than this Owner
@@ -983,7 +978,7 @@ public class RpcListener {
 				deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
 
 				// Delete Object with same Name, if existing
-				if (stateManager.getUsers().remove(NamedObject.normalizeName(user)) != null) {
+				if (stateManager.getUsers().remove(user) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -1011,8 +1006,6 @@ public class RpcListener {
 		RpcResponse response = null;
 
 		try {
-			transmitterName = NamedObject.normalizeName(transmitterName);
-
 			Lock lock = stateManager.getLock().readLock();
 			lock.lock();
 

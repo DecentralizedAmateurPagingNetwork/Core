@@ -8,7 +8,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
@@ -20,8 +19,6 @@ public class TransmitterControl extends AbstractResource {
 	@Path("sendRubricNames/{transmitter}")
 	@GET
 	public Response sendRubricNames(@PathParam("transmitter") String transmitterName) throws Exception {
-		transmitterName = NamedObject.normalizeName(transmitterName);
-
 		Transmitter transmitter = null;
 
 		final Repository repo = getRepository();

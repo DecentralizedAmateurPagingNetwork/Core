@@ -2,16 +2,16 @@ package org.dapnet.core.transmission;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
@@ -110,7 +110,7 @@ public class TransmitterManager {
 	 * @param transmitterName Transmitter name.
 	 */
 	public void sendMessage(PagerMessage message, String transmitterName) {
-		TransmitterClient cl = connectedClients.get(NamedObject.normalizeName(transmitterName));
+		TransmitterClient cl = connectedClients.get(NamedObject.normalize(transmitterName));
 		if (cl != null) {
 			cl.sendMessage(message);
 		}
@@ -138,7 +138,7 @@ public class TransmitterManager {
 			lock.unlock();
 		}
 
-		transmitterName = NamedObject.normalizeName(transmitterName);
+		transmitterName = NamedObject.normalize(transmitterName);
 		if (transmitters.contains(transmitterName)) {
 			TransmitterClient cl = connectedClients.get(transmitterName);
 			if (cl != null) {
@@ -157,7 +157,7 @@ public class TransmitterManager {
 	 * @param transmitterName Transmitter name.
 	 */
 	public void sendMessages(Collection<PagerMessage> messages, String transmitterName) {
-		TransmitterClient cl = connectedClients.get(NamedObject.normalizeName(transmitterName));
+		TransmitterClient cl = connectedClients.get(NamedObject.normalize(transmitterName));
 		if (cl != null) {
 			cl.sendMessages(messages);
 		}
@@ -202,7 +202,7 @@ public class TransmitterManager {
 			lock.unlock();
 		}
 
-		connectedClients.put(t.getNormalizedName(), client);
+		connectedClients.put(NamedObject.normalize(t.getName()), client);
 
 		notifyStatusChanged(listener, t);
 	}
@@ -231,7 +231,7 @@ public class TransmitterManager {
 			lock.unlock();
 		}
 
-		connectedClients.remove(t.getNormalizedName());
+		connectedClients.remove(NamedObject.normalize(t.getName()));
 
 		notifyStatusChanged(listener, t);
 	}
@@ -247,15 +247,16 @@ public class TransmitterManager {
 			return null;
 		}
 
-		Set<String> result = new HashSet<>();
+		Set<String> result = new TreeSet<>();
 		if (!transmitterGroupNames.isEmpty()) {
-			final Map<String, TransmitterGroup> tgMap = repository.getTransmitterGroups();
+			final ModelRepository<TransmitterGroup> repo = repository.getTransmitterGroups();
+
 			for (String name : transmitterGroupNames) {
-				TransmitterGroup tg = tgMap.get(NamedObject.normalizeName(name));
+				TransmitterGroup tg = repo.get(name);
 				if (tg != null) {
 					Set<String> transmitters = tg.getTransmitterNames();
 					if (transmitters != null) {
-						transmitters.forEach(t -> result.add(NamedObject.normalizeName(t)));
+						transmitters.forEach(t -> result.add(NamedObject.normalize(t)));
 					}
 				}
 			}
@@ -282,9 +283,10 @@ public class TransmitterManager {
 	 * @param t Transmitter to disconnect from.
 	 */
 	public void disconnectFrom(Transmitter t) {
-		TransmitterClient cl = connectedClients.remove(t.getNormalizedName());
+		TransmitterClient cl = connectedClients.remove(NamedObject.normalize(t.getName()));
 		if (cl != null) {
 			cl.close();
 		}
 	}
+
 }

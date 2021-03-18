@@ -128,7 +128,7 @@ public class Call implements Serializable {
 	}
 
 	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	public Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
+	Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
 		if (transmitterGroupNames == null) {
 			return null;
 		}
@@ -153,7 +153,7 @@ public class Call implements Serializable {
 	}
 
 	@ValidName(message = "must be a name of an existing user", fieldName = "ownerName", constraintName = "ValidOwnerName")
-	public User getOwner() throws Exception {
+	User getOwner() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}

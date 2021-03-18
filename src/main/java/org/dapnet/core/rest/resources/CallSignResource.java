@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.CallSign;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -54,8 +53,6 @@ public class CallSignResource extends AbstractResource {
 	@GET
 	@Path("{callSign}")
 	public Response getCallSign(@PathParam("callSign") String callSignName) throws Exception {
-		callSignName = NamedObject.normalizeName(callSignName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
@@ -73,8 +70,6 @@ public class CallSignResource extends AbstractResource {
 	@Path("{callSign}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putCallSign(@PathParam("callSign") String callSignName, String callSignJSON) throws Exception {
-		callSignName = NamedObject.normalizeName(callSignName);
-
 		CallSign oldCallSign = null;
 
 		final Repository repo = getRepository();
@@ -107,8 +102,6 @@ public class CallSignResource extends AbstractResource {
 	@DELETE
 	@Path("{callSign}")
 	public Response deleteCallSign(@PathParam("callSign") String callSign) throws Exception {
-		callSign = NamedObject.normalizeName(callSign);
-
 		CallSign oldCallSign = null;
 
 		final Repository repo = getRepository();

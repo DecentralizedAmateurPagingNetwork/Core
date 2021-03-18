@@ -21,7 +21,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.Program;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.StateManager;
@@ -79,7 +79,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 					handleMerge((MergeView) view);
 				} catch (Exception e) {
 					logger.fatal("Could not get State from majority", e);
-					DAPNETCore.shutdown();
+					Program.shutdown();
 					return;
 				}
 			}

@@ -29,7 +29,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Call;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
@@ -41,8 +40,6 @@ public class CallResource extends AbstractResource {
 
 	@GET
 	public Response getCalls(@QueryParam("ownerName") String ownerName) throws Exception {
-		ownerName = NamedObject.normalizeName(ownerName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();

@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
@@ -181,7 +180,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			logger.error("Invalid welcome message format: " + msg);
 			ctx.writeAndFlush("7 Invalid welcome message format").addListener(ChannelFutureListener.CLOSE);
 			return;
-//			throw new TransmitterException("Invalid welcome message format: " + msg);
 		}
 
 		String type = authMatcher.group(1);
@@ -196,7 +194,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		lock.lock();
 
 		try {
-			transmitter = repo.getTransmitters().get(NamedObject.normalizeName(name));
+			transmitter = repo.getTransmitters().get(name);
 			if (transmitter == null) {
 				logger.error("The transmitter name is not registered: " + name + " connecting from "
 						+ ctx.channel().remoteAddress());

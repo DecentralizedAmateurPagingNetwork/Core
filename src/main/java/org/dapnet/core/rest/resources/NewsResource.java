@@ -26,7 +26,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.LoginData;
@@ -47,8 +46,6 @@ public class NewsResource extends AbstractResource {
 				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 				return getObject(repo.getNews(), status);
 			} else {
-				rubricName = NamedObject.normalizeName(rubricName);
-
 				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY,
 						repo.getRubrics().get(rubricName));
 				return getObject(repo.getNews().get(rubricName), status);
@@ -80,9 +77,8 @@ public class NewsResource extends AbstractResource {
 		lock.lock();
 
 		try {
-			final String rubricName = NamedObject.normalizeName(news.getRubricName());
 			// Check if user is OWNER of rubric
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, repo.getRubrics().get(rubricName));
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, repo.getRubrics().get(news.getRubricName()));
 		} finally {
 			lock.unlock();
 		}

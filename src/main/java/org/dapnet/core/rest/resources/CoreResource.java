@@ -20,7 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.Program;
 import org.dapnet.core.rest.RestSecurity;
 
 @Path("/core")
@@ -33,7 +33,7 @@ public class CoreResource extends AbstractResource {
 	@GET
 	public Response getCoreVersion() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		VersionWrapper version = new VersionWrapper(DAPNETCore.getCoreVersion());
+		VersionWrapper version = new VersionWrapper(Program.getCoreVersion());
 		return getObject(version, status);
 	}
 
@@ -41,7 +41,7 @@ public class CoreResource extends AbstractResource {
 	@GET
 	public Response getApiVersion() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-		VersionWrapper version = new VersionWrapper(DAPNETCore.getApiVersion());
+		VersionWrapper version = new VersionWrapper(Program.getApiVersion());
 		return getObject(version, status);
 	}
 
@@ -66,9 +66,9 @@ public class CoreResource extends AbstractResource {
 
 	private static final class Version {
 		@SuppressWarnings("unused")
-		private final String core = DAPNETCore.getCoreVersion();
+		private final String core = Program.getCoreVersion();
 		@SuppressWarnings("unused")
-		private final String api = DAPNETCore.getApiVersion();
+		private final String api = Program.getApiVersion();
 	}
 
 }

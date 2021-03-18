@@ -25,7 +25,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.rest.RestSecurity;
@@ -52,8 +51,6 @@ public class RubricResource extends AbstractResource {
 	@GET
 	@Path("{rubric}")
 	public Response getRubric(@PathParam("rubric") String rubricName) throws Exception {
-		rubricName = NamedObject.normalizeName(rubricName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
@@ -71,8 +68,6 @@ public class RubricResource extends AbstractResource {
 	@Path("{rubric}")
 	@Consumes("application/json")
 	public Response putRubric(@PathParam("rubric") String rubricName, String rubricJSON) throws Exception {
-		rubricName = NamedObject.normalizeName(rubricName);
-
 		Rubric oldRubric = null;
 
 		final Repository repo = getRepository();
@@ -106,8 +101,6 @@ public class RubricResource extends AbstractResource {
 	@DELETE
 	@Path("{rubric}")
 	public Response deleteRubric(@PathParam("rubric") String rubric) throws Exception {
-		rubric = NamedObject.normalizeName(rubric);
-
 		Rubric oldRubric = null;
 
 		final Repository repo = getRepository();

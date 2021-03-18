@@ -16,11 +16,14 @@ package org.dapnet.core;
 
 import java.io.FileNotFoundException;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.validation.ConstraintViolation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,12 +34,12 @@ import org.dapnet.core.scheduler.SchedulerManager;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.dapnet.core.transmission.TransmitterServer;
 
-public class DAPNETCore {
+public class Program {
 
 	private static final Logger logger = LogManager.getLogger();
 	private static final String CORE_VERSION;
 	private static final String API_VERSION;
-	private static volatile DAPNETCore dapnetCore;
+	private static volatile Program dapnetCore;
 	private final StateManager stateManager = new StateManager();
 	private volatile ClusterManager clusterManager;
 	private volatile RestManager restManager;
@@ -45,7 +48,7 @@ public class DAPNETCore {
 	private volatile TransmitterServer transmitterServer;
 
 	static {
-		String ver = DAPNETCore.class.getPackage().getImplementationVersion();
+		String ver = Program.class.getPackage().getImplementationVersion();
 		if (ver != null) {
 			CORE_VERSION = ver;
 		} else {
@@ -63,16 +66,30 @@ public class DAPNETCore {
 		}
 	}
 
-	private void initState(boolean enforceStartup) {
+	private void initState(boolean force) {
+		Set<ConstraintViolation<Object>> violations = null;
+
 		try {
 			logger.info("Loading state file");
 
 			final String fileName = Settings.getModelSettings().getStateFile();
-			stateManager.loadStateFromFile(fileName);
+			violations = stateManager.loadStateFromFile(fileName, force);
 		} catch (FileNotFoundException ex) {
 			logger.error("State file does not exists, using new empty state.");
 		} catch (Exception ex) {
 			throw new CoreStartupException(ex);
+		}
+
+		if (violations != null && !violations.isEmpty()) {
+			violations.forEach(v -> {
+				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
+			});
+
+			if (!force) {
+				throw new CoreStartupException("State validation failed.");
+			} else {
+				logger.warn("Startup enforced, ignoring state validation errors.");
+			}
 		}
 	}
 
@@ -80,8 +97,7 @@ public class DAPNETCore {
 		try {
 			logger.info("Starting DAPNETCore Version {} ...", CORE_VERSION);
 
-			// TODO Use proper parameter
-			initState(true);
+			initState(enforceStartup);
 
 			logger.info("Starting TransmissionManager");
 			transmissionManager = new TransmissionManager(stateManager);
@@ -168,7 +184,7 @@ public class DAPNETCore {
 			}
 		}
 
-		dapnetCore = new DAPNETCore();
+		dapnetCore = new Program();
 		dapnetCore.start(enforceStartup);
 	}
 

@@ -24,7 +24,7 @@ import javax.validation.ConstraintViolation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.Program;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.StateManager;
 import org.jgroups.Message;
@@ -56,11 +56,7 @@ public class MessageListener implements org.jgroups.MessageListener {
 	public void setState(InputStream inputStream) throws Exception {
 		logger.info("Receiving State from other Node");
 
-		stateManager.loadStateFromStream(inputStream);
-		// state.setModelReferences();
-
-		// Validate state
-		Set<ConstraintViolation<Object>> violations = stateManager.validateState();
+		Set<ConstraintViolation<Object>> violations = stateManager.loadStateFromStream(inputStream, false);
 		if (violations.isEmpty()) {
 			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 
@@ -70,9 +66,9 @@ public class MessageListener implements org.jgroups.MessageListener {
 				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
 			});
 
-			logger.fatal("Discarding received State");
+			logger.fatal("Discarding received state");
 			// FIXME Does this work?
-			DAPNETCore.shutdown();
+			Program.shutdown();
 		}
 
 		// Check if node name is in received state.
@@ -84,7 +80,7 @@ public class MessageListener implements org.jgroups.MessageListener {
 		try {
 			if (!stateManager.getNodes().containsKey(nodeName)) {
 				logger.fatal("Current node name does not exist in received state: {}", nodeName);
-				DAPNETCore.shutdown();
+				Program.shutdown();
 			}
 		} finally {
 			lock.unlock();

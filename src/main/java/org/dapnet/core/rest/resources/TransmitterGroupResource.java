@@ -27,7 +27,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.rest.RestSecurity;
@@ -54,8 +53,6 @@ public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	@Path("{transmitterGroup}")
 	public Response getTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName) throws Exception {
-		transmitterGroupName = NamedObject.normalizeName(transmitterGroupName);
-
 		final Repository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
@@ -74,8 +71,6 @@ public class TransmitterGroupResource extends AbstractResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName,
 			String transmitterGroupJSON) throws Exception {
-		transmitterGroupName = NamedObject.normalizeName(transmitterGroupName);
-
 		TransmitterGroup oldGroup = null;
 		TransmitterGroup transmitterGroup = null;
 
@@ -110,8 +105,6 @@ public class TransmitterGroupResource extends AbstractResource {
 	@DELETE
 	@Path("{transmitterGroup}")
 	public Response deleteTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroup) throws Exception {
-		transmitterGroup = NamedObject.normalizeName(transmitterGroup);
-
 		TransmitterGroup oldTransmitterGroup = null;
 
 		final Repository repo = getRepository();

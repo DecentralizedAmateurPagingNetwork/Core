@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
@@ -34,7 +33,7 @@ import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
-import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
 import org.dapnet.core.model.Repository;
@@ -74,11 +73,11 @@ public class SkyperProtocol implements PagerProtocol {
 			Matcher m = NUMERIC_PATTERN.matcher(call.getText());
 			boolean numeric = m.matches();
 
-			final Map<String, CallSign> callsigns = repository.getCallSigns();
+			final ModelRepository<CallSign> callsigns = repository.getCallSigns();
 
 			List<PagerMessage> messages = new LinkedList<>();
 			for (String name : call.getCallSignNames()) {
-				CallSign callsign = callsigns.get(NamedObject.normalizeName(name));
+				CallSign callsign = callsigns.get(name);
 				if (callsign == null) {
 					logger.error("Callsign does not exist: {}", name);
 					continue;

@@ -18,12 +18,14 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
@@ -147,14 +149,25 @@ public class TransmissionManager {
 			logger.info("Call sent to {} CallSigns, to {} Pagers, using {} TransmitterGroups.",
 					call.getCallSignNames().size(), messages.size(), call.getTransmitterGroupNames().size());
 
-			// XXX No other easy way of doing this without performing a
-			// cluster-wide remote procedure call
-			Set<Transmitter> transmitters = new HashSet<>();
-			for (TransmitterGroup grp : call.getTransmitterGroups()) {
-				transmitters.addAll(grp.getTransmitters());
-			}
+			// XXX No other easy way of doing this without performing a cluster-wide remote
+			// procedure call
+			final Repository repo = transmitterManager.getRepository();
+			Lock lock = repo.getLock().writeLock();
+			lock.lock();
 
-			transmitters.forEach(t -> t.updateCallCount(1));
+			try {
+				Set<Transmitter> transmitters = new HashSet<>();
+				Set<TransmitterGroup> transmitterGroups = repo.getTransmitterGroups()
+						.get(call.getTransmitterGroupNames());
+				for (TransmitterGroup tg : transmitterGroups) {
+					Set<Transmitter> selected = repo.getTransmitters().get(tg.getTransmitterNames());
+					transmitters.addAll(selected);
+				}
+
+				transmitters.forEach(t -> t.updateCallCount(1));
+			} finally {
+				lock.unlock();
+			}
 		} catch (Exception e) {
 			logger.error("Failed to send Call", e);
 		}

@@ -16,28 +16,33 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+/**
+ * This class contains the actual state that can also be serialized.
+ * 
+ * @author Philipp Thiel
+ */
 final class State implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Map<String, CallSign> callSigns = new HashMap<>();
+	private Map<String, CallSign> callSigns = new TreeMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Map<String, Node> nodes = new HashMap<>();
+	private Map<String, Node> nodes = new TreeMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Map<String, User> users = new HashMap<>();
+	private Map<String, User> users = new TreeMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
@@ -45,19 +50,19 @@ final class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Map<String, Transmitter> transmitters = new HashMap<>();
+	private Map<String, Transmitter> transmitters = new TreeMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Map<String, TransmitterGroup> transmitterGroups = new HashMap<>();
+	private Map<String, TransmitterGroup> transmitterGroups = new TreeMap<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Map<String, Rubric> rubrics = new HashMap<>();
+	private Map<String, Rubric> rubrics = new TreeMap<>();
 
 	@NotNull(message = "nicht vorhande")
 	@Valid
-	private Map<String, NewsList> news = new HashMap<>();
+	private Map<String, NewsList> news = new TreeMap<>();
 
 	@NotNull
 	@Valid

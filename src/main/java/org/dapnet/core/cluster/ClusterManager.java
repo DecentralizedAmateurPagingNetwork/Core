@@ -16,18 +16,15 @@ package org.dapnet.core.cluster;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
-
-import javax.validation.ConstraintViolation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
-import org.dapnet.core.DAPNETCore;
+import org.dapnet.core.Program;
 import org.dapnet.core.Settings;
+import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
@@ -79,7 +76,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		channel.setName(readNodeName());
 		channel.addAddressGenerator(() -> {
 			ExtendedUUID address = ExtendedUUID.randomUUID(channel.getName());
-			address.put("version", DAPNETCore.getCoreVersion().getBytes(StandardCharsets.UTF_8));
+			address.put("version", Program.getCoreVersion().getBytes(StandardCharsets.UTF_8));
 			return address;
 		});
 
@@ -117,20 +114,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		} finally {
 			lock.unlock();
 		}
-
-		// Validate state
-		Set<ConstraintViolation<Object>> violations = stateManager.validateState();
-		if (!violations.isEmpty()) {
-			violations.forEach(v -> {
-				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
-			});
-
-			if (!enforceStartup) {
-				throw new CoreStartupException("State validation failed.");
-			} else {
-				logger.warn("Startup enforced, ignoring state validation errors.");
-			}
-		}
 	}
 
 	public StateManager getStateManager() {
@@ -138,16 +121,14 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void registerNewsList() {
-		Map<String, Rubric> rubrics = stateManager.getRubrics();
-		Map<String, NewsList> news = stateManager.getNews();
+		ModelRepository<Rubric> rubrics = stateManager.getRubrics();
+		ModelRepository<NewsList> news = stateManager.getNews();
 
 		for (Rubric r : rubrics.values()) {
-			String rubricName = r.getNormalizedName();
-
-			NewsList nl = news.get(rubricName);
+			NewsList nl = news.get(r.getName());
 			if (nl == null) {
 				nl = new NewsList();
-				news.put(rubricName, nl);
+				news.put(r.getName(), nl);
 			}
 
 			nl.setHandler(transmissionManager::handleNews);
@@ -156,7 +137,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void resetNodeStates() {
-		Map<String, Node> nodes = stateManager.getNodes();
+		ModelRepository<Node> nodes = stateManager.getNodes();
 		for (Node n : nodes.values()) {
 			n.setStatus(Status.SUSPENDED);
 		}
@@ -176,7 +157,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		int namePosition = properties.indexOf("name=", gmsPosition);
 		int startPosition = properties.indexOf('@', namePosition) + 1;
 		int endPosition = properties.indexOf(';', startPosition);
-		return properties.substring(startPosition, endPosition) + DAPNETCore.getCoreVersion();
+		return properties.substring(startPosition, endPosition) + Program.getCoreVersion();
 	}
 
 	private String readNodeName() {
@@ -199,7 +180,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		lock.lock();
 
 		try {
-			Map<String, Node> nodes = stateManager.getNodes();
+			ModelRepository<Node> nodes = stateManager.getNodes();
 			for (Node node : nodes.values()) {
 				if (node.getStatus() != Node.Status.SUSPENDED) {
 					// Node is in UNKNOWN
@@ -301,19 +282,19 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 		// XXX I'm not sure if holding the lock could lead to a deadlock, that's why it
 		// is a bit awkward looking here...
-		boolean contains = false;
+		boolean exists = false;
 
 		lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			Map<String, Transmitter> transmitters = stateManager.getTransmitters();
-			contains = transmitters.containsKey(transmitter.getNormalizedName());
+			ModelRepository<Transmitter> transmitters = stateManager.getTransmitters();
+			exists = transmitters.containsKey(transmitter.getName());
 		} finally {
 			lock.unlock();
 		}
 
-		if (contains) {
+		if (exists) {
 			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },
 					new Class[] { Transmitter.class });
 		}

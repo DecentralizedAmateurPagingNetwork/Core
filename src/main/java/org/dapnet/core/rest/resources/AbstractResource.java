@@ -175,7 +175,7 @@ public abstract class AbstractResource {
 		}
 
 		// Send to Cluster
-		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getNormalizedName() },
+		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
 				new Class[] { String.class })) {
 			// TODO Why do we return the deleted object here?
 			return Response.ok(gson.toJson(object)).build();

@@ -22,7 +22,6 @@ import javax.ws.rs.core.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.User;
 
@@ -60,7 +59,7 @@ public class RestSecurity {
 
 		try {
 			// Get User
-			User user = repository.getUsers().get(NamedObject.normalizeName(loginData.getUsername()));
+			User user = repository.getUsers().get(loginData.getUsername());
 			if (user == null) {
 				logger.info("No User with such name");
 				return SecurityStatus.UNAUTHORIZED;
