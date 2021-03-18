@@ -71,7 +71,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
 
 		// Register Transmission
-		this.transmissionManager = transmissionManager;
+		this.transmissionManager = Objects.requireNonNull(transmissionManager,
+				"Transmission manager must not be null.");
 		transmitterManager = transmissionManager.getTransmitterManager();
 		transmitterManager.setListener(this);
 
@@ -88,13 +89,13 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		});
 
 		// Create Dispatcher (for creating Block on top of channel)
-		dispatcher = new RpcDispatcher(channel, new RpcListener(this));
+		dispatcher = new RpcDispatcher(channel, new RpcListener(stateManager, this));
 
 		// Create and register Listener
 		channelListener = new org.dapnet.core.cluster.ChannelListener(this);
 		dispatcher.addChannelListener(channelListener);
 
-		membershipListener = new org.dapnet.core.cluster.MembershipListener(this);
+		membershipListener = new org.dapnet.core.cluster.MembershipListener(stateManager, this);
 		dispatcher.setMembershipListener(membershipListener);
 
 		messageListener = new org.dapnet.core.cluster.MessageListener(stateManager, this);
@@ -119,7 +120,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		lock.lock();
 
 		try {
-
 			// Validate state
 			Set<ConstraintViolation<Object>> violations = validator.validate(stateManager.getRepository());
 			if (!violations.isEmpty()) {
@@ -365,10 +365,5 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 	public JChannel getChannel() {
 		return channel;
-	}
-
-	@Override
-	public State getState() {
-		return state;
 	}
 }

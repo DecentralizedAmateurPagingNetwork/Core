@@ -16,13 +16,9 @@ package org.dapnet.core.rest;
 
 import java.util.Collection;
 
-import org.dapnet.core.model.State;
 import org.jgroups.Address;
 
 public interface RestListener {
-	// Give (ReadOnly) Access to the State
-	State getState();
-
 	// Handler for WriteOnly Operations on State
 	// Add here parameters for rollback
 	@SuppressWarnings("rawtypes")

@@ -21,7 +21,16 @@ public interface NamedObject {
 	 * @return Normalized name or {@code null} if {@code getName() == null}
 	 */
 	default String getNormalizedName() {
-		String name = getName();
+		return normalizeName(getName());
+	}
+
+	/**
+	 * Normalizes a name used for map lookups for example.
+	 * 
+	 * @param name Name to normalize
+	 * @return Normalized name or {@code null} if {@code name == null}
+	 */
+	static String normalizeName(String name) {
 		if (name != null) {
 			name = name.toLowerCase(Locale.ROOT);
 		}

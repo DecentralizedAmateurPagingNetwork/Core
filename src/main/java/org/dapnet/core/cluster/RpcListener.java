@@ -14,14 +14,13 @@
 
 package org.dapnet.core.cluster;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -30,12 +29,12 @@ import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
-import org.dapnet.core.model.State;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
@@ -92,17 +91,17 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Add new Object
 			Lock lock = stateManager.getLock().writeLock();
 			lock.lock();
 
 			try {
-				Repository repo = stateManager.getRepository();
-				repo.getCalls().add(call);
-				stateManager.getStatistics().incrementCalls();
+				// Add new Object
+				stateManager.getRepository().getCalls().add(call);
 			} finally {
 				lock.unlock();
 			}
+
+			stateManager.getStatistics().incrementCalls();
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
@@ -113,7 +112,8 @@ public class RpcListener {
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PostCall", call, response);
@@ -141,7 +141,8 @@ public class RpcListener {
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PostActivation", activation, response);
@@ -174,7 +175,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				stateManager.getRepository().getCallSigns().put(callSign.getName(), callSign);
+				stateManager.getRepository().getCallSigns().put(callSign.getNormalizedName(), callSign);
 			} finally {
 				lock.unlock();
 			}
@@ -185,7 +186,8 @@ public class RpcListener {
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PutCallSign", callSign, response);
@@ -229,9 +231,11 @@ public class RpcListener {
 				deleteCalls.stream().forEach(call -> repo.getCalls().remove(call));
 
 				// Delete Object with same Name, if existing
-				if (repo.getCallSigns().remove(callSign) == null) {
+				if (repo.getCallSigns().remove(NamedObject.normalizeName(callSign)) != null) {
+					response = RpcResponse.OK;
+				} else {
 					// Object not found
-					return response = RpcResponse.BAD_REQUEST;
+					response = RpcResponse.BAD_REQUEST;
 				}
 			} finally {
 				lock.unlock();
@@ -241,9 +245,10 @@ public class RpcListener {
 				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
-			return response = RpcResponse.OK;
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("DeleteCallSign", callSign, response);
@@ -252,8 +257,9 @@ public class RpcListener {
 
 	// ### News
 	// #########################################################################################################
-	public synchronized RpcResponse postNews(News news) {
+	public RpcResponse postNews(News news) {
 		RpcResponse response = null;
+
 		try {
 			// Check Arguments
 			if (news == null) {
@@ -266,22 +272,32 @@ public class RpcListener {
 			}
 
 			// Add new Object
-			State state = clusterManager.getState();
-			NewsList nl = state.getNews().get(news.getRubricName().toLowerCase());
-			if (nl != null) {
-				nl.add(news);
-				state.getCoreStats().incrementNews();
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					state.writeToFile();
+			try {
+				NewsList nl = stateManager.getRepository().getNews()
+						.get(NamedObject.normalizeName(news.getRubricName()));
+				if (nl != null) {
+					nl.add(news);
+					stateManager.getStatistics().incrementNews();
+
+					response = RpcResponse.OK;
+				} else {
+					response = RpcResponse.BAD_REQUEST;
 				}
-
-				return response = RpcResponse.OK;
-			} else {
-				return response = RpcResponse.BAD_REQUEST;
+			} finally {
+				lock.unlock();
 			}
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PostNews", news, response);
@@ -291,34 +307,45 @@ public class RpcListener {
 	// ### Node
 	// #########################################################################################################
 	// Now only used to inform other nodes that going to suspend mode
-	public synchronized RpcResponse updateNodeStatus(String nodeName, Node.Status status) {
+	public RpcResponse updateNodeStatus(String nodeName, Node.Status status) {
 		RpcResponse response = null;
+
 		try {
-			// Check Arguments
-			Node node = clusterManager.getState().getNodes().get(nodeName);
-			if (node == null || status == null) {
-				return response = RpcResponse.BAD_REQUEST;
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				// Check Arguments
+				Node node = stateManager.getRepository().getNodes().get(NamedObject.normalizeName(nodeName));
+				if (node == null || status == null) {
+					return response = RpcResponse.BAD_REQUEST;
+				}
+
+				// Set Status
+				node.setStatus(status);
+			} finally {
+				lock.unlock();
 			}
 
-			// Set Status
-			node.setStatus(status);
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			clusterManager.checkQuorum();
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("UpdateNodeStatus", nodeName + " to " + status, response);
 		}
 	}
 
-	public synchronized RpcResponse putNode(Node node) {
+	public RpcResponse putNode(Node node) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -336,24 +363,34 @@ public class RpcListener {
 			}
 
 			// Replace object
-			clusterManager.getState().getNodes().put(node.getName(), node);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				stateManager.getRepository().getNodes().put(node.getNormalizedName(), node);
+			} finally {
+				lock.unlock();
+			}
+
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			clusterManager.checkQuorum();
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PutNode", node, response);
 		}
 	}
 
-	public synchronized RpcResponse deleteNode(String node) {
+	public RpcResponse deleteNode(String node) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -365,6 +402,11 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
+			node = NamedObject.normalizeName(node);
+
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
 			// TODO Disconnect transmitters
 			// ArrayList<Transmitter> deleteTransmitterNames = new
 			// ArrayList<>();
@@ -375,21 +417,28 @@ public class RpcListener {
 			// deleteTransmitterNames.stream().forEach(t ->
 			// clusterManager.getTransmitterManager().disconnectFrom(t));
 
-			// Delete Object with same Name, if existing
-			if (clusterManager.getState().getNodes().remove(node) == null) {
-				// Object not found
-				return response = RpcResponse.BAD_REQUEST;
-			} else {
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+			try {
+				// Delete Object with same Name, if existing
+				if (stateManager.getRepository().getNodes().remove(node) != null) {
+					response = RpcResponse.OK;
+				} else {
+					// Object not found
+					response = RpcResponse.BAD_REQUEST;
 				}
-
-				clusterManager.checkQuorum();
-
-				return response = RpcResponse.OK;
+			} finally {
+				lock.unlock();
 			}
+
+			if (response == RpcResponse.OK && Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			clusterManager.checkQuorum();
+
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("DeleteNode", node, response);
@@ -398,8 +447,9 @@ public class RpcListener {
 
 	// ### Rubric
 	// #######################################################################################################
-	public synchronized RpcResponse putRubric(Rubric rubric) {
+	public RpcResponse putRubric(Rubric rubric) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -416,20 +466,27 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Replace object
-			final String rubricName = rubric.getName().toLowerCase();
-			clusterManager.getState().getRubrics().put(rubricName, rubric);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-			// Register new news list if missing
-			if (!clusterManager.getState().getNews().containsKey(rubricName)) {
-				NewsList nl = new NewsList();
-				nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
-				nl.setAddHandler(clusterManager.getTransmissionManager()::handleNewsAsCall);
-				clusterManager.getState().getNews().put(rubricName, nl);
+			try {
+				final String rubricName = rubric.getNormalizedName();
+				stateManager.getRepository().getRubrics().put(rubricName, rubric);
+
+				Map<String, NewsList> news = stateManager.getRepository().getNews();
+				if (!news.containsKey(rubricName)) {
+					NewsList nl = new NewsList();
+					nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
+					nl.setAddHandler(clusterManager.getTransmissionManager()::handleNewsAsCall);
+
+					news.put(rubricName, nl);
+				}
+			} finally {
+				lock.unlock();
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			// Transmit new Rubric
@@ -437,15 +494,17 @@ public class RpcListener {
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PutRubric", rubric, response);
 		}
 	}
 
-	public synchronized RpcResponse deleteRubric(String rubric) {
+	public RpcResponse deleteRubric(String rubricName) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -453,69 +512,93 @@ public class RpcListener {
 			}
 
 			// Check Arguments
-			if (rubric == null || rubric.isEmpty()) {
+			if (rubricName == null || rubricName.isEmpty()) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			rubric = rubric.toLowerCase();
-			// Remove news list as well
-			clusterManager.getState().getNews().remove(rubric);
+			rubricName = NamedObject.normalizeName(rubricName);
 
-			// Delete Object with same Name, if existing
-			if (clusterManager.getState().getRubrics().remove(rubric) == null) {
-				// Object not found
-				return response = RpcResponse.BAD_REQUEST;
-			} else {
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				// Remove news list as well
+				stateManager.getRepository().getNews().remove(rubricName);
+
+				// Delete Object with same Name, if existing
+				if (stateManager.getRepository().getRubrics().remove(rubricName) != null) {
+					response = RpcResponse.OK;
+				} else {
+					// Object not found
+					response = RpcResponse.BAD_REQUEST;
 				}
-
-				return response = RpcResponse.OK;
+			} finally {
+				lock.unlock();
 			}
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
-			logResponse("DeleteRubric", rubric, response);
+			logResponse("DeleteRubric", rubricName, response);
 		}
 	}
 
 	// ### Transmitter
 	// ##################################################################################################
-	public synchronized RpcResponse updateTransmitterStatus(Transmitter updated) {
+	public RpcResponse updateTransmitterStatus(Transmitter updated) {
 		RpcResponse response = null;
-		String name = updated != null ? updated.getName() : null;
+		final String transmitterName = updated != null ? updated.getNormalizedName() : null;
 
 		try {
-			Transmitter transmitter = clusterManager.getState().getTransmitters().get(name);
-			if (transmitter == null) {
+			if (updated == null) {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			transmitter.setNodeName(updated.getNodeName());
-			transmitter.setStatus(updated.getStatus());
-			transmitter.setConnectedSince(updated.getConnectedSince());
-			transmitter.setLastConnected(updated.getLastConnected());
-			transmitter.setAddress(updated.getAddress());
-			transmitter.setDeviceType(updated.getDeviceType());
-			transmitter.setDeviceVersion(updated.getDeviceVersion());
-			// transmitter.setLastUpdate(updated.getLastUpdate());
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				Transmitter transmitter = stateManager.getRepository().getTransmitters().get(transmitterName);
+				if (transmitter == null) {
+					return response = RpcResponse.BAD_REQUEST;
+				}
+
+				transmitter.setNodeName(updated.getNodeName());
+				transmitter.setStatus(updated.getStatus());
+				transmitter.setConnectedSince(updated.getConnectedSince());
+				transmitter.setLastConnected(updated.getLastConnected());
+				transmitter.setAddress(updated.getAddress());
+				transmitter.setDeviceType(updated.getDeviceType());
+				transmitter.setDeviceVersion(updated.getDeviceVersion());
+				// transmitter.setLastUpdate(updated.getLastUpdate());
+			} finally {
+				lock.unlock();
+			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
-			logResponse("UpdateTransmitterStatus", name, response);
+			logResponse("UpdateTransmitterStatus", transmitterName, response);
 		}
 	}
 
-	public synchronized RpcResponse putTransmitter(Transmitter transmitter) {
+	public RpcResponse putTransmitter(Transmitter transmitter) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -532,29 +615,38 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Replace object
-			Transmitter oldTransmitter = clusterManager.getState().getTransmitters()
-					.put(transmitter.getName().toLowerCase(), transmitter);
-			if (oldTransmitter != null) {
-				// Disconnect from old transmitter
-				clusterManager.getTransmitterManager().disconnectFrom(oldTransmitter);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				// Replace object
+				final Transmitter oldTransmitter = stateManager.getRepository().getTransmitters()
+						.put(transmitter.getNormalizedName(), transmitter);
+				if (oldTransmitter != null) {
+					// Disconnect from old transmitter
+					clusterManager.getTransmitterManager().disconnectFrom(oldTransmitter);
+				}
+			} finally {
+				lock.unlock();
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PutTransmitter", transmitter, response);
 		}
 	}
 
-	public synchronized RpcResponse deleteTransmitter(String transmitterName) {
+	public RpcResponse deleteTransmitter(String transmitterName) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -566,40 +658,54 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Delete depended Objects
-			// Delete TransmitterGroups
-			ArrayList<String> deleteTransmitterGroupNames = new ArrayList<>();
-			clusterManager.getState().getTransmitterGroups().values().stream()
-					.filter(transmitterGroup -> transmitterGroup.getTransmitterNames().contains(transmitterName))
-					.forEach(transmitterGroup -> {
-						if (transmitterGroup.getTransmitterNames().size() == 1) {
-							// Delete all TransmitterGroups using only this
-							// Transmitter
-							deleteTransmitterGroupNames.add(transmitterGroup.getName());
-						} else {
-							// Remove this Transmitter from TransmitterGroup
-							// using more than this Transmitter
-							transmitterGroup.getTransmitterNames().remove(transmitterName);
-						}
-					});
-			deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
+			Transmitter transmitter = null;
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-			Transmitter transmitter = clusterManager.getState().getTransmitters().remove(transmitterName);
-			if (transmitter == null) {
-				// Object not found
-				return response = RpcResponse.BAD_REQUEST;
-			} else {
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+			try {
+				// Delete depended Objects
+				// Delete TransmitterGroups
+				Set<String> deleteTransmitterGroupNames = new HashSet<>();
+				stateManager.getRepository().getTransmitterGroups().values().stream()
+						.filter(transmitterGroup -> transmitterGroup.getTransmitterNames().contains(transmitterName))
+						.forEach(transmitterGroup -> {
+							if (transmitterGroup.getTransmitterNames().size() == 1) {
+								// Delete all TransmitterGroups using only this
+								// Transmitter
+								deleteTransmitterGroupNames.add(transmitterGroup.getNormalizedName());
+							} else {
+								// Remove this Transmitter from TransmitterGroup
+								// using more than this Transmitter
+								transmitterGroup.getTransmitterNames().remove(transmitterName);
+							}
+						});
+				deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
+
+				transmitter = stateManager.getRepository().getTransmitters()
+						.remove(NamedObject.normalizeName(transmitterName));
+				if (transmitter != null) {
+					response = RpcResponse.OK;
+				} else {
+					// Object not found
+					response = RpcResponse.BAD_REQUEST;
 				}
-
-				// Disconnect from transmitter
-				clusterManager.getTransmitterManager().disconnectFrom(transmitter);
-
-				return response = RpcResponse.OK;
+			} finally {
+				lock.unlock();
 			}
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			// Disconnect from transmitter
+			if (transmitter != null) {
+				clusterManager.getTransmitterManager().disconnectFrom(transmitter);
+			}
+
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("DeleteTransmitter", transmitterName, response);
@@ -608,8 +714,9 @@ public class RpcListener {
 
 	// ### TransmitterGroup
 	// #############################################################################################
-	public synchronized RpcResponse putTransmitterGroup(TransmitterGroup transmitterGroup) {
+	public RpcResponse putTransmitterGroup(TransmitterGroup transmitterGroup) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -626,23 +733,34 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Replace object
-			clusterManager.getState().getTransmitterGroups().put(transmitterGroup.getName(), transmitterGroup);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				// Replace object
+				stateManager.getRepository().getTransmitterGroups().put(transmitterGroup.getNormalizedName(),
+						transmitterGroup);
+			} finally {
+				lock.unlock();
+			}
+
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PutTransmitterGroup", transmitterGroup, response);
 		}
 	}
 
-	public synchronized RpcResponse deleteTransmitterGroup(String transmitterGroup) {
+	public RpcResponse deleteTransmitterGroup(String transmitterGroup) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -654,51 +772,63 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Delete depended Objects
-			// Delete Rubrics
-			ArrayList<String> deleteRubricNames = new ArrayList<>();
-			clusterManager.getState().getRubrics().values().stream()
-					.filter(rubric -> rubric.getTransmitterGroupNames().contains(transmitterGroup)).forEach(rubric -> {
-						if (rubric.getTransmitterGroupNames().size() == 1) {
-							// Delete all Rubrics using only this
-							// TransmitterGroup
-							deleteRubricNames.add(rubric.getName());
-						} else {
-							// Remove this TransmitterGroup from Rubrics using
-							// more than this TransmitterGroup
-							rubric.getTransmitterGroupNames().remove(transmitterGroup);
-						}
-					});
-			deleteRubricNames.stream().forEach(name -> deleteRubric(name));
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-			// Delete Calls
-			ArrayList<Call> deleteCalls = new ArrayList<>();
-			clusterManager.getState().getCalls().stream()
-					.filter(call -> call.getTransmitterGroupNames().contains(transmitterGroup)).forEach(call -> {
-						if (call.getTransmitterGroupNames().size() == 1) {
-							// Delete all Calls using only this TransmitterGroup
-							deleteCalls.add(call);
-						} else {
-							// Remove this TransmitterGroup from Calls using
-							// more than this TransmitterGroup
-							call.getTransmitterGroupNames().remove(transmitterGroup);
-						}
-					});
-			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
+			try {
+				// Delete depended Objects
+				// Delete Rubrics
+				Set<String> deleteRubricNames = new HashSet<>();
+				stateManager.getRepository().getRubrics().values().stream()
+						.filter(rubric -> rubric.getTransmitterGroupNames().contains(transmitterGroup))
+						.forEach(rubric -> {
+							if (rubric.getTransmitterGroupNames().size() == 1) {
+								// Delete all Rubrics using only this
+								// TransmitterGroup
+								deleteRubricNames.add(rubric.getName());
+							} else {
+								// Remove this TransmitterGroup from Rubrics using
+								// more than this TransmitterGroup
+								rubric.getTransmitterGroupNames().remove(transmitterGroup);
+							}
+						});
+				deleteRubricNames.stream().forEach(name -> deleteRubric(name));
 
-			// Delete Object with same Name, if existing
-			if (clusterManager.getState().getTransmitterGroups().remove(transmitterGroup) == null) {
-				// Object not found
-				return response = RpcResponse.BAD_REQUEST;
-			} else {
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+				// Delete Calls
+				Collection<Call> deleteCalls = new LinkedList<>();
+				stateManager.getRepository().getCalls().stream()
+						.filter(call -> call.getTransmitterGroupNames().contains(transmitterGroup)).forEach(call -> {
+							if (call.getTransmitterGroupNames().size() == 1) {
+								// Delete all Calls using only this TransmitterGroup
+								deleteCalls.add(call);
+							} else {
+								// Remove this TransmitterGroup from Calls using
+								// more than this TransmitterGroup
+								call.getTransmitterGroupNames().remove(transmitterGroup);
+							}
+						});
+				deleteCalls.stream().forEach(call -> stateManager.getRepository().getCalls().remove(call));
+
+				// Delete Object with same Name, if existing
+				if (stateManager.getRepository().getTransmitterGroups()
+						.remove(NamedObject.normalizeName(transmitterGroup)) != null) {
+					response = RpcResponse.OK;
+				} else {
+					// Object not found
+					response = RpcResponse.BAD_REQUEST;
 				}
-
-				return response = RpcResponse.OK;
+			} finally {
+				lock.unlock();
 			}
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("DeleteTransmitterGroup", transmitterGroup, response);
@@ -707,8 +837,9 @@ public class RpcListener {
 
 	// ### User
 	// #########################################################################################################
-	public synchronized RpcResponse putUser(User user) {
+	public RpcResponse putUser(User user) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -725,23 +856,33 @@ public class RpcListener {
 				return response = RpcResponse.VALIDATION_ERROR;
 			}
 
-			// Add new Object
-			clusterManager.getState().getUsers().put(user.getName(), user);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				// Add new Object
+				stateManager.getRepository().getUsers().put(user.getNormalizedName(), user);
+			} finally {
+				lock.unlock();
+			}
+
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				clusterManager.getState().writeToFile();
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
 			}
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("PutUser", user, response);
 		}
 	}
 
-	public synchronized RpcResponse deleteUser(String user) {
+	public RpcResponse deleteUser(String user) {
 		RpcResponse response = null;
+
 		try {
 			// Check for Quorum
 			if (!clusterManager.isQuorum()) {
@@ -753,111 +894,133 @@ public class RpcListener {
 				return response = RpcResponse.BAD_REQUEST;
 			}
 
-			// Delete depended Objects
-			// Delete CallSigns
-			ArrayList<String> deleteCallSignNames = new ArrayList<>();
-			clusterManager.getState().getCallSigns().values().stream()
-					.filter(callSign -> callSign.getOwnerNames().contains(user)).forEach(callSign -> {
-						if (callSign.getOwnerNames().size() == 1) {
-							// Delete all CallSigns which have only this Owner
-							deleteCallSignNames.add(callSign.getName());
-						} else {
-							// Remove this Owner from Calls which have more than
-							// this Owner
-							callSign.getOwnerNames().remove(user);
-						}
-					});
-			deleteCallSignNames.stream().forEach(name -> deleteCallSign(name));
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
 
-			// Delete Calls
-			ArrayList<Call> deleteCalls = new ArrayList<>();
-			clusterManager.getState().getCalls().stream().filter(call -> call.getOwnerName().equalsIgnoreCase(user))
-					.forEach(call -> deleteCalls.add(call));
-			deleteCalls.stream().forEach(call -> clusterManager.getState().getCalls().remove(call));
+			try {
+				// Delete depended Objects
+				// Delete CallSigns
+				Set<String> deleteCallSignNames = new HashSet<>();
+				stateManager.getRepository().getCallSigns().values().stream()
+						.filter(callSign -> callSign.getOwnerNames().contains(user)).forEach(callSign -> {
+							if (callSign.getOwnerNames().size() == 1) {
+								// Delete all CallSigns which have only this Owner
+								deleteCallSignNames.add(callSign.getNormalizedName());
+							} else {
+								// Remove this Owner from Calls which have more than
+								// this Owner
+								callSign.getOwnerNames().remove(user);
+							}
+						});
+				deleteCallSignNames.stream().forEach(name -> deleteCallSign(name));
 
-			// Delete Rubrics
-			ArrayList<String> deleteRubricNames = new ArrayList<>();
-			clusterManager.getState().getRubrics().values().stream()
-					.filter(rubric -> rubric.getOwnerNames().contains(user)).forEach(rubric -> {
-						if (rubric.getOwnerNames().size() == 1) {
-							// Delete all Rubrics which have only this Owner
-							deleteRubricNames.add(rubric.getName());
-						} else {
-							// Remove this Owner from Rubric which have more
-							// than this Owner
-							rubric.getOwnerNames().remove(user);
-						}
-					});
-			// Delete news first
-			deleteRubricNames.stream().forEach(name -> clusterManager.getState().getNews().remove(name));
-			deleteRubricNames.stream().forEach(name -> deleteRubric(name));
+				// Delete Calls
+				Collection<Call> deleteCalls = new LinkedList<>();
+				final Collection<Call> calls = stateManager.getRepository().getCalls();
+				calls.stream().filter(call -> call.getOwnerName().equalsIgnoreCase(user))
+						.forEach(call -> deleteCalls.add(call));
+				deleteCalls.stream().forEach(call -> calls.remove(call));
 
-			// Delete TransmitterGroups
-			ArrayList<String> deleteTransmitterGroupNames = new ArrayList<>();
-			clusterManager.getState().getTransmitterGroups().values().stream()
-					.filter(transmitterGroup -> transmitterGroup.getOwnerNames().contains(user))
-					.forEach(transmitterGroup -> {
-						if (transmitterGroup.getOwnerNames().size() == 1) {
-							// Delete all TransmitterGroups which have only this
-							// Owner
-							deleteTransmitterGroupNames.add(transmitterGroup.getName());
-						} else {
-							// Remove this Owner from TransmitterGroups which
-							// have more than this Owner
-							transmitterGroup.getOwnerNames().remove(user);
-						}
-					});
-			deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
+				// Delete Rubrics
+				Set<String> deleteRubricNames = new HashSet<>();
+				stateManager.getRepository().getRubrics().values().stream()
+						.filter(rubric -> rubric.getOwnerNames().contains(user)).forEach(rubric -> {
+							if (rubric.getOwnerNames().size() == 1) {
+								// Delete all Rubrics which have only this Owner
+								deleteRubricNames.add(rubric.getNormalizedName());
+							} else {
+								// Remove this Owner from Rubric which have more
+								// than this Owner
+								rubric.getOwnerNames().remove(user);
+							}
+						});
+				// Delete news first
+				deleteRubricNames.stream().forEach(name -> stateManager.getRepository().getNews().remove(name));
+				deleteRubricNames.stream().forEach(name -> deleteRubric(name));
 
-			// Delete Transmitter
-			ArrayList<String> deleteTransmitterNames = new ArrayList<>();
-			clusterManager.getState().getTransmitters().values().stream()
-					.filter(transmitter -> transmitter.getOwnerNames().contains(user)).forEach(transmitter -> {
-						if (transmitter.getOwnerNames().size() == 1) {
-							// Delete all Transmitter which have only this Owner
-							deleteTransmitterNames.add(transmitter.getName());
-						} else {
-							// Remove this Owner from Transmitters which have
-							// more than this Owner
-							transmitter.getOwnerNames().remove(user);
-						}
-					});
-			deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
+				// Delete TransmitterGroups
+				Set<String> deleteTransmitterGroupNames = new HashSet<>();
+				stateManager.getRepository().getTransmitterGroups().values().stream()
+						.filter(transmitterGroup -> transmitterGroup.getOwnerNames().contains(user))
+						.forEach(transmitterGroup -> {
+							if (transmitterGroup.getOwnerNames().size() == 1) {
+								// Delete all TransmitterGroups which have only this
+								// Owner
+								deleteTransmitterGroupNames.add(transmitterGroup.getName());
+							} else {
+								// Remove this Owner from TransmitterGroups which
+								// have more than this Owner
+								transmitterGroup.getOwnerNames().remove(user);
+							}
+						});
+				deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
 
-			// Delete Object with same Name, if existing
-			if (clusterManager.getState().getUsers().remove(user) == null) {
-				// Object not found
-				return response = RpcResponse.BAD_REQUEST;
-			} else {
-				if (Settings.getModelSettings().isSavingImmediately()) {
-					clusterManager.getState().writeToFile();
+				// Delete Transmitter
+				Set<String> deleteTransmitterNames = new HashSet<>();
+				stateManager.getRepository().getTransmitters().values().stream()
+						.filter(transmitter -> transmitter.getOwnerNames().contains(user)).forEach(transmitter -> {
+							if (transmitter.getOwnerNames().size() == 1) {
+								// Delete all Transmitter which have only this Owner
+								deleteTransmitterNames.add(transmitter.getName());
+							} else {
+								// Remove this Owner from Transmitters which have
+								// more than this Owner
+								transmitter.getOwnerNames().remove(user);
+							}
+						});
+				deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
+
+				// Delete Object with same Name, if existing
+				if (stateManager.getRepository().getUsers().remove(NamedObject.normalizeName(user)) != null) {
+					response = RpcResponse.OK;
+				} else {
+					// Object not found
+					response = RpcResponse.BAD_REQUEST;
 				}
-
-				return response = RpcResponse.OK;
+			} finally {
+				lock.unlock();
 			}
+
+			if (Settings.getModelSettings().isSavingImmediately()) {
+				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			}
+
+			return response;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("DeleteUser", user, response);
 		}
 	}
 
-	public synchronized RpcResponse sendRubricNames(String transmitterName) {
+	public RpcResponse sendRubricNames(String transmitterName) {
 		RpcResponse response = null;
-		try {
-			if (!clusterManager.getState().getTransmitters().containsKey(transmitterName)) {
-				return RpcResponse.BAD_REQUEST;
-			}
 
-			TransmissionManager manager = clusterManager.getTransmissionManager();
-			for (Rubric r : clusterManager.getState().getRubrics().values()) {
-				manager.handleRubricToTransmitter(r, transmitterName);
+		try {
+			transmitterName = NamedObject.normalizeName(transmitterName);
+
+			Lock lock = stateManager.getLock().readLock();
+			lock.lock();
+
+			try {
+				if (!stateManager.getRepository().getTransmitters().containsKey(transmitterName)) {
+					return RpcResponse.BAD_REQUEST;
+				}
+
+				final TransmissionManager manager = clusterManager.getTransmissionManager();
+				for (Rubric r : stateManager.getRepository().getRubrics().values()) {
+					manager.handleRubricToTransmitter(r, transmitterName);
+				}
+			} finally {
+				lock.unlock();
 			}
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
-			logger.error("Exception : ", e);
+			logger.error("Exception: ", e);
+
 			return response = RpcResponse.INTERNAL_ERROR;
 		} finally {
 			logResponse("SendRubricNames", transmitterName, response);
