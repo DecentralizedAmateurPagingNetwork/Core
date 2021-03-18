@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class CoreStatistics implements Serializable {
 
-	private static final long serialVersionUID = 2368991802204097911L;
+	private static final long serialVersionUID = 1L;
 
 	private AtomicLong calls = new AtomicLong();
 	private AtomicLong news = new AtomicLong();

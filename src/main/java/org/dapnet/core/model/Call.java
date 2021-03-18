@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,7 +27,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 
 public class Call implements Serializable {
-	private static final long serialVersionUID = -2897439698777438292L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	// No ID
@@ -36,11 +37,11 @@ public class Call implements Serializable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one callSignName")
-	private Collection<String> callSignNames;
+	private Set<String> callSignNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	private Collection<String> transmitterGroupNames;
+	private Set<String> transmitterGroupNames;
 
 	// No Validation necessary
 	private boolean emergency;
@@ -77,11 +78,11 @@ public class Call implements Serializable {
 		this.text = text;
 	}
 
-	public Collection<String> getCallSignNames() {
+	public Set<String> getCallSignNames() {
 		return callSignNames;
 	}
 
-	public void setCallSignNames(Collection<String> callSignNames) {
+	public void setCallSignNames(Set<String> callSignNames) {
 		this.callSignNames = callSignNames;
 	}
 
@@ -89,7 +90,7 @@ public class Call implements Serializable {
 		return transmitterGroupNames;
 	}
 
-	public void setTransmitterGroupNames(Collection<String> transmitterGroupNames) {
+	public void setTransmitterGroupNames(Set<String> transmitterGroupNames) {
 		this.transmitterGroupNames = transmitterGroupNames;
 	}
 

@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,7 +27,7 @@ import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
 public class TransmitterGroup implements Serializable, RestAuthorizable, NamedObject {
-	private static final long serialVersionUID = 2641698714366327412L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	// ID
@@ -40,11 +41,11 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterName")
-	private Collection<String> transmitterNames;
+	private Set<String> transmitterNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private Collection<String> ownerNames;
+	private Set<String> ownerNames;
 
 	@Override
 	public String getName() {
@@ -63,20 +64,20 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 		this.description = description;
 	}
 
-	public Collection<String> getTransmitterNames() {
+	public Set<String> getTransmitterNames() {
 		return transmitterNames;
 	}
 
-	public void setTransmitterNames(Collection<String> transmitterNames) {
+	public void setTransmitterNames(Set<String> transmitterNames) {
 		this.transmitterNames = transmitterNames;
 	}
 
 	@Override
-	public Collection<String> getOwnerNames() {
+	public Set<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(Collection<String> owners) {
+	public void setOwnerNames(Set<String> owners) {
 		this.ownerNames = owners;
 	}
 
@@ -136,6 +137,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 	}
 
 	public boolean contains(String transmitter) {
+		// TODO Remove
 		for (String transmitterName : transmitterNames) {
 			if (transmitterName.equalsIgnoreCase(transmitter)) {
 				return true;
@@ -146,6 +148,7 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 	}
 
 	public boolean contains(Transmitter transmitter) {
+		// TODO Remove
 		return contains(transmitter.getName());
 	}
 

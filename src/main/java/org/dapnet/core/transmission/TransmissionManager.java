@@ -15,15 +15,18 @@
 package org.dapnet.core.transmission;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
@@ -97,7 +100,7 @@ public class TransmissionManager {
 	public void handleNews(News news) {
 		try {
 			PagerMessage message = protocol.createMessageFromNews(news);
-			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
+			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroupNames());
 
 			logger.info("News sent to transmitters.");
 		} catch (Exception e) {
@@ -108,7 +111,7 @@ public class TransmissionManager {
 	public void handleNewsAsCall(News news) {
 		try {
 			PagerMessage message = protocol.createMessageFromNewsAsCall(news);
-			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroups());
+			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroupNames());
 
 			logger.info("News sent to transmitters as call.");
 		} catch (Exception ex) {
@@ -162,7 +165,8 @@ public class TransmissionManager {
 	public void handleActivation(Activation activation) {
 		try {
 			PagerMessage message = protocol.createMessageFromActivation(activation);
-			transmitterManager.sendMessage(message, activation.getTransmitterGroups());
+
+			transmitterManager.sendMessage(message, activation.getTransmitterGroupNames());
 
 			logger.info("Activation sent to transmitters.");
 		} catch (Exception e) {

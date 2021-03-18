@@ -17,7 +17,7 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 
 public class Activation implements Serializable {
-	private static final long serialVersionUID = 2653692303199008619L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	@NotNull
@@ -37,7 +37,7 @@ public class Activation implements Serializable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	private List<String> transmitterGroupNames;
+	private Set<String> transmitterGroupNames;
 
 	// Internally set
 	@NotNull
@@ -51,11 +51,11 @@ public class Activation implements Serializable {
 		this.number = number;
 	}
 
-	public List<String> getTransmitterGroupNames() {
+	public Set<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}
 
-	public void setTransmitterGroupNames(List<String> transmitterGroupNames) {
+	public void setTransmitterGroupNames(Set<String> transmitterGroupNames) {
 		this.transmitterGroupNames = transmitterGroupNames;
 	}
 

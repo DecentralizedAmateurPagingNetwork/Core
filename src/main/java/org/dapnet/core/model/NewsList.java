@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  */
 public class NewsList implements Serializable, Iterable<News> {
 
-	private static final long serialVersionUID = 8878795787181440875L;
+	private static final long serialVersionUID = 1L;
 	private News[] slots = new News[10];
 	private transient volatile Consumer<News> addHandler;
 	private transient volatile Consumer<News> handler;

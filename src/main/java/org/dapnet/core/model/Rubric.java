@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -28,7 +29,7 @@ import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
 public class Rubric implements Serializable, RestAuthorizable, NamedObject {
-	private static final long serialVersionUID = 6724514122275380520L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	// ID
@@ -43,7 +44,7 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	private Collection<String> transmitterGroupNames;
+	private Set<String> transmitterGroupNames;
 
 	@NotNull
 	@Size(min = 1, max = 11)
@@ -51,7 +52,7 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private Collection<String> ownerNames;
+	private Set<String> ownerNames;
 
 	public int getNumber() {
 		return number;
@@ -65,11 +66,11 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 		return 1000 + number;
 	}
 
-	public Collection<String> getTransmitterGroupNames() {
+	public Set<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}
 
-	public void setTransmitterGroupNames(Collection<String> transmitterGroupNames) {
+	public void setTransmitterGroupNames(Set<String> transmitterGroupNames) {
 		this.transmitterGroupNames = transmitterGroupNames;
 	}
 
@@ -91,11 +92,11 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 	}
 
 	@Override
-	public Collection<String> getOwnerNames() {
+	public Set<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(Collection<String> owners) {
+	public void setOwnerNames(Set<String> owners) {
 		this.ownerNames = owners;
 	}
 

@@ -14,8 +14,8 @@
 
 package org.dapnet.core.cluster;
 
-import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
@@ -107,7 +107,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 				.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
 		// Create new node
 		Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE);
-		node.setOwnerNames(Arrays.asList("admin"));
+		node.setOwnerNames(Set.of("admin"));
 		if (clusterManager.handleStateOperation(null, "putNode", new Object[] { node }, new Class[] { Node.class })) {
 			logger.info("First node successfully created");
 		} else {

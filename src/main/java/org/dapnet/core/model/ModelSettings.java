@@ -17,7 +17,7 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 
 public class ModelSettings implements Serializable {
-	private static final long serialVersionUID = 5048489519878548934L;
+	private static final long serialVersionUID = 1L;
 	private String stateFile = "data/State.json";
 	private boolean savingImmediately = false;
 	private long callExpirationTimeInMinutes = 24 * 60;

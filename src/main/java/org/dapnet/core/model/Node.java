@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -29,7 +30,7 @@ import org.dapnet.core.model.validator.ValidName;
 import org.jgroups.stack.IpAddress;
 
 public class Node implements Serializable, NamedObject {
-	private static final long serialVersionUID = -4104175163845286560L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	// ID
@@ -56,7 +57,7 @@ public class Node implements Serializable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private Collection<String> ownerNames;
+	private Set<String> ownerNames;
 
 	private String version;
 
@@ -113,11 +114,11 @@ public class Node implements Serializable, NamedObject {
 		this.address = address;
 	}
 
-	public Collection<String> getOwnerNames() {
+	public Set<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(Collection<String> owners) {
+	public void setOwnerNames(Set<String> owners) {
 		this.ownerNames = owners;
 	}
 

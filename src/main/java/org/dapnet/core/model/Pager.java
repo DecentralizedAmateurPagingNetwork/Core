@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class Pager implements Serializable {
-	private static final long serialVersionUID = -8518189973413053726L;
+	private static final long serialVersionUID = 1L;
 
 	@NotNull
 	@Min(value = 0)

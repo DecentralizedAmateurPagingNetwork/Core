@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 
 public class CallSign implements Serializable, RestAuthorizable, NamedObject {
-	private static final long serialVersionUID = 1884808852367562476L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	// ID
@@ -49,7 +50,7 @@ public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private Collection<String> ownerNames;
+	private Set<String> ownerNames;
 
 	@Override
 	public String getName() {
@@ -85,11 +86,11 @@ public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 	}
 
 	@Override
-	public Collection<String> getOwnerNames() {
+	public Set<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(Collection<String> owners) {
+	public void setOwnerNames(Set<String> owners) {
 		this.ownerNames = owners;
 	}
 

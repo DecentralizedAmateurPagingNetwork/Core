@@ -3,6 +3,7 @@ package org.dapnet.core.transmission;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,21 +64,43 @@ public class TransmitterManager {
 	/**
 	 * Sends a message to one or more transmitter groups.
 	 * 
-	 * @param message Message to send.
-	 * @param groups  Transmitter groups to send to.
+	 * @param message               Message to send.
+	 * @param transmitterGroupNames Transmitter groups to send to.
 	 */
-	public void sendMessage(PagerMessage message, Collection<TransmitterGroup> groups) {
-		getTransmitterNames(groups).forEach(n -> sendMessage(message, n));
+	public void sendMessage(PagerMessage message, Set<String> transmitterGroupNames) {
+		Set<String> transmitters = null;
+
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
+
+		try {
+			transmitters = getTransmitterNames(transmitterGroupNames);
+		} finally {
+			lock.unlock();
+		}
+
+		transmitters.forEach(n -> sendMessage(message, n));
 	}
 
 	/**
 	 * Sends multiple messages to one or more transmitter groups.
 	 * 
-	 * @param messages Messages to send.
-	 * @param groups   Transmitter groups to send to.
+	 * @param messages              Messages to send.
+	 * @param transmitterGroupNames Transmitter groups to send to.
 	 */
-	public void sendMessages(Collection<PagerMessage> messages, Collection<TransmitterGroup> groups) {
-		getTransmitterNames(groups).forEach(n -> sendMessages(messages, n));
+	public void sendMessages(Collection<PagerMessage> messages, Set<String> transmitterGroupNames) {
+		Set<String> transmitters = null;
+
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
+
+		try {
+			transmitters = getTransmitterNames(transmitterGroupNames);
+		} finally {
+			lock.unlock();
+		}
+
+		transmitters.forEach(n -> sendMessages(messages, n));
 	}
 
 	/**
@@ -97,21 +120,30 @@ public class TransmitterManager {
 	 * Sends a message to a specific connected transmitter only if it is in one of
 	 * the given transmitter groups.
 	 * 
-	 * @param message         Message to send.
-	 * @param transmitterName Transmitter name.
-	 * @param groups          Transmitter groups to check.
+	 * @param message               Message to send.
+	 * @param transmitterName       Transmitter name.
+	 * @param transmitterGroupNames Transmitter groups to check.
 	 * @return {@code true} if the message was sent.
 	 */
 	public boolean sendMessageIfInGroups(PagerMessage message, String transmitterName,
-			Collection<TransmitterGroup> groups) {
-		Collection<String> transmitters = getTransmitterNames(groups);
-		for (String name : transmitters) {
-			if (name.equalsIgnoreCase(transmitterName)) {
-				TransmitterClient cl = connectedClients.get(NamedObject.normalizeName(transmitterName));
-				if (cl != null) {
-					cl.sendMessage(message);
-					return true;
-				}
+			Set<String> transmitterGroupNames) {
+		Set<String> transmitters = null;
+
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
+
+		try {
+			transmitters = getTransmitterNames(transmitterGroupNames);
+		} finally {
+			lock.unlock();
+		}
+
+		transmitterName = NamedObject.normalizeName(transmitterName);
+		if (transmitters.contains(transmitterName)) {
+			TransmitterClient cl = connectedClients.get(transmitterName);
+			if (cl != null) {
+				cl.sendMessage(message);
+				return true;
 			}
 		}
 
@@ -210,13 +242,26 @@ public class TransmitterManager {
 		}
 	}
 
-	private static Set<String> getTransmitterNames(Collection<TransmitterGroup> groups) {
-		Set<String> selected = new HashSet<>();
-		for (TransmitterGroup g : groups) {
-			g.getTransmitterNames().forEach(t -> selected.add(NamedObject.normalizeName(t)));
+	private Set<String> getTransmitterNames(Set<String> transmitterGroupNames) {
+		if (transmitterGroupNames == null) {
+			return null;
 		}
 
-		return selected;
+		Set<String> result = new HashSet<>();
+		if (!transmitterGroupNames.isEmpty()) {
+			final Map<String, TransmitterGroup> tgMap = stateManager.getRepository().getTransmitterGroups();
+			for (String name : transmitterGroupNames) {
+				TransmitterGroup tg = tgMap.get(NamedObject.normalizeName(name));
+				if (tg != null) {
+					Set<String> transmitters = tg.getTransmitterNames();
+					if (transmitters != null) {
+						transmitters.forEach(t -> result.add(NamedObject.normalizeName(t)));
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	/**

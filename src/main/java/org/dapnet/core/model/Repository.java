@@ -1,7 +1,10 @@
 package org.dapnet.core.model;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Repository interface providing access to the stored models.
@@ -65,5 +68,31 @@ public interface Repository {
 	 * @return News map
 	 */
 	Map<String, NewsList> getNews();
+
+	public static <T> T getObject(Map<String, T> map, String name) {
+		return map.get(NamedObject.normalizeName(name));
+	}
+
+	public static <T> Collection<T> getObjects(Map<String, T> map, Set<String> names) {
+		return getObjects(map, names, false);
+	}
+
+	public static <T> Collection<T> getObjects(Map<String, T> map, Set<String> names, boolean throwException) {
+		if (names == null) {
+			return null;
+		}
+
+		Collection<T> result = new LinkedList<>();
+		for (String name : names) {
+			T obj = map.get(NamedObject.normalizeName(name));
+			if (obj != null) {
+				result.add(obj);
+			} else if (throwException) {
+				throw new NoSuchElementException(name);
+			}
+		}
+
+		return result;
+	}
 
 }

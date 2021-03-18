@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.validation.constraints.Digits;
@@ -37,7 +38,7 @@ import org.jgroups.stack.IpAddress;
 
 public class Transmitter implements Serializable, RestAuthorizable, NamedObject {
 
-	private static final long serialVersionUID = -8142160974834002456L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	@NotNull
@@ -76,7 +77,7 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	private Collection<String> ownerNames;
+	private Set<String> ownerNames;
 
 	private String deviceType;
 
@@ -208,11 +209,11 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 	}
 
 	@Override
-	public Collection<String> getOwnerNames() {
+	public Set<String> getOwnerNames() {
 		return ownerNames;
 	}
 
-	public void setOwnerNames(Collection<String> owners) {
+	public void setOwnerNames(Set<String> owners) {
 		this.ownerNames = owners;
 	}
 

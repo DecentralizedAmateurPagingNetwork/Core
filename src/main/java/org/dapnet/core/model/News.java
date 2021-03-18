@@ -25,7 +25,7 @@ import javax.validation.constraints.Size;
 import org.dapnet.core.model.validator.ValidName;
 
 public class News implements Serializable {
-	private static final long serialVersionUID = 255218965991641092L;
+	private static final long serialVersionUID = 1L;
 	private static volatile State state;
 
 	// No ID

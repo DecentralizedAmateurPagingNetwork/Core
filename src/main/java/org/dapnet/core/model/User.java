@@ -15,8 +15,7 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -25,7 +24,7 @@ import org.dapnet.core.model.validator.EMail;
 import org.dapnet.core.rest.RestAuthorizable;
 
 public class User implements Serializable, RestAuthorizable, NamedObject {
-	private static final long serialVersionUID = 8927103398113377284L;
+	private static final long serialVersionUID = 1L;
 
 	// ID
 	@NotNull
@@ -84,10 +83,8 @@ public class User implements Serializable, RestAuthorizable, NamedObject {
 	}
 
 	@Override
-	public Collection<String> getOwnerNames() {
-		ArrayList<String> list = new ArrayList<>();
-		list.add(name);
-		return list;
+	public Set<String> getOwnerNames() {
+		return Set.of(name);
 	}
 
 	@Override
