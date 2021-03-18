@@ -30,5 +30,5 @@ public interface TransmitterManagerListener {
 	/**
 	 * Called when all transmitters are to be disconnected.
 	 */
-	void handleDisconnectedFromAllTransmitters();
+	void handleDisconnectFromAllTransmitters();
 }

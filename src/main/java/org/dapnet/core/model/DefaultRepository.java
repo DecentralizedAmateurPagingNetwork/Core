@@ -61,6 +61,10 @@ class DefaultRepository implements Repository {
 		return state.getNews();
 	}
 
+	public CoreStatistics getStatistics() {
+		return state.getStatistics();
+	}
+
 	public State getState() {
 		return state;
 	}

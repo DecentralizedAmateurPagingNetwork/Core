@@ -15,12 +15,17 @@
 package org.dapnet.core.cluster;
 
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.HashUtil;
+import org.dapnet.core.Settings;
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Node;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.User;
 import org.jgroups.Channel;
 import org.jgroups.Event;
@@ -31,7 +36,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 	private final ClusterManager clusterManager;
 
 	public ChannelListener(ClusterManager clusterManager) {
-		this.clusterManager = clusterManager;
+		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
 	}
 
 	@Override
@@ -47,16 +52,35 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		if (clusterManager.getChannel().getView().size() == 1) {
 			printCreateClusterWarning();
 
-			// User already existing in State?
-			if (clusterManager.getState().getUsers().size() == 0) {
+			// XXX I'm not sure if holding the lock while the RPC call is executed might
+			// lead to a dead-lock. That's why this is looking a bit awkward...
+			boolean createUser = false;
+			boolean createNode = false;
+
+			final StateManager sm = clusterManager.getStateManager();
+			Lock lock = sm.getLock().writeLock();
+			lock.lock();
+
+			try {
+				// User already existing in State?
+				createUser = sm.getRepository().getUsers().isEmpty();
+
+				// Node already existing in State?
+				if (!sm.getRepository().getNodes().containsKey(NamedObject.normalizeName(channel.getName()))) {
+					createNode = true;
+				}
+			} finally {
+				lock.unlock();
+			}
+
+			if (createUser) {
 				createFirstUser();
 			}
 
-			// Node already existing in State?
-			if (clusterManager.getState().getNodes().containsKey(channel.getName())) {
-				updateFirstNode();
-			} else {
+			if (createNode) {
 				createFirstNode();
+			} else {
+				updateFirstNode(sm);
 			}
 		} else {
 			// Is performed automatically by each node!
@@ -92,20 +116,35 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		}
 	}
 
-	private void updateFirstNode() {
+	private void updateFirstNode(StateManager stateManager) {
 		IpAddress address = (IpAddress) clusterManager.getChannel()
 				.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
 
-		Node node = clusterManager.getState().getNodes().get(clusterManager.getChannel().getName());
-		node.setAddress(address);
-		node.setStatus(Node.Status.ONLINE);
-		clusterManager.getState().writeToFile();
+		Lock lock = stateManager.getLock().writeLock();
+		lock.lock();
+
+		try {
+			Node node = stateManager.getRepository().getNodes()
+					.get(NamedObject.normalizeName(clusterManager.getChannel().getName()));
+			node.setAddress(address);
+			node.setStatus(Node.Status.ONLINE);
+		} finally {
+			lock.unlock();
+		}
+
+		try {
+			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+		} catch (Exception ex) {
+			logger.fatal("Failed to write state file.", ex);
+		}
+
 		logger.info("First node successfully updated");
 	}
 
 	private void createFirstUser() {
 		logger.info("Creating first user");
 		User user = new User("admin", "admin", "admin@admin.de", true);
+
 		try {
 			user.setHash(HashUtil.createHash(user.getHash()));
 		} catch (Exception e) {

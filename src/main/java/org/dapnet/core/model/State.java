@@ -180,7 +180,7 @@ public class State implements Serializable {
 		return news;
 	}
 
-	public CoreStatistics getCoreStats() {
+	public CoreStatistics getStatistics() {
 		return stats;
 	}
 

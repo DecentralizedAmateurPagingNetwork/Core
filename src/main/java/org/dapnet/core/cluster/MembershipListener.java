@@ -35,12 +35,12 @@ import org.jgroups.util.ExtendedUUID;
 
 public class MembershipListener implements org.jgroups.MembershipListener {
 	private static final Logger logger = LogManager.getLogger();
-	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
+	private final StateManager stateManager;
 
-	public MembershipListener(StateManager stateManager, ClusterManager clusterManager) {
-		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	public MembershipListener(ClusterManager clusterManager) {
 		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
+		this.stateManager = Objects.requireNonNull(clusterManager.getStateManager(), "State manager must not be null.");
 	}
 
 	@Override

@@ -2,12 +2,15 @@ package org.dapnet.core.transmission;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
+import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
@@ -186,34 +189,53 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		String name = authMatcher.group(3);
 		String key = authMatcher.group(4);
 
-		Transmitter t = manager.getTransmitter(name);
-		if (t == null) {
-			logger.error("The transmitter name is not registered: " + name + " connecting from " + ctx.channel().remoteAddress());
-			ctx.writeAndFlush("7 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
-			return;
-//			throw new TransmitterException("The transmitter name is not registered: " + name);
-		} else if (t.getStatus() == Status.DISABLED) {
-			logger.error("Transmitter is disabled and not allowed to connect: " + name + " connecting from " + ctx.channel().remoteAddress());
-			ctx.writeAndFlush("7 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
-			return;
-		}
+		Transmitter transmitter = null;
+		final StateManager sm = manager.getStateManager();
 
-		// Test authentication key
-		if (!t.getAuthKey().equals(key)) {
-			logger.error("Wrong authentication key supplied for transmitter: " + name + " connecting from " + ctx.channel().remoteAddress());
-			ctx.writeAndFlush("7 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
-			return;
+		Lock lock = sm.getLock().readLock();
+		lock.lock();
+
+		try {
+			transmitter = sm.getRepository().getTransmitters().get(NamedObject.normalizeName(name));
+			if (transmitter == null) {
+				logger.error("The transmitter name is not registered: " + name + " connecting from "
+						+ ctx.channel().remoteAddress());
+				ctx.writeAndFlush("7 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
+				return;
+			} else if (transmitter.getStatus() == Status.DISABLED) {
+				logger.error("Transmitter is disabled and not allowed to connect: " + name + " connecting from "
+						+ ctx.channel().remoteAddress());
+				ctx.writeAndFlush("7 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
+				return;
+			}
+
+			// Test authentication key
+			if (!transmitter.getAuthKey().equals(key)) {
+				logger.error("Wrong authentication key supplied for transmitter: " + name + " connecting from "
+						+ ctx.channel().remoteAddress());
+				ctx.writeAndFlush("7 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
+				return;
+			}
+		} finally {
+			lock.unlock();
 		}
 
 		// Close existing connection if necessary. This is a no-op if the
 		// transmitter is not connected.
-		manager.disconnectFrom(t);
+		manager.disconnectFrom(transmitter);
 
-		t.setDeviceType(type);
-		t.setDeviceVersion(version);
-		t.setAddress(new IpAddress((InetSocketAddress) ctx.channel().remoteAddress()));
+		lock = sm.getLock().writeLock();
+		lock.lock();
 
-		client.setTransmitter(t);
+		try {
+			transmitter.setDeviceType(type);
+			transmitter.setDeviceVersion(version);
+			transmitter.setAddress(new IpAddress((InetSocketAddress) ctx.channel().remoteAddress()));
+		} finally {
+			lock.unlock();
+		}
+
+		client.setTransmitter(transmitter);
 
 		// Begin the sync time procedure
 		syncHandler.handleMessage(ctx, msg);

@@ -84,16 +84,16 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		});
 
 		// Create Dispatcher (for creating Block on top of channel)
-		dispatcher = new RpcDispatcher(channel, new RpcListener(stateManager, this));
+		dispatcher = new RpcDispatcher(channel, new RpcListener(this));
 
 		// Create and register Listener
 		channelListener = new org.dapnet.core.cluster.ChannelListener(this);
 		dispatcher.addChannelListener(channelListener);
 
-		membershipListener = new org.dapnet.core.cluster.MembershipListener(stateManager, this);
+		membershipListener = new org.dapnet.core.cluster.MembershipListener(this);
 		dispatcher.setMembershipListener(membershipListener);
 
-		messageListener = new org.dapnet.core.cluster.MessageListener(stateManager, this);
+		messageListener = new org.dapnet.core.cluster.MessageListener(this);
 		dispatcher.setMessageListener(messageListener);
 
 		// Create default RequestOptions
@@ -131,6 +131,10 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 				logger.warn("Startup enforced, ignoring state validation errors.");
 			}
 		}
+	}
+
+	public StateManager getStateManager() {
+		return stateManager;
 	}
 
 	private void registerNewsList() {
@@ -316,9 +320,17 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	@Override
-	public void handleDisconnectedFromAllTransmitters() {
+	public void handleDisconnectFromAllTransmitters() {
 		if (stopping) {
-			updateNodeStatus(Node.Status.SUSPENDED);
+			Lock lock = stateManager.getLock().writeLock();
+			lock.lock();
+
+			try {
+				updateNodeStatus(Node.Status.SUSPENDED);
+			} finally {
+				lock.unlock();
+			}
+
 			channel.close();
 
 			try {

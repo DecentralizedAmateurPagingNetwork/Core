@@ -25,13 +25,12 @@ import com.google.gson.GsonBuilder;
 
 public final class StateManager {
 
-	private static final Gson gson;
-	private static final Validator validator;
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
+	private final Gson gson;
+	private final Validator validator;
 	private DefaultRepository repository = new DefaultRepository();
-	private CoreStatistics statistics = new CoreStatistics();
 
-	static {
+	public StateManager() {
 		GsonBuilder builder = new GsonBuilder();
 		builder.setPrettyPrinting();
 		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
@@ -49,7 +48,7 @@ public final class StateManager {
 	}
 
 	public CoreStatistics getStatistics() {
-		return statistics;
+		return repository.getStatistics();
 	}
 
 	public void loadStateFromFile(String fileName) throws IOException {

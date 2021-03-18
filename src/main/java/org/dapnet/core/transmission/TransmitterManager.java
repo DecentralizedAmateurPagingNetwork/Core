@@ -7,9 +7,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
@@ -31,18 +33,12 @@ public class TransmitterManager {
 	}
 
 	/**
-	 * Gets a transmitter by its name.
+	 * Gets the state manager instance.
 	 * 
-	 * @param name Transmitter name
-	 * @return Transmitter or {@code null} if not found.
+	 * @return State manager
 	 */
-	public Transmitter getTransmitter(String name) {
-		TransmitterManagerListener theListener = listener;
-		if (theListener != null) {
-			return theListener.handleGetTransmitter(name.toLowerCase());
-		} else {
-			return null;
-		}
+	public StateManager getStateManager() {
+		return stateManager;
 	}
 
 	/**
@@ -51,6 +47,7 @@ public class TransmitterManager {
 	 * @param listener Event listener instance.
 	 */
 	public void setListener(TransmitterManagerListener listener) {
+		// The listener can be null
 		this.listener = listener;
 	}
 
@@ -90,7 +87,7 @@ public class TransmitterManager {
 	 * @param transmitterName Transmitter name.
 	 */
 	public void sendMessage(PagerMessage message, String transmitterName) {
-		TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
+		TransmitterClient cl = connectedClients.get(NamedObject.normalizeName(transmitterName));
 		if (cl != null) {
 			cl.sendMessage(message);
 		}
@@ -110,7 +107,7 @@ public class TransmitterManager {
 		Collection<String> transmitters = getTransmitterNames(groups);
 		for (String name : transmitters) {
 			if (name.equalsIgnoreCase(transmitterName)) {
-				TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
+				TransmitterClient cl = connectedClients.get(NamedObject.normalizeName(transmitterName));
 				if (cl != null) {
 					cl.sendMessage(message);
 					return true;
@@ -128,7 +125,7 @@ public class TransmitterManager {
 	 * @param transmitterName Transmitter name.
 	 */
 	public void sendMessages(Collection<PagerMessage> messages, String transmitterName) {
-		TransmitterClient cl = connectedClients.get(transmitterName.toLowerCase());
+		TransmitterClient cl = connectedClients.get(NamedObject.normalizeName(transmitterName));
 		if (cl != null) {
 			cl.sendMessages(messages);
 		}
@@ -160,11 +157,18 @@ public class TransmitterManager {
 			return;
 		}
 
-		t.setStatus(Status.ONLINE);
+		Lock lock = stateManager.getLock().writeLock();
+		lock.lock();
 
-		Instant lastConnected = Instant.now();
-		t.setLastConnected(lastConnected);
-		t.setConnectedSince(lastConnected);
+		try {
+			t.setStatus(Status.ONLINE);
+
+			Instant lastConnected = Instant.now();
+			t.setLastConnected(lastConnected);
+			t.setConnectedSince(lastConnected);
+		} finally {
+			lock.unlock();
+		}
 
 		connectedClients.put(t.getNormalizedName(), client);
 
@@ -177,16 +181,23 @@ public class TransmitterManager {
 	 * @param client Transmitter to remove.
 	 */
 	public void onDisconnect(TransmitterClient client) {
-		Transmitter t = client.getTransmitter();
+		final Transmitter t = client.getTransmitter();
 		if (t == null) {
 			return;
 		}
 
-		if (t.getStatus() != Status.ERROR) {
-			t.setStatus(Status.OFFLINE);
-		}
+		Lock lock = stateManager.getLock().writeLock();
+		lock.lock();
 
-		t.setConnectedSince(null);
+		try {
+			if (t.getStatus() != Status.ERROR) {
+				t.setStatus(Status.OFFLINE);
+			}
+
+			t.setConnectedSince(null);
+		} finally {
+			lock.unlock();
+		}
 
 		connectedClients.remove(t.getNormalizedName());
 
@@ -202,7 +213,7 @@ public class TransmitterManager {
 	private static Set<String> getTransmitterNames(Collection<TransmitterGroup> groups) {
 		Set<String> selected = new HashSet<>();
 		for (TransmitterGroup g : groups) {
-			g.getTransmitterNames().forEach(t -> selected.add(t.toLowerCase()));
+			g.getTransmitterNames().forEach(t -> selected.add(NamedObject.normalizeName(t)));
 		}
 
 		return selected;
@@ -216,7 +227,7 @@ public class TransmitterManager {
 
 		TransmitterManagerListener theListener = listener;
 		if (theListener != null) {
-			theListener.handleDisconnectedFromAllTransmitters();
+			theListener.handleDisconnectFromAllTransmitters();
 		}
 	}
 

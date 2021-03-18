@@ -47,18 +47,17 @@ import org.dapnet.core.transmission.TransmissionManager;
  */
 public class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
-	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
+	private final StateManager stateManager;
 
 	/**
 	 * Constructs a new RPC listener instance.
 	 * 
-	 * @param stateManager   State manager to use
 	 * @param clusterManager Cluster manager to use
 	 */
-	public RpcListener(StateManager stateManager, ClusterManager clusterManager) {
-		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	public RpcListener(ClusterManager clusterManager) {
 		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
+		stateManager = Objects.requireNonNull(clusterManager.getStateManager(), "State manager must not be null.");
 	}
 
 	/**

@@ -16,6 +16,7 @@ package org.dapnet.core.cluster;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
@@ -30,12 +31,12 @@ import org.jgroups.Message;
 
 public class MessageListener implements org.jgroups.MessageListener {
 	private static final Logger logger = LogManager.getLogger();
-	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
+	private final StateManager stateManager;
 
-	public MessageListener(StateManager stateManager, ClusterManager clusterManager) {
-		this.stateManager = stateManager;
-		this.clusterManager = clusterManager;
+	public MessageListener(ClusterManager clusterManager) {
+		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
+		stateManager = Objects.requireNonNull(clusterManager.getStateManager(), "State manager must not be null.");
 	}
 
 	@Override
