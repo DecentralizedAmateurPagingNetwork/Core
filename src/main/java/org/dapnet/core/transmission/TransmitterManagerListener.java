@@ -16,10 +16,19 @@ package org.dapnet.core.transmission;
 
 import org.dapnet.core.model.Transmitter;
 
+/**
+ * Transmitter manager event listener interface.
+ */
 public interface TransmitterManagerListener {
+	/**
+	 * Called when a transmitter status has changed.
+	 * 
+	 * @param transmitter Affected transmitter
+	 */
 	void handleTransmitterStatusChanged(Transmitter transmitter);
 
+	/**
+	 * Called when all transmitters are to be disconnected.
+	 */
 	void handleDisconnectedFromAllTransmitters();
-
-	Transmitter handleGetTransmitter(String name);
 }

@@ -41,16 +41,33 @@ import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
 import org.dapnet.core.transmission.TransmissionManager;
 
+/**
+ * This class implements the RPC listener and is responsible for handling RPCs
+ * over jgroups.
+ */
 public class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
 	private final StateManager stateManager;
 	private final ClusterManager clusterManager;
 
+	/**
+	 * Constructs a new RPC listener instance.
+	 * 
+	 * @param stateManager   State manager to use
+	 * @param clusterManager Cluster manager to use
+	 */
 	public RpcListener(StateManager stateManager, ClusterManager clusterManager) {
 		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
 		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
 	}
 
+	/**
+	 * Logs a RPC response.
+	 * 
+	 * @param methodName RPC method name
+	 * @param object     Object affected
+	 * @param response   Response type
+	 */
 	private static void logResponse(String methodName, Object object, RpcResponse response) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(methodName);

@@ -14,7 +14,6 @@
 
 package org.dapnet.core.cluster;
 
-import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
@@ -23,8 +22,6 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +32,6 @@ import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.model.Rubric;
-import org.dapnet.core.model.State;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestListener;
@@ -52,7 +48,6 @@ import org.jgroups.util.RspList;
 
 public class ClusterManager implements TransmitterManagerListener, RestListener {
 	private static final Logger logger = LogManager.getLogger();
-	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 	private final StateManager stateManager;
 	private final JChannel channel;
@@ -113,67 +108,53 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void initState(boolean enforceStartup) {
-		registerNewsList();
-		resetNodeStates();
-
-		Lock lock = stateManager.getLock().readLock();
+		Lock lock = stateManager.getLock().writeLock();
 		lock.lock();
 
 		try {
-			// Validate state
-			Set<ConstraintViolation<Object>> violations = validator.validate(stateManager.getRepository());
-			if (!violations.isEmpty()) {
-				violations.forEach(v -> {
-					logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
-				});
-
-				if (!enforceStartup) {
-					throw new CoreStartupException("State validation failed.");
-				} else {
-					logger.warn("Startup enforced, ignoring state validation errors.");
-				}
-			}
+			registerNewsList();
+			resetNodeStates();
 		} finally {
 			lock.unlock();
+		}
+
+		// Validate state
+		Set<ConstraintViolation<Object>> violations = stateManager.validateState();
+		if (!violations.isEmpty()) {
+			violations.forEach(v -> {
+				logger.error("Constraint violation: {} {}", v.getPropertyPath(), v.getMessage());
+			});
+
+			if (!enforceStartup) {
+				throw new CoreStartupException("State validation failed.");
+			} else {
+				logger.warn("Startup enforced, ignoring state validation errors.");
+			}
 		}
 	}
 
 	private void registerNewsList() {
-		Lock lock = stateManager.getLock().writeLock();
-		lock.lock();
+		Map<String, Rubric> rubrics = stateManager.getRepository().getRubrics();
+		Map<String, NewsList> news = stateManager.getRepository().getNews();
 
-		try {
-			Map<String, Rubric> rubrics = stateManager.getRepository().getRubrics();
-			Map<String, NewsList> news = stateManager.getRepository().getNews();
+		for (Rubric r : rubrics.values()) {
+			String rubricName = r.getNormalizedName();
 
-			for (Rubric r : rubrics.values()) {
-				String rubricName = r.getNormalizedName();
-
-				NewsList nl = news.get(rubricName);
-				if (nl == null) {
-					nl = new NewsList();
-					news.put(rubricName, nl);
-				}
-
-				nl.setHandler(transmissionManager::handleNews);
-				nl.setAddHandler(transmissionManager::handleNewsAsCall);
+			NewsList nl = news.get(rubricName);
+			if (nl == null) {
+				nl = new NewsList();
+				news.put(rubricName, nl);
 			}
-		} finally {
-			lock.unlock();
+
+			nl.setHandler(transmissionManager::handleNews);
+			nl.setAddHandler(transmissionManager::handleNewsAsCall);
 		}
 	}
 
 	private void resetNodeStates() {
-		Lock lock = stateManager.getLock().writeLock();
-		lock.lock();
-
-		try {
-			Map<String, Node> nodes = stateManager.getRepository().getNodes();
-			for (Node n : nodes.values()) {
-				n.setStatus(Status.SUSPENDED);
-			}
-		} finally {
-			lock.unlock();
+		Map<String, Node> nodes = stateManager.getRepository().getNodes();
+		for (Node n : nodes.values()) {
+			n.setStatus(Status.SUSPENDED);
 		}
 	}
 
@@ -314,8 +295,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			lock.unlock();
 		}
 
-		// XXX I'm not sure if holding the lock could lead to a deadlock, that's it is a
-		// bit awkward looking here...
+		// XXX I'm not sure if holding the lock could lead to a deadlock, that's why it
+		// is a bit awkward looking here...
 		boolean contains = false;
 
 		lock = stateManager.getLock().readLock();
@@ -346,11 +327,6 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 				logger.fatal("Failed to write state file.", ex);
 			}
 		}
-	}
-
-	@Override
-	public Transmitter handleGetTransmitter(String name) {
-		return getState().getTransmitters().get(name);
 	}
 
 	// ### Getter and Setter
