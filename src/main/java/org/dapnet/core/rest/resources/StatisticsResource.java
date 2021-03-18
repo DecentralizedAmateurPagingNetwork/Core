@@ -13,11 +13,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.CoreStatistics;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Repository;
-import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 
@@ -29,12 +27,12 @@ public class StatisticsResource extends AbstractResource {
 	public Response get() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			ObjectCounts counts = new ObjectCounts(stateManager.getRepository(), stateManager.getStatistics());
+			ObjectCounts counts = new ObjectCounts(repo);
 			return getObject(counts, status);
 		} finally {
 			lock.unlock();
@@ -54,13 +52,13 @@ public class StatisticsResource extends AbstractResource {
 		private final int transmittersTotal;
 		private final int transmittersOnline;
 
-		public ObjectCounts(Repository repo, CoreStatistics stats) {
+		public ObjectCounts(Repository repo) {
 			users = repo.getUsers().size();
 			calls = repo.getCalls().size();
 			callSigns = repo.getCallSigns().size();
 			news = repo.getNews().values().stream().mapToInt(NewsList::getSize).sum();
-			callsTotal = stats.getCalls();
-			newsTotal = stats.getNews();
+			callsTotal = repo.getStatistics().getCalls();
+			newsTotal = repo.getStatistics().getNews();
 			rubrics = repo.getRubrics().size();
 			nodesTotal = repo.getNodes().size();
 			nodesOnline = (int) repo.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)

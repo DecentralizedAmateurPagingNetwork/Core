@@ -82,7 +82,7 @@ public class MessageListener implements org.jgroups.MessageListener {
 		lock.lock();
 
 		try {
-			if (!stateManager.getRepository().getNodes().containsKey(nodeName)) {
+			if (!stateManager.getNodes().containsKey(nodeName)) {
 				logger.fatal("Current node name does not exist in received state: {}", nodeName);
 				DAPNETCore.shutdown();
 			}

@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
@@ -190,13 +190,13 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		String key = authMatcher.group(4);
 
 		Transmitter transmitter = null;
-		final StateManager sm = manager.getStateManager();
+		final Repository repo = manager.getRepository();
 
-		Lock lock = sm.getLock().readLock();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			transmitter = sm.getRepository().getTransmitters().get(NamedObject.normalizeName(name));
+			transmitter = repo.getTransmitters().get(NamedObject.normalizeName(name));
 			if (transmitter == null) {
 				logger.error("The transmitter name is not registered: " + name + " connecting from "
 						+ ctx.channel().remoteAddress());
@@ -224,7 +224,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		// transmitter is not connected.
 		manager.disconnectFrom(transmitter);
 
-		lock = sm.getLock().writeLock();
+		lock = repo.getLock().writeLock();
 		lock.lock();
 
 		try {

@@ -86,7 +86,7 @@ public class Call implements Serializable {
 		this.callSignNames = callSignNames;
 	}
 
-	public Collection<String> getTransmitterGroupNames() {
+	public Set<String> getTransmitterGroupNames() {
 		return transmitterGroupNames;
 	}
 
@@ -103,7 +103,7 @@ public class Call implements Serializable {
 	}
 
 	@ValidName(message = "must contain names of existing callSigns", fieldName = "callSignNames", constraintName = "ValidCallSignNames")
-	public Collection<CallSign> getCallSigns() throws Exception {
+	Collection<CallSign> getCallSignsEx() throws Exception {
 		if (callSignNames == null) {
 			return null;
 		}
@@ -112,10 +112,10 @@ public class Call implements Serializable {
 			throw new Exception("StateNotSetException");
 		}
 
-		Map<String, CallSign> callSigns = state.getCallSigns();
+		Map<String, CallSign> map = state.getCallSigns();
 		ArrayList<CallSign> result = new ArrayList<>();
 		for (String callSign : callSignNames) {
-			CallSign s = callSigns.get(callSign.toLowerCase());
+			CallSign s = map.get(callSign.toLowerCase());
 			if (s != null) {
 				result.add(s);
 			}

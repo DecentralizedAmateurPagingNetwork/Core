@@ -15,16 +15,15 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-public class State implements Serializable {
+final class State implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +41,7 @@ public class State implements Serializable {
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
-	private Collection<Call> calls;
+	private Collection<Call> calls = new LinkedList<>();
 
 	@NotNull(message = "nicht vorhanden")
 	@Valid
@@ -65,8 +64,6 @@ public class State implements Serializable {
 	private CoreStatistics stats = new CoreStatistics();
 
 	public State() {
-		calls = Collections.synchronizedList(new ArrayList<>());
-
 		setModelReferences();
 	}
 

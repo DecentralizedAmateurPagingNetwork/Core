@@ -63,10 +63,10 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 
 			try {
 				// User already existing in State?
-				createUser = sm.getRepository().getUsers().isEmpty();
+				createUser = sm.getUsers().isEmpty();
 
 				// Node already existing in State?
-				if (!sm.getRepository().getNodes().containsKey(NamedObject.normalizeName(channel.getName()))) {
+				if (!sm.getNodes().containsKey(NamedObject.normalizeName(channel.getName()))) {
 					createNode = true;
 				}
 			} finally {
@@ -124,8 +124,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		lock.lock();
 
 		try {
-			Node node = stateManager.getRepository().getNodes()
-					.get(NamedObject.normalizeName(clusterManager.getChannel().getName()));
+			Node node = stateManager.getNodes().get(NamedObject.normalizeName(clusterManager.getChannel().getName()));
 			node.setAddress(address);
 			node.setStatus(Node.Status.ONLINE);
 		} finally {

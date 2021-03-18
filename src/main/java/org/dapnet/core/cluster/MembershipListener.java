@@ -89,7 +89,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 
 			try {
 				for (Address addr : view.getMembers()) {
-					Node node = stateManager.getRepository().getNodes().get(addr.toString());
+					Node node = stateManager.getNodes().get(addr.toString());
 					if (node == null) {
 						logger.warn("Unknown node in view: " + addr);
 						continue;
@@ -187,7 +187,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			// otherwise rejected while authorization
 			// (expect of first node, which might not be in the state, but will
 			// add itself immediately)
-			for (Node node : stateManager.getRepository().getNodes().values()) {
+			for (Node node : stateManager.getNodes().values()) {
 				Node.Status oldStatus = node.getStatus();
 				if (view.getMembers().stream().filter(m -> m.toString().equalsIgnoreCase(node.getName())).findFirst()
 						.isPresent()) {

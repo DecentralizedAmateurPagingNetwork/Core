@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.ExclusionStrategies;
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.dapnet.core.rest.RestAuthorizable;
@@ -53,7 +53,7 @@ public abstract class AbstractResource {
 	protected static final Gson userGson;
 
 	@Inject
-	private StateManager stateManager;
+	private Repository repository;
 	@Inject
 	private RestSecurity restSecurity;
 	@Inject
@@ -73,8 +73,8 @@ public abstract class AbstractResource {
 		return build;
 	}
 
-	protected StateManager getStateManager() {
-		return stateManager;
+	protected Repository getRepository() {
+		return repository;
 	}
 
 	protected RestListener getRestListener() {

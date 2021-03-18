@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -40,12 +40,12 @@ public class CallSignResource extends AbstractResource {
 	public Response getCallSigns() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			return getObject(stateManager.getRepository().getCallSigns().values(), status);
+			return getObject(repo.getCallSigns().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -56,12 +56,12 @@ public class CallSignResource extends AbstractResource {
 	public Response getCallSign(@PathParam("callSign") String callSignName) throws Exception {
 		callSignName = NamedObject.normalizeName(callSignName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			CallSign obj = stateManager.getRepository().getCallSigns().get(callSignName);
+			CallSign obj = repo.getCallSigns().get(callSignName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -77,12 +77,12 @@ public class CallSignResource extends AbstractResource {
 
 		CallSign oldCallSign = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldCallSign = stateManager.getRepository().getCallSigns().get(callSignName);
+			oldCallSign = repo.getCallSigns().get(callSignName);
 			if (oldCallSign != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);
@@ -111,12 +111,12 @@ public class CallSignResource extends AbstractResource {
 
 		CallSign oldCallSign = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldCallSign = stateManager.getRepository().getCallSigns().get(callSign);
+			oldCallSign = repo.getCallSigns().get(callSign);
 			if (oldCallSign != null) {
 				// only owner can delete object
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldCallSign);

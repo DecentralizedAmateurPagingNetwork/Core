@@ -6,9 +6,11 @@
 <Configuration monitorInterval="30" shutdownHook="disable">
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
-		<RollingFile name="RollingFile" fileName="logs/DAPNET_CORE.log"
+		<RollingFile name="RollingFile"
+			fileName="logs/DAPNET_CORE.log"
 			filePattern="logs/DAPNET_CORE-%d{MM-dd-yyyy}.log.gz"
 			ignoreExceptions="false">
 			<PatternLayout>
@@ -32,22 +34,27 @@
 		<!--Transmission -->
 		<logger name="org.dapnet.core.transmission.TransmissionManager"
 			level="info" />
-		<logger name="org.dapnet.core.transmission.TransmitterDeviceManager"
+		<logger
+			name="org.dapnet.core.transmission.TransmitterDeviceManager"
 			level="info" />
 		<logger name="org.dapnet.core.transmission.TransmitterDevice"
 			level="info" />
-		<logger name="org.dapnet.core.transmission.Raspager" level="info" />
+		<logger name="org.dapnet.core.transmission.Raspager"
+			level="info" />
 		<logger name="org.dapnet.core.transmission.SkyperProtocol"
 			level="info" />
 
 		<!--Cluster -->
-		<logger name="org.dapnet.core.cluster.ChannelListener" level="info" />
+		<logger name="org.dapnet.core.cluster.ChannelListener"
+			level="info" />
 		<logger name="org.dapnet.core.cluster.ClusterAuthentication"
 			level="info" />
-		<logger name="org.dapnet.core.cluster.ClusterManager" level="info" />
+		<logger name="org.dapnet.core.cluster.ClusterManager"
+			level="info" />
 		<logger name="org.dapnet.core.cluster.MembershipListener"
 			level="info" />
-		<logger name="org.dapnet.core.cluster.MessageListener" level="info" />
+		<logger name="org.dapnet.core.cluster.MessageListener"
+			level="info" />
 		<logger name="org.dapnet.core.cluster.RpcListener" level="info" />
 
 		<!--Model -->
@@ -57,14 +64,17 @@
 		<logger name="org.jgroups.protocols" level="error" />
 
 		<!--REST -->
-		<logger name="org.dapnet.core.rest.CustomLoggingFilter" level="info" />
+		<logger name="org.dapnet.core.rest.CustomLoggingFilter"
+			level="info" />
 		<logger name="org.dapnet.core.rest.RestManager" level="info" />
 		<logger name="org.dapnet.core.rest.RestSecurity" level="warn" />
-		<logger name="org.dapnet.core.rest.exceptionHandling.ExceptionHandler"
+		<logger
+			name="org.dapnet.core.rest.exceptionHandling.ExceptionHandler"
 			level="info" />
 
 		<!--Scheduler -->
-		<logger name="org.dapnet.core.scheduler.RubricNameTransmissionJob"
+		<logger
+			name="org.dapnet.core.scheduler.RubricNameTransmissionJob"
 			level="info" />
 		<logger name="org.dapnet.core.scheduler.SchedulerManager"
 			level="info" />

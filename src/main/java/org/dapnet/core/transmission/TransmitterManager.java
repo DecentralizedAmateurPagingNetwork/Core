@@ -13,7 +13,7 @@ import java.util.concurrent.locks.Lock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.model.TransmitterGroup;
@@ -26,20 +26,20 @@ import org.dapnet.core.model.TransmitterGroup;
 public class TransmitterManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
-	private final StateManager stateManager;
+	private final Repository repository;
 	private volatile TransmitterManagerListener listener;
 
-	public TransmitterManager(StateManager stateManager) {
-		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	public TransmitterManager(Repository repository) {
+		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
 	}
 
 	/**
-	 * Gets the state manager instance.
+	 * Gets the repository instance.
 	 * 
-	 * @return State manager
+	 * @return Repository
 	 */
-	public StateManager getStateManager() {
-		return stateManager;
+	public Repository getRepository() {
+		return repository;
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class TransmitterManager {
 	public void sendMessage(PagerMessage message, Set<String> transmitterGroupNames) {
 		Set<String> transmitters = null;
 
-		Lock lock = stateManager.getLock().readLock();
+		Lock lock = repository.getLock().readLock();
 		lock.lock();
 
 		try {
@@ -91,7 +91,7 @@ public class TransmitterManager {
 	public void sendMessages(Collection<PagerMessage> messages, Set<String> transmitterGroupNames) {
 		Set<String> transmitters = null;
 
-		Lock lock = stateManager.getLock().readLock();
+		Lock lock = repository.getLock().readLock();
 		lock.lock();
 
 		try {
@@ -129,7 +129,7 @@ public class TransmitterManager {
 			Set<String> transmitterGroupNames) {
 		Set<String> transmitters = null;
 
-		Lock lock = stateManager.getLock().readLock();
+		Lock lock = repository.getLock().readLock();
 		lock.lock();
 
 		try {
@@ -189,7 +189,7 @@ public class TransmitterManager {
 			return;
 		}
 
-		Lock lock = stateManager.getLock().writeLock();
+		Lock lock = repository.getLock().writeLock();
 		lock.lock();
 
 		try {
@@ -218,7 +218,7 @@ public class TransmitterManager {
 			return;
 		}
 
-		Lock lock = stateManager.getLock().writeLock();
+		Lock lock = repository.getLock().writeLock();
 		lock.lock();
 
 		try {
@@ -249,7 +249,7 @@ public class TransmitterManager {
 
 		Set<String> result = new HashSet<>();
 		if (!transmitterGroupNames.isEmpty()) {
-			final Map<String, TransmitterGroup> tgMap = stateManager.getRepository().getTransmitterGroups();
+			final Map<String, TransmitterGroup> tgMap = repository.getTransmitterGroups();
 			for (String name : transmitterGroupNames) {
 				TransmitterGroup tg = tgMap.get(NamedObject.normalizeName(name));
 				if (tg != null) {

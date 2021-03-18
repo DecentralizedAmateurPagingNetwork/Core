@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" monitorInterval="30" shutdownHook="disable">
+<Configuration status="WARN" monitorInterval="30"
+	shutdownHook="disable">
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
 		</Console>
-		<RollingFile name="RestLog" fileName="../local/logs/DAPNET_CORE_REST.log"
+		<RollingFile name="RestLog"
+			fileName="../local/logs/DAPNET_CORE_REST.log"
 			filePattern="../local/logs/DAPNET_CORE_REST-%d{MM-dd-yyyy}.log.gz"
 			ignoreExceptions="false">
 			<PatternLayout>
@@ -12,7 +15,8 @@
 			</PatternLayout>
 			<TimeBasedTriggeringPolicy />
 		</RollingFile>
-		<RollingFile name="ServerLog" fileName="../local/logs/DAPNET_CORE_SRV.log"
+		<RollingFile name="ServerLog"
+			fileName="../local/logs/DAPNET_CORE_SRV.log"
 			filePattern="../local/logs/DAPNET_CORE_SRV-%d{MM-dd-yyyy}.log.gz"
 			ignoreExceptions="false">
 			<PatternLayout>
@@ -23,13 +27,15 @@
 	</Appenders>
 	<Loggers>
 		<Root level="info">
-			<AppenderRef ref="Console"/>
+			<AppenderRef ref="Console" />
 		</Root>
-		<Logger name="org.dapnet.core.rest.CustomLoggingFilter" level="info" additivity="false">
-			<AppenderRef ref="RestLog"/>
+		<Logger name="org.dapnet.core.rest.CustomLoggingFilter"
+			level="info" additivity="false">
+			<AppenderRef ref="RestLog" />
 		</Logger>
-		<Logger name="org.dapnet.core.transmission.ServerHandler" level="info" additivity="false">
-			<AppenderRef ref="ServerLog"/>
+		<Logger name="org.dapnet.core.transmission.ServerHandler"
+			level="info" additivity="false">
+			<AppenderRef ref="ServerLog" />
 		</Logger>
 	</Loggers>
 </Configuration>

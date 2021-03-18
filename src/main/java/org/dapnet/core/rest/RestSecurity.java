@@ -23,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.User;
 
 public class RestSecurity {
@@ -36,10 +36,10 @@ public class RestSecurity {
 	}
 
 	private static final Logger logger = LogManager.getLogger(RestSecurity.class.getName());
-	private final StateManager stateManager;
+	private final Repository repository;
 
-	public RestSecurity(StateManager stateManager) {
-		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	public RestSecurity(Repository repository) {
+		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
 	}
 
 	public SecurityStatus getStatus(HttpHeaders httpHeaders, SecurityLevel minSecurityLevel,
@@ -55,12 +55,12 @@ public class RestSecurity {
 			return checkAuthorization(minSecurityLevel, SecurityStatus.ANYBODY);
 		}
 
-		Lock lock = stateManager.getLock().readLock();
+		Lock lock = repository.getLock().readLock();
 		lock.lock();
 
 		try {
 			// Get User
-			User user = stateManager.getRepository().getUsers().get(NamedObject.normalizeName(loginData.getUsername()));
+			User user = repository.getUsers().get(NamedObject.normalizeName(loginData.getUsername()));
 			if (user == null) {
 				logger.info("No User with such name");
 				return SecurityStatus.UNAUTHORIZED;

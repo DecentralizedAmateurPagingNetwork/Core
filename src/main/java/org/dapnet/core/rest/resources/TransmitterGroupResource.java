@@ -28,7 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -40,12 +40,12 @@ public class TransmitterGroupResource extends AbstractResource {
 	public Response getTransmitterGroups() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			return getObject(stateManager.getRepository().getTransmitterGroups().values(), status);
+			return getObject(repo.getTransmitterGroups().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -56,12 +56,12 @@ public class TransmitterGroupResource extends AbstractResource {
 	public Response getTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName) throws Exception {
 		transmitterGroupName = NamedObject.normalizeName(transmitterGroupName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			TransmitterGroup obj = stateManager.getRepository().getTransmitterGroups().get(transmitterGroupName);
+			TransmitterGroup obj = repo.getTransmitterGroups().get(transmitterGroupName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -79,12 +79,12 @@ public class TransmitterGroupResource extends AbstractResource {
 		TransmitterGroup oldGroup = null;
 		TransmitterGroup transmitterGroup = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldGroup = stateManager.getRepository().getTransmitterGroups().get(transmitterGroupName);
+			oldGroup = repo.getTransmitterGroups().get(transmitterGroupName);
 			if (oldGroup != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldGroup);
@@ -114,12 +114,12 @@ public class TransmitterGroupResource extends AbstractResource {
 
 		TransmitterGroup oldTransmitterGroup = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldTransmitterGroup = stateManager.getRepository().getTransmitterGroups().get(transmitterGroup);
+			oldTransmitterGroup = repo.getTransmitterGroups().get(transmitterGroup);
 			if (oldTransmitterGroup != null) {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitterGroup);
 			} else {

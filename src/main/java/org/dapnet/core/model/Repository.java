@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Repository interface providing access to the stored models.
@@ -12,6 +13,13 @@ import java.util.Set;
  * @author Philipp Thiel
  */
 public interface Repository {
+
+	/**
+	 * Gets the read-write lock that can be used to synchronize repository access.
+	 * 
+	 * @return Lock instance
+	 */
+	ReadWriteLock getLock();
 
 	/**
 	 * Gets the collection of all calls.
@@ -68,6 +76,13 @@ public interface Repository {
 	 * @return News map
 	 */
 	Map<String, NewsList> getNews();
+
+	/**
+	 * Gets the statistics.
+	 * 
+	 * @return Statistics
+	 */
+	CoreStatistics getStatistics();
 
 	public static <T> T getObject(Map<String, T> map, String name) {
 		return map.get(NamedObject.normalizeName(name));

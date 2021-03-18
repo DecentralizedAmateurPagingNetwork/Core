@@ -15,8 +15,9 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.validation.constraints.Max;
@@ -72,7 +73,7 @@ public class Activation implements Serializable {
 	}
 
 	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	public ArrayList<TransmitterGroup> getTransmitterGroups() throws Exception {
+	Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
 		if (state == null) {
 			throw new Exception("StateNotSetException");
 		}
@@ -81,7 +82,7 @@ public class Activation implements Serializable {
 			return null;
 		}
 
-		ArrayList<TransmitterGroup> transmitterGroups = new ArrayList<>();
+		Collection<TransmitterGroup> transmitterGroups = new LinkedList<>();
 
 		for (String transmitterGroup : transmitterGroupNames) {
 			TransmitterGroup g = state.getTransmitterGroups().get(transmitterGroup);

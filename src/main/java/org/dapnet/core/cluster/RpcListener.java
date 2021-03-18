@@ -112,7 +112,7 @@ public class RpcListener {
 
 			try {
 				// Add new Object
-				stateManager.getRepository().getCalls().add(call);
+				stateManager.getCalls().add(call);
 			} finally {
 				lock.unlock();
 			}
@@ -191,7 +191,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				stateManager.getRepository().getCallSigns().put(callSign.getNormalizedName(), callSign);
+				stateManager.getCallSigns().put(callSign.getNormalizedName(), callSign);
 			} finally {
 				lock.unlock();
 			}
@@ -228,7 +228,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				Repository repo = stateManager.getRepository();
+				Repository repo = stateManager;
 
 				// Delete depended Objects
 				// Delete Calls
@@ -292,8 +292,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				NewsList nl = stateManager.getRepository().getNews()
-						.get(NamedObject.normalizeName(news.getRubricName()));
+				NewsList nl = stateManager.getNews().get(NamedObject.normalizeName(news.getRubricName()));
 				if (nl != null) {
 					nl.add(news);
 					stateManager.getStatistics().incrementNews();
@@ -332,7 +331,7 @@ public class RpcListener {
 
 			try {
 				// Check Arguments
-				Node node = stateManager.getRepository().getNodes().get(NamedObject.normalizeName(nodeName));
+				Node node = stateManager.getNodes().get(NamedObject.normalizeName(nodeName));
 				if (node == null || status == null) {
 					return response = RpcResponse.BAD_REQUEST;
 				}
@@ -383,7 +382,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				stateManager.getRepository().getNodes().put(node.getNormalizedName(), node);
+				stateManager.getNodes().put(node.getNormalizedName(), node);
 			} finally {
 				lock.unlock();
 			}
@@ -435,7 +434,7 @@ public class RpcListener {
 
 			try {
 				// Delete Object with same Name, if existing
-				if (stateManager.getRepository().getNodes().remove(node) != null) {
+				if (stateManager.getNodes().remove(node) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -487,9 +486,9 @@ public class RpcListener {
 
 			try {
 				final String rubricName = rubric.getNormalizedName();
-				stateManager.getRepository().getRubrics().put(rubricName, rubric);
+				stateManager.getRubrics().put(rubricName, rubric);
 
-				Map<String, NewsList> news = stateManager.getRepository().getNews();
+				Map<String, NewsList> news = stateManager.getNews();
 				if (!news.containsKey(rubricName)) {
 					NewsList nl = new NewsList();
 					nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
@@ -539,10 +538,10 @@ public class RpcListener {
 
 			try {
 				// Remove news list as well
-				stateManager.getRepository().getNews().remove(rubricName);
+				stateManager.getNews().remove(rubricName);
 
 				// Delete Object with same Name, if existing
-				if (stateManager.getRepository().getRubrics().remove(rubricName) != null) {
+				if (stateManager.getRubrics().remove(rubricName) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -581,7 +580,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				Transmitter transmitter = stateManager.getRepository().getTransmitters().get(transmitterName);
+				Transmitter transmitter = stateManager.getTransmitters().get(transmitterName);
 				if (transmitter == null) {
 					return response = RpcResponse.BAD_REQUEST;
 				}
@@ -636,8 +635,8 @@ public class RpcListener {
 
 			try {
 				// Replace object
-				final Transmitter oldTransmitter = stateManager.getRepository().getTransmitters()
-						.put(transmitter.getNormalizedName(), transmitter);
+				final Transmitter oldTransmitter = stateManager.getTransmitters().put(transmitter.getNormalizedName(),
+						transmitter);
 				if (oldTransmitter != null) {
 					// Disconnect from old transmitter
 					clusterManager.getTransmitterManager().disconnectFrom(oldTransmitter);
@@ -682,7 +681,7 @@ public class RpcListener {
 				// Delete depended Objects
 				// Delete TransmitterGroups
 				Set<String> deleteTransmitterGroupNames = new HashSet<>();
-				stateManager.getRepository().getTransmitterGroups().values().stream()
+				stateManager.getTransmitterGroups().values().stream()
 						.filter(transmitterGroup -> transmitterGroup.getTransmitterNames().contains(transmitterName))
 						.forEach(transmitterGroup -> {
 							if (transmitterGroup.getTransmitterNames().size() == 1) {
@@ -697,8 +696,7 @@ public class RpcListener {
 						});
 				deleteTransmitterGroupNames.stream().forEach(name -> deleteTransmitterGroup(name));
 
-				transmitter = stateManager.getRepository().getTransmitters()
-						.remove(NamedObject.normalizeName(transmitterName));
+				transmitter = stateManager.getTransmitters().remove(NamedObject.normalizeName(transmitterName));
 				if (transmitter != null) {
 					response = RpcResponse.OK;
 				} else {
@@ -754,8 +752,7 @@ public class RpcListener {
 
 			try {
 				// Replace object
-				stateManager.getRepository().getTransmitterGroups().put(transmitterGroup.getNormalizedName(),
-						transmitterGroup);
+				stateManager.getTransmitterGroups().put(transmitterGroup.getNormalizedName(), transmitterGroup);
 			} finally {
 				lock.unlock();
 			}
@@ -795,7 +792,7 @@ public class RpcListener {
 				// Delete depended Objects
 				// Delete Rubrics
 				Set<String> deleteRubricNames = new HashSet<>();
-				stateManager.getRepository().getRubrics().values().stream()
+				stateManager.getRubrics().values().stream()
 						.filter(rubric -> rubric.getTransmitterGroupNames().contains(transmitterGroup))
 						.forEach(rubric -> {
 							if (rubric.getTransmitterGroupNames().size() == 1) {
@@ -812,7 +809,7 @@ public class RpcListener {
 
 				// Delete Calls
 				Collection<Call> deleteCalls = new LinkedList<>();
-				stateManager.getRepository().getCalls().stream()
+				stateManager.getCalls().stream()
 						.filter(call -> call.getTransmitterGroupNames().contains(transmitterGroup)).forEach(call -> {
 							if (call.getTransmitterGroupNames().size() == 1) {
 								// Delete all Calls using only this TransmitterGroup
@@ -823,11 +820,10 @@ public class RpcListener {
 								call.getTransmitterGroupNames().remove(transmitterGroup);
 							}
 						});
-				deleteCalls.stream().forEach(call -> stateManager.getRepository().getCalls().remove(call));
+				deleteCalls.stream().forEach(call -> stateManager.getCalls().remove(call));
 
 				// Delete Object with same Name, if existing
-				if (stateManager.getRepository().getTransmitterGroups()
-						.remove(NamedObject.normalizeName(transmitterGroup)) != null) {
+				if (stateManager.getTransmitterGroups().remove(NamedObject.normalizeName(transmitterGroup)) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -877,7 +873,7 @@ public class RpcListener {
 
 			try {
 				// Add new Object
-				stateManager.getRepository().getUsers().put(user.getNormalizedName(), user);
+				stateManager.getUsers().put(user.getNormalizedName(), user);
 			} finally {
 				lock.unlock();
 			}
@@ -917,7 +913,7 @@ public class RpcListener {
 				// Delete depended Objects
 				// Delete CallSigns
 				Set<String> deleteCallSignNames = new HashSet<>();
-				stateManager.getRepository().getCallSigns().values().stream()
+				stateManager.getCallSigns().values().stream()
 						.filter(callSign -> callSign.getOwnerNames().contains(user)).forEach(callSign -> {
 							if (callSign.getOwnerNames().size() == 1) {
 								// Delete all CallSigns which have only this Owner
@@ -932,15 +928,15 @@ public class RpcListener {
 
 				// Delete Calls
 				Collection<Call> deleteCalls = new LinkedList<>();
-				final Collection<Call> calls = stateManager.getRepository().getCalls();
+				final Collection<Call> calls = stateManager.getCalls();
 				calls.stream().filter(call -> call.getOwnerName().equalsIgnoreCase(user))
 						.forEach(call -> deleteCalls.add(call));
 				deleteCalls.stream().forEach(call -> calls.remove(call));
 
 				// Delete Rubrics
 				Set<String> deleteRubricNames = new HashSet<>();
-				stateManager.getRepository().getRubrics().values().stream()
-						.filter(rubric -> rubric.getOwnerNames().contains(user)).forEach(rubric -> {
+				stateManager.getRubrics().values().stream().filter(rubric -> rubric.getOwnerNames().contains(user))
+						.forEach(rubric -> {
 							if (rubric.getOwnerNames().size() == 1) {
 								// Delete all Rubrics which have only this Owner
 								deleteRubricNames.add(rubric.getNormalizedName());
@@ -951,12 +947,12 @@ public class RpcListener {
 							}
 						});
 				// Delete news first
-				deleteRubricNames.stream().forEach(name -> stateManager.getRepository().getNews().remove(name));
+				deleteRubricNames.stream().forEach(name -> stateManager.getNews().remove(name));
 				deleteRubricNames.stream().forEach(name -> deleteRubric(name));
 
 				// Delete TransmitterGroups
 				Set<String> deleteTransmitterGroupNames = new HashSet<>();
-				stateManager.getRepository().getTransmitterGroups().values().stream()
+				stateManager.getTransmitterGroups().values().stream()
 						.filter(transmitterGroup -> transmitterGroup.getOwnerNames().contains(user))
 						.forEach(transmitterGroup -> {
 							if (transmitterGroup.getOwnerNames().size() == 1) {
@@ -973,7 +969,7 @@ public class RpcListener {
 
 				// Delete Transmitter
 				Set<String> deleteTransmitterNames = new HashSet<>();
-				stateManager.getRepository().getTransmitters().values().stream()
+				stateManager.getTransmitters().values().stream()
 						.filter(transmitter -> transmitter.getOwnerNames().contains(user)).forEach(transmitter -> {
 							if (transmitter.getOwnerNames().size() == 1) {
 								// Delete all Transmitter which have only this Owner
@@ -987,7 +983,7 @@ public class RpcListener {
 				deleteTransmitterNames.stream().forEach(name -> deleteTransmitter(name));
 
 				// Delete Object with same Name, if existing
-				if (stateManager.getRepository().getUsers().remove(NamedObject.normalizeName(user)) != null) {
+				if (stateManager.getUsers().remove(NamedObject.normalizeName(user)) != null) {
 					response = RpcResponse.OK;
 				} else {
 					// Object not found
@@ -1021,12 +1017,12 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				if (!stateManager.getRepository().getTransmitters().containsKey(transmitterName)) {
+				if (!stateManager.getTransmitters().containsKey(transmitterName)) {
 					return RpcResponse.BAD_REQUEST;
 				}
 
 				final TransmissionManager manager = clusterManager.getTransmissionManager();
-				for (Rubric r : stateManager.getRepository().getRubrics().values()) {
+				for (Rubric r : stateManager.getRubrics().values()) {
 					manager.handleRubricToTransmitter(r, transmitterName);
 				}
 			} finally {

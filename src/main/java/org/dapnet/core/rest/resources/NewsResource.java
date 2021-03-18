@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.News;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -38,20 +38,20 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NewsResource extends AbstractResource {
 	@GET
 	public Response getNews(@QueryParam("rubricName") String rubricName) throws Exception {
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			if (rubricName == null || rubricName.isEmpty()) {
 				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-				return getObject(stateManager.getRepository().getNews(), status);
+				return getObject(repo.getNews(), status);
 			} else {
 				rubricName = NamedObject.normalizeName(rubricName);
 
 				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY,
-						stateManager.getRepository().getRubrics().get(rubricName));
-				return getObject(stateManager.getRepository().getNews().get(rubricName), status);
+						repo.getRubrics().get(rubricName));
+				return getObject(repo.getNews().get(rubricName), status);
 			}
 		} finally {
 			lock.unlock();
@@ -75,15 +75,14 @@ public class NewsResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			final String rubricName = NamedObject.normalizeName(news.getRubricName());
 			// Check if user is OWNER of rubric
-			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					stateManager.getRepository().getRubrics().get(rubricName));
+			checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, repo.getRubrics().get(rubricName));
 		} finally {
 			lock.unlock();
 		}

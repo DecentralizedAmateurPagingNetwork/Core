@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -45,12 +45,12 @@ public class TransmitterResource extends AbstractResource {
 	public Response getTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			return getObject(stateManager.getRepository().getTransmitters().values(), status);
+			return getObject(repo.getTransmitters().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -61,12 +61,12 @@ public class TransmitterResource extends AbstractResource {
 	public Response getTransmitter(@PathParam("transmitter") String transmitterName) throws Exception {
 		transmitterName = NamedObject.normalizeName(transmitterName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			Transmitter obj = stateManager.getRepository().getTransmitters().get(transmitterName);
+			Transmitter obj = repo.getTransmitters().get(transmitterName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -83,12 +83,12 @@ public class TransmitterResource extends AbstractResource {
 
 		Transmitter oldTransmitter = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldTransmitter = stateManager.getRepository().getTransmitters().get(transmitterName);
+			oldTransmitter = repo.getTransmitters().get(transmitterName);
 			if (oldTransmitter != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
@@ -130,12 +130,12 @@ public class TransmitterResource extends AbstractResource {
 
 		Transmitter oldTransmitter = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldTransmitter = stateManager.getRepository().getTransmitters().get(transmitter);
+			oldTransmitter = repo.getTransmitters().get(transmitter);
 			if (oldTransmitter != null) {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
 			} else {

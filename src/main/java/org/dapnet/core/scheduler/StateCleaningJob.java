@@ -45,11 +45,10 @@ public class StateCleaningJob implements Job {
 			lock.lock();
 
 			try {
-				Repository repo = stateManager.getRepository();
 				Instant now = Instant.now();
 
-				cleanCalls(repo, now);
-				cleanNews(repo, now);
+				cleanCalls(stateManager, now);
+				cleanNews(stateManager, now);
 				// FIXME This is broken
 				// cleanTransmitters(clusterManager, now);
 			} finally {

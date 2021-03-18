@@ -26,8 +26,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
-import org.dapnet.core.model.StateManager;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -38,12 +38,12 @@ public class RubricResource extends AbstractResource {
 	public Response getRubrics() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			return getObject(stateManager.getRepository().getRubrics().values(), status);
+			return getObject(repo.getRubrics().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -54,12 +54,12 @@ public class RubricResource extends AbstractResource {
 	public Response getRubric(@PathParam("rubric") String rubricName) throws Exception {
 		rubricName = NamedObject.normalizeName(rubricName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			Rubric obj = stateManager.getRepository().getRubrics().get(rubricName);
+			Rubric obj = repo.getRubrics().get(rubricName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -75,12 +75,12 @@ public class RubricResource extends AbstractResource {
 
 		Rubric oldRubric = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldRubric = stateManager.getRepository().getRubrics().get(rubricName);
+			oldRubric = repo.getRubrics().get(rubricName);
 			if (oldRubric != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldRubric);
@@ -110,12 +110,12 @@ public class RubricResource extends AbstractResource {
 
 		Rubric oldRubric = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldRubric = stateManager.getRepository().getRubrics().get(rubric);
+			oldRubric = repo.getRubrics().get(rubric);
 			if (oldRubric != null) {
 				// only owner can delete object
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldRubric);

@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -43,20 +43,20 @@ public class CallResource extends AbstractResource {
 	public Response getCalls(@QueryParam("ownerName") String ownerName) throws Exception {
 		ownerName = NamedObject.normalizeName(ownerName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			if (ownerName == null || ownerName.isEmpty()) {
 				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-				return getObject(stateManager.getRepository().getCalls(), status);
+				return getObject(repo.getCalls(), status);
 			} else {
 				RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-						stateManager.getRepository().getUsers().get(ownerName));
+						repo.getUsers().get(ownerName));
 
 				List<Call> calls = new LinkedList<>();
-				for (Call call : stateManager.getRepository().getCalls()) {
+				for (Call call : repo.getCalls()) {
 					if (call.getOwnerName().equalsIgnoreCase(ownerName)) {
 						calls.add(call);
 					}

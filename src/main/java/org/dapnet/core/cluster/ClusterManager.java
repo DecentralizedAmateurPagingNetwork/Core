@@ -138,8 +138,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void registerNewsList() {
-		Map<String, Rubric> rubrics = stateManager.getRepository().getRubrics();
-		Map<String, NewsList> news = stateManager.getRepository().getNews();
+		Map<String, Rubric> rubrics = stateManager.getRubrics();
+		Map<String, NewsList> news = stateManager.getNews();
 
 		for (Rubric r : rubrics.values()) {
 			String rubricName = r.getNormalizedName();
@@ -156,7 +156,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	}
 
 	private void resetNodeStates() {
-		Map<String, Node> nodes = stateManager.getRepository().getNodes();
+		Map<String, Node> nodes = stateManager.getNodes();
 		for (Node n : nodes.values()) {
 			n.setStatus(Status.SUSPENDED);
 		}
@@ -199,7 +199,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		lock.lock();
 
 		try {
-			Map<String, Node> nodes = stateManager.getRepository().getNodes();
+			Map<String, Node> nodes = stateManager.getNodes();
 			for (Node node : nodes.values()) {
 				if (node.getStatus() != Node.Status.SUSPENDED) {
 					// Node is in UNKNOWN
@@ -307,7 +307,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		lock.lock();
 
 		try {
-			Map<String, Transmitter> transmitters = stateManager.getRepository().getTransmitters();
+			Map<String, Transmitter> transmitters = stateManager.getTransmitters();
 			contains = transmitters.containsKey(transmitter.getNormalizedName());
 		} finally {
 			lock.unlock();

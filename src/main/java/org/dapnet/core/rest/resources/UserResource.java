@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -40,12 +40,12 @@ public class UserResource extends AbstractResource {
 	public Response getUsers() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			return getObject(stateManager.getRepository().getUsers().values(), status);
+			return getObject(repo.getUsers().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -56,12 +56,12 @@ public class UserResource extends AbstractResource {
 	public Response getUser(@PathParam("user") String userName) throws Exception {
 		userName = NamedObject.normalizeName(userName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			User user = stateManager.getRepository().getUsers().get(userName);
+			User user = repo.getUsers().get(userName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, user);
 			return getObject(user, status);
 		} finally {
@@ -78,15 +78,15 @@ public class UserResource extends AbstractResource {
 		User user = null;
 		User oldUser = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			// Start request processing only if at least USER
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-			oldUser = stateManager.getRepository().getUsers().get(userName);
+			oldUser = repo.getUsers().get(userName);
 
 			// Create User from received data
 			user = gson.fromJson(userJSON, User.class);
@@ -126,12 +126,12 @@ public class UserResource extends AbstractResource {
 
 		User oldUser = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldUser = stateManager.getRepository().getUsers().get(user);
+			oldUser = repo.getUsers().get(user);
 			if (oldUser != null) {
 				// only owner can delete object
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);

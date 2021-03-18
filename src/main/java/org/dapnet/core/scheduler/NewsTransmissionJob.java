@@ -23,7 +23,7 @@ public class NewsTransmissionJob implements Job {
 			lock.lock();
 
 			try {
-				stateManager.getRepository().getNews().values().forEach(nl -> {
+				stateManager.getNews().values().forEach(nl -> {
 					try {
 						nl.triggerAll();
 					} catch (Throwable t) {

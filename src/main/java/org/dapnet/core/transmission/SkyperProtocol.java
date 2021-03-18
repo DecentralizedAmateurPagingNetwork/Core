@@ -19,9 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,8 +34,10 @@ import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
 import org.dapnet.core.transmission.PagerMessage.MessagePriority;
@@ -50,33 +55,48 @@ public class SkyperProtocol implements PagerProtocol {
 			.ofPattern("'YYYYMMDDHHMMSS'yyMMddHHmm'00'");
 	private static final Charset PAGER_CHARSET = new DE_ASCII7();
 
+	private final Repository repository;
+
+	public SkyperProtocol(Repository stateManager) {
+		this.repository = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	}
+
 	@Override
 	public List<PagerMessage> createMessagesFromCall(Call call) {
 		MessagePriority priority = call.isEmergency() ? MessagePriority.EMERGENCY : MessagePriority.CALL;
 		Instant now = Instant.now();
+
+		Lock lock = repository.getLock().readLock();
+		lock.lock();
 
 		try {
 			// Test if message is numeric
 			Matcher m = NUMERIC_PATTERN.matcher(call.getText());
 			boolean numeric = m.matches();
 
-			List<PagerMessage> messages = new ArrayList<>();
-			for (CallSign callsign : call.getCallSigns()) {
+			final Map<String, CallSign> callsigns = repository.getCallSigns();
+
+			List<PagerMessage> messages = new LinkedList<>();
+			for (String name : call.getCallSignNames()) {
+				CallSign callsign = callsigns.get(NamedObject.normalizeName(name));
+				if (callsign == null) {
+					logger.error("Callsign does not exist: {}", name);
+					continue;
+				}
+
 				FunctionalBits mode;
 				String text;
 				if (!callsign.isNumeric()) {
-					// Support for alphanumeric messages -> create ALPHANUM
-					// message
+					// Support for alphanumeric messages -> create ALPHANUM message
 					mode = FunctionalBits.ALPHANUM;
 					text = encodeString(call.getText());
 				} else if (numeric) {
-					// No support for alphanumeric messages but text is numeric
-					// -> create NUMERIC message
+					// No support for alphanumeric messages but text is numeric -> create NUMERIC
+					// message
 					mode = FunctionalBits.NUMERIC;
 					text = call.getText().toUpperCase();
 				} else {
-					// No support for alphanumeric messages and non-numeric
-					// message -> skip
+					// No support for alphanumeric messages and non-numeric message -> skip
 					logger.warn("Callsign {} does not support alphanumeric messages.", callsign.getName());
 					continue;
 				}
@@ -90,6 +110,8 @@ public class SkyperProtocol implements PagerProtocol {
 		} catch (Exception ex) {
 			logger.error("Failed to create messages from call.", ex);
 			return null;
+		} finally {
+			lock.unlock();
 		}
 	}
 

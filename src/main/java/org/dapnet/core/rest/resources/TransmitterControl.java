@@ -9,7 +9,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -24,12 +24,12 @@ public class TransmitterControl extends AbstractResource {
 
 		Transmitter transmitter = null;
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			transmitter = stateManager.getRepository().getTransmitters().get(transmitterName);
+			transmitter = repo.getTransmitters().get(transmitterName);
 			if (transmitter != null) {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, transmitter);
 			} else {

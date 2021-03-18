@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Repository;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -39,13 +39,13 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NodeResource extends AbstractResource {
 	@GET
 	public Response getNodes() throws Exception {
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(stateManager.getRepository().getNodes().values(), status);
+			return getObject(repo.getNodes().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -56,13 +56,13 @@ public class NodeResource extends AbstractResource {
 	public Response getNode(@PathParam("node") String nodeName) throws Exception {
 		nodeName = NamedObject.normalizeName(nodeName);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(stateManager.getRepository().getNodes().get(nodeName), status);
+			return getObject(repo.getNodes().get(nodeName), status);
 		} finally {
 			lock.unlock();
 		}
@@ -87,13 +87,13 @@ public class NodeResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
 			// Preserve old status
-			oldNode = stateManager.getRepository().getNodes().get(nodeName);
+			oldNode = repo.getNodes().get(nodeName);
 			if (oldNode != null && oldNode.getStatus() == Status.ONLINE) {
 				node.setStatus(Status.ONLINE);
 				node.setAddress(oldNode.getAddress());
@@ -114,12 +114,12 @@ public class NodeResource extends AbstractResource {
 
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 
-		final StateManager stateManager = getStateManager();
-		Lock lock = stateManager.getLock().readLock();
+		final Repository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldNode = stateManager.getRepository().getNodes().get(node);
+			oldNode = repo.getNodes().get(node);
 			if (oldNode == null) {
 				throw new NotFoundException();
 			}
