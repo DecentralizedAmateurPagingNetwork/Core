@@ -35,7 +35,7 @@ public class TransmissionManager {
 	private final TransmitterManager transmitterManager;
 
 	public TransmissionManager(StateManager stateManager) {
-		transmitterManager = new TransmitterManager();
+		transmitterManager = new TransmitterManager(stateManager);
 	}
 
 	public void handleTime(LocalDateTime time) {

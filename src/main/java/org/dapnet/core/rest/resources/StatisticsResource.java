@@ -13,9 +13,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.model.CoreStatistics;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
-import org.dapnet.core.model.State;
+import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 
@@ -25,12 +27,15 @@ public class StatisticsResource extends AbstractResource {
 
 	@GET
 	public Response get() throws Exception {
-		Lock lock = State.getReadLock();
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-			return getObject(new ObjectCounts(restListener.getState()), status);
+			ObjectCounts counts = new ObjectCounts(stateManager.getRepository(), stateManager.getStatistics());
+			return getObject(counts, status);
 		} finally {
 			lock.unlock();
 		}
@@ -49,19 +54,19 @@ public class StatisticsResource extends AbstractResource {
 		private final int transmittersTotal;
 		private final int transmittersOnline;
 
-		public ObjectCounts(State state) {
-			users = state.getUsers().size();
-			calls = state.getCalls().size();
-			callSigns = state.getCallSigns().size();
-			news = state.getNews().values().stream().mapToInt(NewsList::getSize).sum();
-			callsTotal = state.getCoreStats().getCalls();
-			newsTotal = state.getCoreStats().getNews();
-			rubrics = state.getRubrics().size();
-			nodesTotal = state.getNodes().size();
-			nodesOnline = (int) state.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)
+		public ObjectCounts(Repository repo, CoreStatistics stats) {
+			users = repo.getUsers().size();
+			calls = repo.getCalls().size();
+			callSigns = repo.getCallSigns().size();
+			news = repo.getNews().values().stream().mapToInt(NewsList::getSize).sum();
+			callsTotal = stats.getCalls();
+			newsTotal = stats.getNews();
+			rubrics = repo.getRubrics().size();
+			nodesTotal = repo.getNodes().size();
+			nodesOnline = (int) repo.getNodes().values().stream().filter(n -> n.getStatus() == Node.Status.ONLINE)
 					.count();
-			transmittersTotal = state.getTransmitters().size();
-			transmittersOnline = (int) state.getTransmitters().values().stream()
+			transmittersTotal = repo.getTransmitters().size();
+			transmittersOnline = (int) repo.getTransmitters().values().stream()
 					.filter(t -> t.getStatus() == Transmitter.Status.ONLINE).count();
 		}
 

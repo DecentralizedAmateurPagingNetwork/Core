@@ -27,9 +27,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Node;
-import org.dapnet.core.model.State;
 import org.dapnet.core.model.Node.Status;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -38,12 +39,13 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NodeResource extends AbstractResource {
 	@GET
 	public Response getNodes() throws Exception {
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(restListener.getState().getNodes().values(), status);
+			return getObject(stateManager.getRepository().getNodes().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -52,16 +54,15 @@ public class NodeResource extends AbstractResource {
 	@GET
 	@Path("{node}")
 	public Response getNode(@PathParam("node") String nodeName) throws Exception {
-		if (nodeName != null) {
-			nodeName = nodeName.toLowerCase();
-		}
+		nodeName = NamedObject.normalizeName(nodeName);
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(restListener.getState().getNodes().get(nodeName), status);
+			return getObject(stateManager.getRepository().getNodes().get(nodeName), status);
 		} finally {
 			lock.unlock();
 		}
@@ -71,29 +72,28 @@ public class NodeResource extends AbstractResource {
 	@Path("{node}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putNode(@PathParam("node") String nodeName, String nodeJSON) throws Exception {
-		if (nodeName != null) {
-			nodeName = nodeName.toLowerCase();
-		}
+		nodeName = NamedObject.normalizeName(nodeName);
 
 		Node node = null;
 		Node oldNode = null;
 
-		Lock lock = State.getReadLock();
+		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+
+		node = gson.fromJson(nodeJSON, Node.class);
+		if (node != null) {
+			node.setName(nodeName);
+			node.setStatus(Node.Status.SUSPENDED);
+		} else {
+			throw new EmptyBodyException();
+		}
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-
-			node = gson.fromJson(nodeJSON, Node.class);
-			if (node != null) {
-				node.setName(nodeName);
-				node.setStatus(Node.Status.SUSPENDED);
-			} else {
-				throw new EmptyBodyException();
-			}
-
 			// Preserve old status
-			oldNode = restListener.getState().getNodes().get(nodeName);
+			oldNode = stateManager.getRepository().getNodes().get(nodeName);
 			if (oldNode != null && oldNode.getStatus() == Status.ONLINE) {
 				node.setStatus(Status.ONLINE);
 				node.setAddress(oldNode.getAddress());
@@ -108,18 +108,18 @@ public class NodeResource extends AbstractResource {
 	@DELETE
 	@Path("{node}")
 	public Response deleteNode(@PathParam("node") String node) throws Exception {
-		if (node != null) {
-			node = node.toLowerCase();
-		}
+		node = NamedObject.normalizeName(node);
 
 		Node oldNode = null;
 
-		Lock lock = State.getReadLock();
+		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-			oldNode = restListener.getState().getNodes().get(node);
+			oldNode = stateManager.getRepository().getNodes().get(node);
 			if (oldNode == null) {
 				throw new NotFoundException();
 			}

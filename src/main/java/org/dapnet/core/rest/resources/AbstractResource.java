@@ -16,6 +16,7 @@ package org.dapnet.core.rest.resources;
 
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
@@ -30,6 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.rest.ExclusionStrategies;
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.dapnet.core.rest.RestAuthorizable;
@@ -43,16 +45,19 @@ import com.google.gson.GsonBuilder;
 
 public abstract class AbstractResource {
 	@Context
-	UriInfo uriInfo;
+	protected UriInfo uriInfo;
 	@Context
-	HttpHeaders httpHeaders;
+	protected HttpHeaders httpHeaders;
 
 	protected static final Gson gson;
 	protected static final Gson userGson;
-	// Resources are created with Jersey, cannot pass parameters, so using
-	// instead static attributes
-	protected static volatile RestListener restListener;
-	protected static volatile RestSecurity restSecurity;
+
+	@Inject
+	private StateManager stateManager;
+	@Inject
+	private RestSecurity restSecurity;
+	@Inject
+	private RestListener restListener;
 
 	static {
 		gson = createBuilder().addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
@@ -68,6 +73,14 @@ public abstract class AbstractResource {
 		return build;
 	}
 
+	protected StateManager getStateManager() {
+		return stateManager;
+	}
+
+	protected RestListener getRestListener() {
+		return restListener;
+	}
+
 	protected Gson getExclusionGson(RestSecurity.SecurityStatus status) {
 		switch (status) {
 		case ADMIN:
@@ -81,14 +94,6 @@ public abstract class AbstractResource {
 		default:
 			return gson;
 		}
-	}
-
-	public static void setRestListener(RestListener restListenerPar) {
-		restListener = restListenerPar;
-	}
-
-	public static void setRestSecurity(RestSecurity restSecurityPar) {
-		restSecurity = restSecurityPar;
 	}
 
 	// Authorization Helper

@@ -2,6 +2,7 @@ package org.dapnet.core.model;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -69,9 +70,14 @@ public final class StateManager {
 	}
 
 	public void writeStateToFile(String fileName) throws IOException {
+		File stateFile = new File(fileName);
+		if (stateFile.getParentFile() != null) {
+			stateFile.getParentFile().mkdirs();
+		}
+
 		lock.readLock().lock();
 
-		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8")) {
+		try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(stateFile), "UTF-8")) {
 			writer.write(gson.toJson(this));
 			writer.flush();
 		} finally {

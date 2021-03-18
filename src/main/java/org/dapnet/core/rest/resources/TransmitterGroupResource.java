@@ -27,7 +27,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.State;
+import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -37,12 +38,14 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	public Response getTransmitterGroups() throws Exception {
-		Lock lock = State.getReadLock();
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(restListener.getState().getTransmitterGroups().values(), status);
+			return getObject(stateManager.getRepository().getTransmitterGroups().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -51,15 +54,14 @@ public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	@Path("{transmitterGroup}")
 	public Response getTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName) throws Exception {
-		if (transmitterGroupName != null) {
-			transmitterGroupName = transmitterGroupName.toLowerCase();
-		}
+		transmitterGroupName = NamedObject.normalizeName(transmitterGroupName);
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			TransmitterGroup obj = restListener.getState().getTransmitterGroups().get(transmitterGroupName);
+			TransmitterGroup obj = stateManager.getRepository().getTransmitterGroups().get(transmitterGroupName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -72,18 +74,17 @@ public class TransmitterGroupResource extends AbstractResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName,
 			String transmitterGroupJSON) throws Exception {
-		if (transmitterGroupName != null) {
-			transmitterGroupName = transmitterGroupName.toLowerCase();
-		}
+		transmitterGroupName = NamedObject.normalizeName(transmitterGroupName);
 
 		TransmitterGroup oldGroup = null;
 		TransmitterGroup transmitterGroup = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldGroup = restListener.getState().getTransmitterGroups().get(transmitterGroupName);
+			oldGroup = stateManager.getRepository().getTransmitterGroups().get(transmitterGroupName);
 			if (oldGroup != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldGroup);
@@ -91,16 +92,16 @@ public class TransmitterGroupResource extends AbstractResource {
 				// Create
 				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			}
-
-			// Create TransmitterGroup
-			transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
-			if (transmitterGroup != null) {
-				transmitterGroup.setName(transmitterGroupName);
-			} else {
-				throw new EmptyBodyException();
-			}
 		} finally {
 			lock.unlock();
+		}
+
+		// Create TransmitterGroup
+		transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
+		if (transmitterGroup != null) {
+			transmitterGroup.setName(transmitterGroupName);
+		} else {
+			throw new EmptyBodyException();
 		}
 
 		return handleObject(transmitterGroup, "putTransmitterGroup", oldGroup == null, true);
@@ -109,17 +110,16 @@ public class TransmitterGroupResource extends AbstractResource {
 	@DELETE
 	@Path("{transmitterGroup}")
 	public Response deleteTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroup) throws Exception {
-		if (transmitterGroup != null) {
-			transmitterGroup = transmitterGroup.toLowerCase();
-		}
+		transmitterGroup = NamedObject.normalizeName(transmitterGroup);
 
 		TransmitterGroup oldTransmitterGroup = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldTransmitterGroup = restListener.getState().getTransmitterGroups().get(transmitterGroup);
+			oldTransmitterGroup = stateManager.getRepository().getTransmitterGroups().get(transmitterGroup);
 			if (oldTransmitterGroup != null) {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitterGroup);
 			} else {

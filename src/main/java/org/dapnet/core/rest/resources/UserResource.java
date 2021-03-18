@@ -27,7 +27,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.HashUtil;
-import org.dapnet.core.model.State;
+import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -37,12 +38,14 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class UserResource extends AbstractResource {
 	@GET
 	public Response getUsers() throws Exception {
-		final Lock lock = State.getReadLock();
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(restListener.getState().getUsers().values(), status);
+			return getObject(stateManager.getRepository().getUsers().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -51,15 +54,14 @@ public class UserResource extends AbstractResource {
 	@GET
 	@Path("{user}")
 	public Response getUser(@PathParam("user") String userName) throws Exception {
-		if (userName != null) {
-			userName = userName.toLowerCase();
-		}
+		userName = NamedObject.normalizeName(userName);
 
-		final Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			User user = restListener.getState().getUsers().get(userName);
+			User user = stateManager.getRepository().getUsers().get(userName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, user);
 			return getObject(user, status);
 		} finally {
@@ -71,21 +73,20 @@ public class UserResource extends AbstractResource {
 	@Path("{user}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putUser(@PathParam("user") String userName, String userJSON) throws Exception {
-		if (userName != null) {
-			userName = userName.toLowerCase();
-		}
+		userName = NamedObject.normalizeName(userName);
 
 		User user = null;
 		User oldUser = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
 			// Start request processing only if at least USER
 			checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-			oldUser = restListener.getState().getUsers().get(userName);
+			oldUser = stateManager.getRepository().getUsers().get(userName);
 
 			// Create User from received data
 			user = gson.fromJson(userJSON, User.class);
@@ -121,17 +122,16 @@ public class UserResource extends AbstractResource {
 	@DELETE
 	@Path("{user}")
 	public Response deleteUser(@PathParam("user") String user) throws Exception {
-		if (user != null) {
-			user = user.toLowerCase();
-		}
+		user = NamedObject.normalizeName(user);
 
 		User oldUser = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldUser = restListener.getState().getUsers().get(user);
+			oldUser = stateManager.getRepository().getUsers().get(user);
 			if (oldUser != null) {
 				// only owner can delete object
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldUser);

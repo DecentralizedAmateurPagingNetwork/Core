@@ -25,8 +25,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Rubric;
-import org.dapnet.core.model.State;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -35,12 +36,14 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class RubricResource extends AbstractResource {
 	@GET
 	public Response getRubrics() throws Exception {
-		Lock lock = State.getReadLock();
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
-			return getObject(restListener.getState().getRubrics().values(), status);
+			return getObject(stateManager.getRepository().getRubrics().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -49,15 +52,14 @@ public class RubricResource extends AbstractResource {
 	@GET
 	@Path("{rubric}")
 	public Response getRubric(@PathParam("rubric") String rubricName) throws Exception {
-		if (rubricName != null) {
-			rubricName = rubricName.toLowerCase();
-		}
+		rubricName = NamedObject.normalizeName(rubricName);
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			Rubric obj = restListener.getState().getRubrics().get(rubricName);
+			Rubric obj = stateManager.getRepository().getRubrics().get(rubricName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -69,18 +71,16 @@ public class RubricResource extends AbstractResource {
 	@Path("{rubric}")
 	@Consumes("application/json")
 	public Response putRubric(@PathParam("rubric") String rubricName, String rubricJSON) throws Exception {
-		if (rubricName != null) {
-			rubricName = rubricName.toLowerCase();
-		}
+		rubricName = NamedObject.normalizeName(rubricName);
 
 		Rubric oldRubric = null;
-		Rubric rubric = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldRubric = restListener.getState().getRubrics().get(rubricName);
+			oldRubric = stateManager.getRepository().getRubrics().get(rubricName);
 			if (oldRubric != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldRubric);
@@ -88,16 +88,16 @@ public class RubricResource extends AbstractResource {
 				// Create
 				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			}
-
-			// Create Rubric
-			rubric = gson.fromJson(rubricJSON, Rubric.class);
-			if (rubric != null) {
-				rubric.setName(rubricName);
-			} else {
-				throw new EmptyBodyException();
-			}
 		} finally {
 			lock.unlock();
+		}
+
+		// Create Rubric
+		Rubric rubric = gson.fromJson(rubricJSON, Rubric.class);
+		if (rubric != null) {
+			rubric.setName(rubricName);
+		} else {
+			throw new EmptyBodyException();
 		}
 
 		return handleObject(rubric, "putRubric", oldRubric == null, true);
@@ -106,17 +106,16 @@ public class RubricResource extends AbstractResource {
 	@DELETE
 	@Path("{rubric}")
 	public Response deleteRubric(@PathParam("rubric") String rubric) throws Exception {
-		if (rubric != null) {
-			rubric = rubric.toLowerCase();
-		}
+		rubric = NamedObject.normalizeName(rubric);
 
 		Rubric oldRubric = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldRubric = restListener.getState().getRubrics().get(rubric);
+			oldRubric = stateManager.getRepository().getRubrics().get(rubric);
 			if (oldRubric != null) {
 				// only owner can delete object
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldRubric);

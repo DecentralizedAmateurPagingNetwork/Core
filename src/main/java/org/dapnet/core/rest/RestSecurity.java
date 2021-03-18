@@ -14,11 +14,16 @@
 
 package org.dapnet.core.rest;
 
+import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
+import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.User;
 
 public class RestSecurity {
@@ -31,16 +36,17 @@ public class RestSecurity {
 	}
 
 	private static final Logger logger = LogManager.getLogger(RestSecurity.class.getName());
-	private RestListener restListener;
+	private final StateManager stateManager;
 
-	public RestSecurity(RestListener restListener) {
-		this.restListener = restListener;
+	public RestSecurity(StateManager stateManager) {
+		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
 	}
 
 	public SecurityStatus getStatus(HttpHeaders httpHeaders, SecurityLevel minSecurityLevel,
 			RestAuthorizable restAuthorizable) {
 		// Get LoginData
 		LoginData loginData;
+
 		try {
 			loginData = new LoginData(httpHeaders);
 		} catch (Exception e) {
@@ -48,40 +54,50 @@ public class RestSecurity {
 			logger.info("No Authorization Data in HttpHeader");
 			return checkAuthorization(minSecurityLevel, SecurityStatus.ANYBODY);
 		}
-		// Get User
-		User user = restListener.getState().getUsers().get(loginData.getUsername().toLowerCase());
-		if (user == null) {
-			logger.info("No User with such name");
-			return SecurityStatus.UNAUTHORIZED;
-		}
-		// ValidatePassword
-		boolean authenticated = false;
+
+		Lock lock = stateManager.getLock().readLock();
+		lock.lock();
+
 		try {
-			authenticated = HashUtil.validatePassword(loginData.getPassword(), user.getHash());
-		} catch (Exception e) {
-			logger.error("Error while validating password", e);
-			return SecurityStatus.INTERNAL_ERROR;
-		}
-		if (!authenticated) {
-			logger.info("Wrong Password");
-			return SecurityStatus.UNAUTHORIZED;
-		}
+			// Get User
+			User user = stateManager.getRepository().getUsers().get(NamedObject.normalizeName(loginData.getUsername()));
+			if (user == null) {
+				logger.info("No User with such name");
+				return SecurityStatus.UNAUTHORIZED;
+			}
 
-		// Check if admin
-		if (user.isAdmin()) {
-			return checkAuthorization(minSecurityLevel, SecurityStatus.ADMIN);
-		}
+			// ValidatePassword
+			boolean authenticated = false;
+			try {
+				authenticated = HashUtil.validatePassword(loginData.getPassword(), user.getHash());
+			} catch (Exception e) {
+				logger.error("Error while validating password", e);
+				return SecurityStatus.INTERNAL_ERROR;
+			}
+			if (!authenticated) {
+				logger.info("Wrong Password");
+				return SecurityStatus.UNAUTHORIZED;
+			}
 
-		// Check if owner
-		if (isOwner(user.getName(), restAuthorizable)) {
-			return checkAuthorization(minSecurityLevel, SecurityStatus.OWNER);
+			// Check if admin
+			if (user.isAdmin()) {
+				return checkAuthorization(minSecurityLevel, SecurityStatus.ADMIN);
+			}
+
+			// Check if owner
+			if (isOwner(user.getName(), restAuthorizable)) {
+				return checkAuthorization(minSecurityLevel, SecurityStatus.OWNER);
+			}
+
+		} finally {
+			lock.unlock();
 		}
 
 		// Is User
 		return checkAuthorization(minSecurityLevel, SecurityStatus.USER);
 	}
 
-	private boolean isOwner(String name, RestAuthorizable restAuthorizable) {
+	private static boolean isOwner(String name, RestAuthorizable restAuthorizable) {
 		if (restAuthorizable == null) {
 			return false;
 		}
@@ -96,7 +112,8 @@ public class RestSecurity {
 	}
 
 	// Check SecurityStatus against minSecurityLevel
-	private SecurityStatus checkAuthorization(SecurityLevel minSecurityLevel, SecurityStatus givenSecurityStatus) {
+	private static SecurityStatus checkAuthorization(SecurityLevel minSecurityLevel,
+			SecurityStatus givenSecurityStatus) {
 		switch (givenSecurityStatus) {
 		case ADMIN:
 			return SecurityStatus.ADMIN;

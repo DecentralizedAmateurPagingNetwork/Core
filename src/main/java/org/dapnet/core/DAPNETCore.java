@@ -97,7 +97,7 @@ public class DAPNETCore {
 			schedulerManager = new SchedulerManager(stateManager, transmissionManager, clusterManager);
 
 			logger.info("Starting RestManager");
-			restManager = new RestManager(clusterManager);
+			restManager = new RestManager(stateManager, clusterManager);
 			restManager.start();
 
 			logger.info("DAPNETCore started");

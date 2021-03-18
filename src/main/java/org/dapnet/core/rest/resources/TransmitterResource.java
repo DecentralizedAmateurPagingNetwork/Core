@@ -30,7 +30,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.State;
+import org.dapnet.core.model.NamedObject;
+import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -42,12 +43,14 @@ public class TransmitterResource extends AbstractResource {
 
 	@GET
 	public Response getTransmitters() throws Exception {
-		Lock lock = State.getReadLock();
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
-			return getObject(restListener.getState().getTransmitters().values(), status);
+			return getObject(stateManager.getRepository().getTransmitters().values(), status);
 		} finally {
 			lock.unlock();
 		}
@@ -56,15 +59,14 @@ public class TransmitterResource extends AbstractResource {
 	@GET
 	@Path("{transmitter}")
 	public Response getTransmitter(@PathParam("transmitter") String transmitterName) throws Exception {
-		if (transmitterName != null) {
-			transmitterName = transmitterName.toLowerCase();
-		}
+		transmitterName = NamedObject.normalizeName(transmitterName);
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			Transmitter obj = restListener.getState().getTransmitters().get(transmitterName);
+			Transmitter obj = stateManager.getRepository().getTransmitters().get(transmitterName);
 			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY, obj);
 			return getObject(obj, status);
 		} finally {
@@ -77,18 +79,16 @@ public class TransmitterResource extends AbstractResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response putTransmitter(@PathParam("transmitter") String transmitterName, String transmitterJSON)
 			throws Exception {
-		if (transmitterName != null) {
-			transmitterName = transmitterName.toLowerCase();
-		}
+		transmitterName = NamedObject.normalizeName(transmitterName);
 
 		Transmitter oldTransmitter = null;
-		Transmitter transmitter = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldTransmitter = restListener.getState().getTransmitters().get(transmitterName);
+			oldTransmitter = stateManager.getRepository().getTransmitters().get(transmitterName);
 			if (oldTransmitter != null) {
 				// Overwrite
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
@@ -96,28 +96,28 @@ public class TransmitterResource extends AbstractResource {
 				// Create
 				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			}
-
-			// Create Transmitter
-			transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
-			if (transmitter != null) {
-				// Only Status OFFLINE or DISABLED is accepted:
-				if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
-					transmitter.setStatus(Transmitter.Status.OFFLINE);
-				}
-
-				transmitter.setName(transmitterName);
-				transmitter.setLastUpdate(Instant.now());
-			} else {
-				throw new EmptyBodyException();
-			}
-
-			// Test auth key
-			Matcher m = authKeyPattern.matcher(transmitter.getAuthKey());
-			if (!m.matches()) {
-				throw new NotAcceptableException("Auth key contains invalid characters.");
-			}
 		} finally {
 			lock.unlock();
+		}
+
+		// Create Transmitter
+		Transmitter transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
+		if (transmitter != null) {
+			// Only Status OFFLINE or DISABLED is accepted:
+			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
+				transmitter.setStatus(Transmitter.Status.OFFLINE);
+			}
+
+			transmitter.setName(transmitterName);
+			transmitter.setLastUpdate(Instant.now());
+		} else {
+			throw new EmptyBodyException();
+		}
+
+		// Test auth key
+		Matcher m = authKeyPattern.matcher(transmitter.getAuthKey());
+		if (!m.matches()) {
+			throw new NotAcceptableException("Auth key contains invalid characters.");
 		}
 
 		return handleObject(transmitter, "putTransmitter", oldTransmitter == null, true);
@@ -126,17 +126,16 @@ public class TransmitterResource extends AbstractResource {
 	@DELETE
 	@Path("{transmitter}")
 	public Response deleteTransmitter(@PathParam("transmitter") String transmitter) throws Exception {
-		if (transmitter != null) {
-			transmitter = transmitter.toLowerCase();
-		}
+		transmitter = NamedObject.normalizeName(transmitter);
 
 		Transmitter oldTransmitter = null;
 
-		Lock lock = State.getReadLock();
+		final StateManager stateManager = getStateManager();
+		Lock lock = stateManager.getLock().readLock();
 		lock.lock();
 
 		try {
-			oldTransmitter = restListener.getState().getTransmitters().get(transmitter);
+			oldTransmitter = stateManager.getRepository().getTransmitters().get(transmitter);
 			if (oldTransmitter != null) {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitter);
 			} else {

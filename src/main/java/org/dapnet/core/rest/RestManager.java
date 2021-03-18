@@ -16,36 +16,38 @@ package org.dapnet.core.rest;
 
 import java.net.BindException;
 import java.net.URI;
+import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.Settings;
-import org.dapnet.core.rest.resources.AbstractResource;
+import org.dapnet.core.model.StateManager;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 public class RestManager {
 	private static final Logger logger = LogManager.getLogger();
-
+	private final StateManager stateManager;
+	private final RestListener restListener;
 	private HttpServer server;
-	private RestListener restListener;
-	private RestSecurity restSecurity;
 
-	public RestManager(RestListener restListener) {
-		this.restListener = restListener;
-		this.restSecurity = new RestSecurity(this.restListener);
-
-		AbstractResource.setRestListener(this.restListener);
-		AbstractResource.setRestSecurity(restSecurity);
+	public RestManager(StateManager stateManager, RestListener restListener) {
+		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+		this.restListener = Objects.requireNonNull(restListener, "REST listener must not be null.");
 	}
 
 	public void start() {
 		try {
-			RestSettings settings = Settings.getRestSettings();
+			final RestSettings settings = Settings.getRestSettings();
 
 			ResourceConfig rc = new ResourceConfig().packages("org/dapnet/core/rest");
+			// Register object instances for dependency injection
+			rc.register(stateManager);
+			rc.register(new RestSecurity(stateManager));
+			rc.register(restListener);
+
 			URI endpoint = new URI("http", null, settings.getHostname(), settings.getPort(), settings.getPath(), null,
 					null);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
