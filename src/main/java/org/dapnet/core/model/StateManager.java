@@ -63,8 +63,7 @@ public final class StateManager implements CoreRepository {
 
 		validatorFactory = Validation.buildDefaultValidatorFactory();
 
-		state = new State();
-		setModelRepositories();
+		setState(new State());
 	}
 
 	public ReadWriteLock getLock() {
@@ -135,8 +134,7 @@ public final class StateManager implements CoreRepository {
 			lock.writeLock().lock();
 
 			try {
-				state = newState;
-				setModelRepositories();
+				setState(newState);
 			} finally {
 				lock.writeLock().unlock();
 			}
@@ -183,8 +181,7 @@ public final class StateManager implements CoreRepository {
 			lock.writeLock().lock();
 
 			try {
-				state = newState;
-				setModelRepositories();
+				setState(newState);
 			} finally {
 				lock.writeLock().unlock();
 			}
@@ -221,9 +218,12 @@ public final class StateManager implements CoreRepository {
 	}
 
 	/**
-	 * Sets the model repositories for the current state.
+	 * Sets the new state to use. This will also update the model repositories.
+	 * 
+	 * @param state State to set
 	 */
-	private void setModelRepositories() {
+	private void setState(State state) {
+		this.state = Objects.requireNonNull(state, "State must not be null.");
 		callsigns = new MapModelRepository<>(state.getCallSigns());
 		nodes = new MapModelRepository<>(state.getNodes());
 		users = new MapModelRepository<>(state.getUsers());
