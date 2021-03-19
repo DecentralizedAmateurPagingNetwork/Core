@@ -33,10 +33,10 @@ import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
-import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
 import org.dapnet.core.transmission.PagerMessage.MessagePriority;
@@ -168,10 +168,22 @@ public class SkyperProtocol implements PagerProtocol {
 		// Generate News String: Coding adapted from Funkrufmaster
 		String text = encodeString(news.getText());
 		StringBuilder sb = new StringBuilder();
+
+		Lock lock = repository.getLock().readLock();
+		lock.lock();
+
 		try {
-			sb.append(String.valueOf((char) (news.getRubric().getNumber() + 0x1f)));
+			Rubric rubric = repository.getRubrics().get(news.getRubricName());
+			if (rubric != null) {
+				sb.append(String.valueOf((char) (rubric.getNumber() + 0x1f)));
+			} else {
+				logger.error("Could not create message, rubric not found: {}", news.getRubricName());
+				return null;
+			}
 		} catch (Exception e) {
 			return null;
+		} finally {
+			lock.unlock();
 		}
 
 		sb.append(String.valueOf((char) (news.getNumber() + 0x20)));
@@ -187,11 +199,23 @@ public class SkyperProtocol implements PagerProtocol {
 
 	@Override
 	public PagerMessage createMessageFromNewsAsCall(News news) {
+		Lock lock = repository.getLock().readLock();
+		lock.lock();
+
 		try {
-			return new PagerMessage(news.getText(), news.getRubric().getAddress(), PagerMessage.MessagePriority.CALL,
-					PagerMessage.FunctionalBits.ALPHANUM);
+			Rubric rubric = repository.getRubrics().get(news.getRubricName());
+			if (rubric != null) {
+				return new PagerMessage(news.getText(), rubric.getAddress(), PagerMessage.MessagePriority.CALL,
+						PagerMessage.FunctionalBits.ALPHANUM);
+			} else {
+				logger.error("Could not create message, rubric not found: {}", news.getRubricName());
+				return null;
+			}
 		} catch (Exception ex) {
+			logger.error("Failed to create message from news as call.", ex);
 			return null;
+		} finally {
+			lock.unlock();
 		}
 	}
 

@@ -16,9 +16,6 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -28,8 +25,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.dapnet.core.model.validator.RepositoryLookup;
 import org.dapnet.core.model.validator.TimeSlot;
-import org.dapnet.core.model.validator.ValidName;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.dapnet.core.transmission.PagerMessage;
 import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
@@ -39,7 +36,6 @@ import org.jgroups.stack.IpAddress;
 public class Transmitter implements Serializable, RestAuthorizable, NamedObject {
 
 	private static final long serialVersionUID = 1L;
-	private static volatile State state;
 
 	@NotNull
 	@Size(min = 3, max = 20)
@@ -77,6 +73,7 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
+	@RepositoryLookup(User.class)
 	private Set<String> ownerNames;
 
 	private String deviceType;
@@ -326,15 +323,6 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 	}
 
 	/**
-	 * Sets the Core state instance.
-	 * 
-	 * @param statePar Core state.
-	 */
-	public static void setState(State statePar) {
-		state = statePar;
-	}
-
-	/**
 	 * Gets the timepoint when the transmitter connected.
 	 * 
 	 * @return Timepoint
@@ -432,46 +420,6 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 	public void updateCallCount(long delta) {
 		callCount.addAndGet(delta);
 	}
-
-	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public Collection<User> getOwners() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-
-		if (ownerNames == null) {
-			return null;
-		}
-
-		Map<String, User> users = state.getUsers();
-		ArrayList<User> result = new ArrayList<>();
-		for (String owner : ownerNames) {
-			User u = users.get(owner);
-			if (u != null) {
-				result.add(u);
-			}
-		}
-
-		if (ownerNames.size() == result.size()) {
-			return result;
-		} else {
-			return null;
-		}
-	}
-
-	// @ValidName(message = "must contain the name of an existing node",
-	// fieldName = "nodeName", constraintName = "ValidNodeName")
-	// public Node getNode() throws Exception {
-	// if (nodeName == null) {
-	// return null;
-	// }
-	//
-	// if (state != null) {
-	// return state.getNodes().get(nodeName.toLowerCase());
-	// } else {
-	// throw new Exception("StateNotSetException");
-	// }
-	// }
 
 	@Override
 	public String toString() {

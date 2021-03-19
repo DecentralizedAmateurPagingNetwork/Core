@@ -15,9 +15,6 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.Digits;
@@ -26,7 +23,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.model.validator.RepositoryLookup;
 import org.jgroups.stack.IpAddress;
 
 public class Node implements Serializable, NamedObject {
@@ -57,6 +54,7 @@ public class Node implements Serializable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
+	@RepositoryLookup(User.class)
 	private Set<String> ownerNames;
 
 	private String version;
@@ -133,32 +131,6 @@ public class Node implements Serializable, NamedObject {
 	@Override
 	public String toString() {
 		return String.format("Node{status=%s, name='%s'}", status, name);
-	}
-
-	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public Collection<User> getOwners() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-
-		if (ownerNames == null) {
-			return null;
-		}
-
-		Map<String, User> users = state.getUsers();
-		ArrayList<User> results = new ArrayList<>();
-		for (String owner : ownerNames) {
-			User u = users.get(owner.toLowerCase());
-			if (u != null) {
-				results.add(u);
-			}
-		}
-
-		if (ownerNames.size() == results.size()) {
-			return results;
-		} else {
-			return null;
-		}
 	}
 
 	public static State getState() {

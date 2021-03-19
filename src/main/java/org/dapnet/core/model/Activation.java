@@ -15,9 +15,7 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Set;
 
 import javax.validation.constraints.Max;
@@ -25,11 +23,10 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.model.validator.RepositoryLookup;
 
 public class Activation implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static volatile State state;
 
 	@NotNull
 	@Min(value = 0)
@@ -38,6 +35,7 @@ public class Activation implements Serializable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
+	@RepositoryLookup(TransmitterGroup.class)
 	private Set<String> transmitterGroupNames;
 
 	// Internally set
@@ -66,35 +64,6 @@ public class Activation implements Serializable {
 
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
-	}
-
-	public static void setState(State statePar) {
-		state = statePar;
-	}
-
-	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-
-		if (transmitterGroupNames == null) {
-			return null;
-		}
-
-		Collection<TransmitterGroup> transmitterGroups = new LinkedList<>();
-
-		for (String transmitterGroup : transmitterGroupNames) {
-			TransmitterGroup g = state.getTransmitterGroups().get(transmitterGroup);
-			if (g != null) {
-				transmitterGroups.add(g);
-			}
-		}
-		if (transmitterGroups.size() == transmitterGroups.size()) {
-			return transmitterGroups;
-		} else {
-			return null;
-		}
 	}
 
 	@Override

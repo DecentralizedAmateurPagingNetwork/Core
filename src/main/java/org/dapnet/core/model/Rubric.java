@@ -15,9 +15,6 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.Max;
@@ -25,12 +22,11 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.model.validator.RepositoryLookup;
 import org.dapnet.core.rest.RestAuthorizable;
 
 public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 1L;
-	private static volatile State state;
 
 	// ID
 	@NotNull
@@ -44,6 +40,7 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
+	@RepositoryLookup(TransmitterGroup.class)
 	private Set<String> transmitterGroupNames;
 
 	@NotNull
@@ -52,6 +49,7 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
+	@RepositoryLookup(User.class)
 	private Set<String> ownerNames;
 
 	public int getNumber() {
@@ -98,61 +96,6 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	public void setOwnerNames(Set<String> owners) {
 		this.ownerNames = owners;
-	}
-
-	public static void setState(State statePar) {
-		state = statePar;
-	}
-
-	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	public Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-		if (transmitterGroupNames == null) {
-			return null;
-		}
-
-		Map<String, TransmitterGroup> groups = state.getTransmitterGroups();
-		ArrayList<TransmitterGroup> result = new ArrayList<>();
-		for (String transmitterGroup : transmitterGroupNames) {
-			TransmitterGroup g = groups.get(transmitterGroup.toLowerCase());
-			if (g != null) {
-				result.add(g);
-			}
-		}
-
-		if (transmitterGroupNames.size() == result.size()) {
-			return result;
-		} else {
-			return null;
-		}
-	}
-
-	@ValidName(message = "must contain names of existing users", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public Collection<User> getOwners() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-
-		if (ownerNames == null) {
-			return null;
-		}
-
-		Map<String, User> users = state.getUsers();
-		ArrayList<User> results = new ArrayList<>();
-		for (String owner : ownerNames) {
-			User u = users.get(owner.toLowerCase());
-			if (u != null) {
-				results.add(u);
-			}
-		}
-
-		if (ownerNames.size() == results.size()) {
-			return results;
-		} else {
-			return null;
-		}
 	}
 
 	@Override

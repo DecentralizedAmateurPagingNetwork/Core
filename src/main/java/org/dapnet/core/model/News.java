@@ -22,7 +22,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.model.validator.RepositoryLookup;
 
 public class News implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -34,6 +34,7 @@ public class News implements Serializable {
 	private String text;
 
 	@NotNull
+	@RepositoryLookup(Rubric.class)
 	private String rubricName;
 
 	@NotNull
@@ -48,6 +49,7 @@ public class News implements Serializable {
 	// Internally set
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
+	@RepositoryLookup(User.class)
 	private String ownerName;
 
 	public String getText() {
@@ -96,30 +98,6 @@ public class News implements Serializable {
 
 	public static void setState(State statePar) {
 		state = statePar;
-	}
-
-	@ValidName(message = "must contain the name of an existing rubric", fieldName = "rubricName", constraintName = "ValidRubricName")
-	public Rubric getRubric() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-		if (rubricName != null) {
-			return state.getRubrics().get(rubricName.toLowerCase());
-		} else {
-			return null;
-		}
-	}
-
-	@ValidName(message = "must contain the name of an existing user", fieldName = "ownerNames", constraintName = "ValidOwnerNames")
-	public User getOwner() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-		if (ownerName != null) {
-			return state.getUsers().get(ownerName.toLowerCase());
-		} else {
-			return null;
-		}
 	}
 
 	@Override

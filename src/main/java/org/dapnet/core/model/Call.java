@@ -16,19 +16,15 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.dapnet.core.model.validator.ValidName;
+import org.dapnet.core.model.validator.RepositoryLookup;
 
 public class Call implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private static volatile State state;
 
 	// No ID
 	@NotNull
@@ -37,10 +33,12 @@ public class Call implements Serializable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one callSignName")
+	@RepositoryLookup(CallSign.class)
 	private Set<String> callSignNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
+	@RepositoryLookup(TransmitterGroup.class)
 	private Set<String> transmitterGroupNames;
 
 	// No Validation necessary
@@ -52,6 +50,7 @@ public class Call implements Serializable {
 
 	// Internally set
 	@NotNull
+	@RepositoryLookup(User.class)
 	private String ownerName;
 
 	public Instant getTimestamp() {
@@ -96,72 +95,6 @@ public class Call implements Serializable {
 
 	public boolean isEmergency() {
 		return emergency;
-	}
-
-	public static void setState(State statePar) {
-		state = statePar;
-	}
-
-	@ValidName(message = "must contain names of existing callSigns", fieldName = "callSignNames", constraintName = "ValidCallSignNames")
-	Collection<CallSign> getCallSignsEx() throws Exception {
-		if (callSignNames == null) {
-			return null;
-		}
-
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-
-		Map<String, CallSign> map = state.getCallSigns();
-		ArrayList<CallSign> result = new ArrayList<>();
-		for (String callSign : callSignNames) {
-			CallSign s = map.get(callSign.toLowerCase());
-			if (s != null) {
-				result.add(s);
-			}
-		}
-		if (result.size() == callSignNames.size()) {
-			return result;
-		} else {
-			return null;
-		}
-	}
-
-	@ValidName(message = "must contain names of existing transmitterGroups", fieldName = "transmitterGroupNames", constraintName = "ValidTransmitterGroupNames")
-	Collection<TransmitterGroup> getTransmitterGroups() throws Exception {
-		if (transmitterGroupNames == null) {
-			return null;
-		}
-
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-
-		Map<String, TransmitterGroup> groups = state.getTransmitterGroups();
-		ArrayList<TransmitterGroup> result = new ArrayList<>();
-		for (String transmitterGroup : transmitterGroupNames) {
-			TransmitterGroup g = groups.get(transmitterGroup.toLowerCase());
-			if (g != null) {
-				result.add(g);
-			}
-		}
-		if (transmitterGroupNames.size() == result.size()) {
-			return result;
-		} else {
-			return null;
-		}
-	}
-
-	@ValidName(message = "must be a name of an existing user", fieldName = "ownerName", constraintName = "ValidOwnerName")
-	User getOwner() throws Exception {
-		if (state == null) {
-			throw new Exception("StateNotSetException");
-		}
-		if (ownerName != null) {
-			return state.getUsers().get(ownerName.toLowerCase());
-		} else {
-			return null;
-		}
 	}
 
 	@Override

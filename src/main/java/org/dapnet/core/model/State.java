@@ -68,23 +68,6 @@ final class State implements Serializable {
 	@Valid
 	private CoreStatistics stats = new CoreStatistics();
 
-	public State() {
-		setModelReferences();
-	}
-
-	public void setModelReferences() {
-		// Setting reference to state in model for allow returning of reference
-		// instead of strings
-		Activation.setState(this);
-		Call.setState(this);
-		CallSign.setState(this);
-		News.setState(this);
-		Node.setState(this);
-		Rubric.setState(this);
-		Transmitter.setState(this);
-		TransmitterGroup.setState(this);
-	}
-
 	public Collection<Call> getCalls() {
 		return calls;
 	}

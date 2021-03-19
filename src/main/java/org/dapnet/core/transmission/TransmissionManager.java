@@ -24,8 +24,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
-import org.dapnet.core.model.News;
 import org.dapnet.core.model.CoreRepository;
+import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
@@ -98,9 +98,25 @@ public class TransmissionManager {
 	}
 
 	public void handleNews(News news) {
+		Rubric rubric = null;
+
+		final CoreRepository repo = transmitterManager.getRepository();
+		Lock lock = repo.getLock().readLock();
+		lock.unlock();
+		try {
+			rubric = repo.getRubrics().get(news.getRubricName());
+		} finally {
+			lock.unlock();
+		}
+
+		if (rubric == null) {
+			logger.error("Failed to send news, could not get rubric for name: {}", news.getRubricName());
+			return;
+		}
+
 		try {
 			PagerMessage message = protocol.createMessageFromNews(news);
-			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroupNames());
+			transmitterManager.sendMessage(message, rubric.getTransmitterGroupNames());
 
 			logger.info("News sent to transmitters.");
 		} catch (Exception e) {
@@ -109,9 +125,25 @@ public class TransmissionManager {
 	}
 
 	public void handleNewsAsCall(News news) {
+		Rubric rubric = null;
+
+		final CoreRepository repo = transmitterManager.getRepository();
+		Lock lock = repo.getLock().readLock();
+		lock.unlock();
+		try {
+			rubric = repo.getRubrics().get(news.getRubricName());
+		} finally {
+			lock.unlock();
+		}
+
+		if (rubric == null) {
+			logger.error("Failed to send news, could not get rubric for name: {}", news.getRubricName());
+			return;
+		}
+
 		try {
 			PagerMessage message = protocol.createMessageFromNewsAsCall(news);
-			transmitterManager.sendMessage(message, news.getRubric().getTransmitterGroupNames());
+			transmitterManager.sendMessage(message, rubric.getTransmitterGroupNames());
 
 			logger.info("News sent to transmitters as call.");
 		} catch (Exception ex) {
