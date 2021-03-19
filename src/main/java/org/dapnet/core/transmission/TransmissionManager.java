@@ -120,7 +120,7 @@ public class TransmissionManager {
 
 		try {
 			PagerMessage message = protocol.createMessageFromNews(news);
-			transmitterManager.sendMessage(message, rubric.getTransmitterGroupNames());
+			transmitterManager.sendMessage(message, transmitterGroups);
 
 			logger.info("News sent to transmitters.");
 		} catch (Exception e) {
