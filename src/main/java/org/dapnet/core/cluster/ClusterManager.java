@@ -315,7 +315,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			channel.close();
 
 			try {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			} catch (Exception ex) {
 				logger.fatal("Failed to write state file.", ex);
 			}

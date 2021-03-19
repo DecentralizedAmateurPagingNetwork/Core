@@ -55,7 +55,7 @@ public class StateCleaningJob implements Job {
 				lock.unlock();
 			}
 
-			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			stateManager.writeStateToFile();
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute StateCleaningJob", e);
 		} catch (IOException e) {

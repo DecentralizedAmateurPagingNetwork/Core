@@ -25,7 +25,6 @@ import javax.validation.ConstraintViolation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Program;
-import org.dapnet.core.Settings;
 import org.dapnet.core.model.StateManager;
 import org.jgroups.Message;
 
@@ -58,7 +57,7 @@ public class MessageListener implements org.jgroups.MessageListener {
 
 		Set<ConstraintViolation<Object>> violations = stateManager.loadStateFromStream(inputStream, false);
 		if (violations.isEmpty()) {
-			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			stateManager.writeStateToFile();
 
 			logger.info("State successfully received");
 		} else {

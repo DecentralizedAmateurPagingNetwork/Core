@@ -28,11 +28,11 @@ import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
-import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
@@ -119,7 +119,7 @@ public class RpcListener {
 			stateManager.getStatistics().incrementCalls();
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			// Transmit new Call
@@ -196,7 +196,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response = RpcResponse.OK;
@@ -257,7 +257,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response;
@@ -305,7 +305,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response;
@@ -342,7 +342,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			clusterManager.checkQuorum();
@@ -387,7 +387,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			clusterManager.checkQuorum();
@@ -442,7 +442,7 @@ public class RpcListener {
 			}
 
 			if (response == RpcResponse.OK && Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			clusterManager.checkQuorum();
@@ -498,7 +498,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			// Transmit new Rubric
@@ -547,7 +547,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response;
@@ -593,7 +593,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response = RpcResponse.OK;
@@ -641,7 +641,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response = RpcResponse.OK;
@@ -703,7 +703,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			// Disconnect from transmitter
@@ -753,7 +753,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response = RpcResponse.OK;
@@ -829,7 +829,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response;
@@ -874,7 +874,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response = RpcResponse.OK;
@@ -989,7 +989,7 @@ public class RpcListener {
 			}
 
 			if (Settings.getModelSettings().isSavingImmediately()) {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			}
 
 			return response;

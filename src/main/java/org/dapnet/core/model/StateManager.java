@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -34,6 +35,7 @@ import com.google.gson.GsonBuilder;
 public final class StateManager implements CoreRepository {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
+	private final String fileName;
 	private final Gson gson;
 	private final ValidatorFactory validatorFactory;
 	private State state;
@@ -47,8 +49,13 @@ public final class StateManager implements CoreRepository {
 
 	/**
 	 * Constructs a new state manager instance.
+	 * 
+	 * @param fileName State file path
+	 * @throws NullPointerException if {@code fileName == null}
 	 */
-	public StateManager() {
+	public StateManager(String fileName) {
+		this.fileName = Objects.requireNonNull(fileName, "File name must not be null.");
+
 		GsonBuilder builder = new GsonBuilder();
 		builder.setPrettyPrinting();
 		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
@@ -112,12 +119,11 @@ public final class StateManager implements CoreRepository {
 	/**
 	 * Loads the state from the given state file.
 	 * 
-	 * @param fileName State file name
-	 * @param force    Use the new state even if constraint violations are found
+	 * @param force Use the new state even if constraint violations are found
 	 * @return Constraint violations
 	 * @throws IOException on IO errors
 	 */
-	public Set<ConstraintViolation<Object>> loadStateFromFile(String fileName, boolean force) throws IOException {
+	public Set<ConstraintViolation<Object>> loadStateFromFile(boolean force) throws IOException {
 		State newState = null;
 
 		try (InputStreamReader reader = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
@@ -142,10 +148,9 @@ public final class StateManager implements CoreRepository {
 	/**
 	 * Writes the state to the state file.
 	 * 
-	 * @param fileName State file name
 	 * @throws IOException on IO errors
 	 */
-	public void writeStateToFile(String fileName) throws IOException {
+	public void writeStateToFile() throws IOException {
 		File stateFile = new File(fileName);
 		if (stateFile.getParentFile() != null) {
 			stateFile.getParentFile().mkdirs();

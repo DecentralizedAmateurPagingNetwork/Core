@@ -40,7 +40,7 @@ public class Program {
 	private static final String CORE_VERSION;
 	private static final String API_VERSION;
 	private static volatile Program dapnetCore;
-	private final StateManager stateManager = new StateManager();
+	private final StateManager stateManager = new StateManager(Settings.getModelSettings().getStateFile());
 	private volatile ClusterManager clusterManager;
 	private volatile RestManager restManager;
 	private volatile TransmissionManager transmissionManager;
@@ -72,8 +72,7 @@ public class Program {
 		try {
 			logger.info("Loading state file");
 
-			final String fileName = Settings.getModelSettings().getStateFile();
-			violations = stateManager.loadStateFromFile(fileName, force);
+			violations = stateManager.loadStateFromFile(force);
 		} catch (FileNotFoundException ex) {
 			logger.error("State file does not exists, using new empty state.");
 		} catch (Exception ex) {

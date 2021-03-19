@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.Program;
-import org.dapnet.core.Settings;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.User;
@@ -131,7 +130,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		}
 
 		try {
-			stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+			stateManager.writeStateToFile();
 		} catch (Exception ex) {
 			logger.fatal("Failed to write state file.", ex);
 		}

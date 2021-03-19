@@ -22,7 +22,6 @@ import java.util.concurrent.locks.Lock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Program;
-import org.dapnet.core.Settings;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.StateManager;
 import org.jgroups.Address;
@@ -122,7 +121,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			clusterManager.checkQuorum();
 
 			try {
-				stateManager.writeStateToFile(Settings.getModelSettings().getStateFile());
+				stateManager.writeStateToFile();
 			} catch (IOException ex) {
 				// Forward the exception
 				throw new RuntimeException(ex);

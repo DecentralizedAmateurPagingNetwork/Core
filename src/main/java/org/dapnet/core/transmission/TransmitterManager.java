@@ -29,6 +29,12 @@ public class TransmitterManager {
 	private final CoreRepository repository;
 	private volatile TransmitterManagerListener listener;
 
+	/**
+	 * Constructs a new transmitter manager instance.
+	 * 
+	 * @param repository Repository instance to use
+	 * @throws NullPointerException if the repository is {@code null}
+	 */
 	public TransmitterManager(CoreRepository repository) {
 		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
 	}
