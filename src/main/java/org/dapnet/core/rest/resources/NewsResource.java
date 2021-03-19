@@ -27,7 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.News;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -37,7 +37,7 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NewsResource extends AbstractResource {
 	@GET
 	public Response getNews(@QueryParam("rubricName") String rubricName) throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -72,7 +72,7 @@ public class NewsResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 

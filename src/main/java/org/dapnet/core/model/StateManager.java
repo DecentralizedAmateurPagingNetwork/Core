@@ -31,7 +31,7 @@ import com.google.gson.GsonBuilder;
  * 
  * @author Philipp Thiel
  */
-public final class StateManager implements Repository {
+public final class StateManager implements CoreRepository {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final Gson gson;
@@ -215,6 +215,9 @@ public final class StateManager implements Repository {
 		return validator.validate(object);
 	}
 
+	/**
+	 * Sets the model repositories for the current state.
+	 */
 	private void setModelRepositories() {
 		callsigns = new MapModelRepository<>(state.getCallSigns());
 		nodes = new MapModelRepository<>(state.getNodes());

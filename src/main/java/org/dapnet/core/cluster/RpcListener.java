@@ -32,7 +32,7 @@ import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
@@ -227,7 +227,7 @@ public class RpcListener {
 			lock.lock();
 
 			try {
-				Repository repo = stateManager;
+				CoreRepository repo = stateManager;
 
 				// Delete depended Objects
 				// Delete Calls

@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.Call;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.StateManager;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -63,7 +63,7 @@ public class StateCleaningJob implements Job {
 		}
 	}
 
-	private static void cleanCalls(Repository repo, Instant now) {
+	private static void cleanCalls(CoreRepository repo, Instant now) {
 		Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
 
 		Iterator<Call> it = repo.getCalls().iterator();
@@ -75,7 +75,7 @@ public class StateCleaningJob implements Job {
 		}
 	}
 
-	private static void cleanNews(Repository repo, Instant now) {
+	private static void cleanNews(CoreRepository repo, Instant now) {
 		Duration ttl = Duration.ofMinutes(Settings.getModelSettings().getNewsExpirationTimeInMinutes());
 		repo.getNews().values().forEach(nl -> nl.removeExpired(now, ttl));
 	}

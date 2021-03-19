@@ -25,7 +25,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -37,7 +37,7 @@ public class RubricResource extends AbstractResource {
 	public Response getRubrics() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -51,7 +51,7 @@ public class RubricResource extends AbstractResource {
 	@GET
 	@Path("{rubric}")
 	public Response getRubric(@PathParam("rubric") String rubricName) throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -70,7 +70,7 @@ public class RubricResource extends AbstractResource {
 	public Response putRubric(@PathParam("rubric") String rubricName, String rubricJSON) throws Exception {
 		Rubric oldRubric = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -103,7 +103,7 @@ public class RubricResource extends AbstractResource {
 	public Response deleteRubric(@PathParam("rubric") String rubric) throws Exception {
 		Rubric oldRubric = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 

@@ -22,7 +22,7 @@ import javax.ws.rs.core.HttpHeaders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.HashUtil;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.User;
 
 public class RestSecurity {
@@ -35,9 +35,9 @@ public class RestSecurity {
 	}
 
 	private static final Logger logger = LogManager.getLogger(RestSecurity.class.getName());
-	private final Repository repository;
+	private final CoreRepository repository;
 
-	public RestSecurity(Repository repository) {
+	public RestSecurity(CoreRepository repository) {
 		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
 	}
 

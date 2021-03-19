@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.News;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
@@ -151,7 +151,7 @@ public class TransmissionManager {
 
 			// XXX No other easy way of doing this without performing a cluster-wide remote
 			// procedure call
-			final Repository repo = transmitterManager.getRepository();
+			final CoreRepository repo = transmitterManager.getRepository();
 			Lock lock = repo.getLock().writeLock();
 			lock.lock();
 

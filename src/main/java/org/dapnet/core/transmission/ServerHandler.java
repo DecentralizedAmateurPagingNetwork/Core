@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
@@ -188,7 +188,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		String key = authMatcher.group(4);
 
 		Transmitter transmitter = null;
-		final Repository repo = manager.getRepository();
+		final CoreRepository repo = manager.getRepository();
 
 		Lock lock = repo.getLock().readLock();
 		lock.lock();

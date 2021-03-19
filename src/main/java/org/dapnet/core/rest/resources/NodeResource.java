@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -38,7 +38,7 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class NodeResource extends AbstractResource {
 	@GET
 	public Response getNodes() throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -53,7 +53,7 @@ public class NodeResource extends AbstractResource {
 	@GET
 	@Path("{node}")
 	public Response getNode(@PathParam("node") String nodeName) throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -82,7 +82,7 @@ public class NodeResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -107,7 +107,7 @@ public class NodeResource extends AbstractResource {
 
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 

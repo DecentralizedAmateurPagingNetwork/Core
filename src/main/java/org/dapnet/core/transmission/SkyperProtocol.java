@@ -36,7 +36,7 @@ import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
 import org.dapnet.core.transmission.PagerMessage.MessagePriority;
@@ -54,9 +54,9 @@ public class SkyperProtocol implements PagerProtocol {
 			.ofPattern("'YYYYMMDDHHMMSS'yyMMddHHmm'00'");
 	private static final Charset PAGER_CHARSET = new DE_ASCII7();
 
-	private final Repository repository;
+	private final CoreRepository repository;
 
-	public SkyperProtocol(Repository stateManager) {
+	public SkyperProtocol(CoreRepository stateManager) {
 		this.repository = Objects.requireNonNull(stateManager, "State manager must not be null.");
 	}
 

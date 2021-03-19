@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
- * Repository interface providing access to the models.
+ * DAPNET Core repository interface providing access to the models.
  * 
  * @author Philipp Thiel
  */
-public interface Repository {
+public interface CoreRepository {
 
 	/**
 	 * Gets the read-write lock that can be used to synchronize repository access.

@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 
@@ -27,7 +27,7 @@ public class StatisticsResource extends AbstractResource {
 	public Response get() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -52,7 +52,7 @@ public class StatisticsResource extends AbstractResource {
 		private final int transmittersTotal;
 		private final int transmittersOnline;
 
-		public ObjectCounts(Repository repo) {
+		public ObjectCounts(CoreRepository repo) {
 			users = repo.getUsers().size();
 			calls = repo.getCalls().size();
 			callSigns = repo.getCallSigns().size();

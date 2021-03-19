@@ -27,7 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.HashUtil;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.User;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -39,7 +39,7 @@ public class UserResource extends AbstractResource {
 	public Response getUsers() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -53,7 +53,7 @@ public class UserResource extends AbstractResource {
 	@GET
 	@Path("{user}")
 	public Response getUser(@PathParam("user") String userName) throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -73,7 +73,7 @@ public class UserResource extends AbstractResource {
 		User user = null;
 		User oldUser = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -119,7 +119,7 @@ public class UserResource extends AbstractResource {
 	public Response deleteUser(@PathParam("user") String user) throws Exception {
 		User oldUser = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 

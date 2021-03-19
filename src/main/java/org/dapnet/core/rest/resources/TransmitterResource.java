@@ -30,7 +30,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -44,7 +44,7 @@ public class TransmitterResource extends AbstractResource {
 	public Response getTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -58,7 +58,7 @@ public class TransmitterResource extends AbstractResource {
 	@GET
 	@Path("{transmitter}")
 	public Response getTransmitter(@PathParam("transmitter") String transmitterName) throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -78,7 +78,7 @@ public class TransmitterResource extends AbstractResource {
 			throws Exception {
 		Transmitter oldTransmitter = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -123,7 +123,7 @@ public class TransmitterResource extends AbstractResource {
 	public Response deleteTransmitter(@PathParam("transmitter") String transmitter) throws Exception {
 		Transmitter oldTransmitter = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 

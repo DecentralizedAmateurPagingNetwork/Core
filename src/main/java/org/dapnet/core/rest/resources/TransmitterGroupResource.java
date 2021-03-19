@@ -27,7 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -39,7 +39,7 @@ public class TransmitterGroupResource extends AbstractResource {
 	public Response getTransmitterGroups() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -53,7 +53,7 @@ public class TransmitterGroupResource extends AbstractResource {
 	@GET
 	@Path("{transmitterGroup}")
 	public Response getTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroupName) throws Exception {
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -74,7 +74,7 @@ public class TransmitterGroupResource extends AbstractResource {
 		TransmitterGroup oldGroup = null;
 		TransmitterGroup transmitterGroup = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 
@@ -107,7 +107,7 @@ public class TransmitterGroupResource extends AbstractResource {
 	public Response deleteTransmitterGroup(@PathParam("transmitterGroup") String transmitterGroup) throws Exception {
 		TransmitterGroup oldTransmitterGroup = null;
 
-		final Repository repo = getRepository();
+		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.lock();
 

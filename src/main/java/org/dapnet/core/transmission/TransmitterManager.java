@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.Repository;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.model.TransmitterGroup;
@@ -26,10 +26,10 @@ import org.dapnet.core.model.TransmitterGroup;
 public class TransmitterManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
-	private final Repository repository;
+	private final CoreRepository repository;
 	private volatile TransmitterManagerListener listener;
 
-	public TransmitterManager(Repository repository) {
+	public TransmitterManager(CoreRepository repository) {
 		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
 	}
 
@@ -38,7 +38,7 @@ public class TransmitterManager {
 	 * 
 	 * @return Repository
 	 */
-	public Repository getRepository() {
+	public CoreRepository getRepository() {
 		return repository;
 	}
 
