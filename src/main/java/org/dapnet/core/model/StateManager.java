@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
-import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.jgroups.util.Util;
@@ -35,7 +35,7 @@ public final class StateManager implements CoreRepository {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final Gson gson;
-	private final Validator validator;
+	private final ValidatorFactory validatorFactory;
 	private State state;
 	private ModelRepository<CallSign> callsigns;
 	private ModelRepository<Node> nodes;
@@ -54,7 +54,7 @@ public final class StateManager implements CoreRepository {
 		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
 		gson = builder.create();
 
-		validator = Validation.buildDefaultValidatorFactory().getValidator();
+		validatorFactory = Validation.buildDefaultValidatorFactory();
 
 		state = new State();
 		setModelRepositories();
@@ -212,7 +212,7 @@ public final class StateManager implements CoreRepository {
 	 * @return Constraint violations
 	 */
 	public <T> Set<ConstraintViolation<T>> validate(T object) {
-		return validator.validate(object);
+		return validatorFactory.getValidator().validate(object);
 	}
 
 	/**
