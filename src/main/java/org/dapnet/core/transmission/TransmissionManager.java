@@ -103,7 +103,8 @@ public class TransmissionManager {
 
 		final CoreRepository repo = transmitterManager.getRepository();
 		Lock lock = repo.getLock().readLock();
-		lock.unlock();
+		lock.lock();
+
 		try {
 			Rubric rubric = repo.getRubrics().get(news.getRubricName());
 			if (rubric != null) {
@@ -133,7 +134,8 @@ public class TransmissionManager {
 
 		final CoreRepository repo = transmitterManager.getRepository();
 		Lock lock = repo.getLock().readLock();
-		lock.unlock();
+		lock.lock();
+
 		try {
 			Rubric rubric = repo.getRubrics().get(news.getRubricName());
 			if (rubric != null) {
