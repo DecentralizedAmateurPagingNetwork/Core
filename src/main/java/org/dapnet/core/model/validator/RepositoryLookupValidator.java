@@ -2,12 +2,14 @@ package org.dapnet.core.model.validator;
 
 import java.util.Objects;
 
+import javax.sound.midi.Transmitter;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
+import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
 
@@ -15,6 +17,11 @@ public class RepositoryLookupValidator implements ConstraintValidator<Repository
 
 	private final CoreRepository repository;
 	private Class<?> objectType;
+
+	public RepositoryLookupValidator() {
+		// TODO Use custom implementation
+		repository = null;
+	}
 
 	public RepositoryLookupValidator(CoreRepository repository) {
 		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
@@ -27,12 +34,20 @@ public class RepositoryLookupValidator implements ConstraintValidator<Repository
 
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
-		if (objectType == TransmitterGroup.class) {
+		if (repository == null) {
+			return true;
+		}
+
+		if (objectType == CallSign.class) {
+			return isValid(repository.getCallSigns(), value);
+		} else if (objectType == TransmitterGroup.class) {
 			return isValid(repository.getTransmitterGroups(), value);
 		} else if (objectType == User.class) {
 			return isValid(repository.getUsers(), value);
-		} else if (objectType == CallSign.class) {
-			return isValid(repository.getCallSigns(), value);
+		} else if (objectType == Rubric.class) {
+			return isValid(repository.getRubrics(), value);
+		} else if (objectType == Transmitter.class) {
+			return isValid(repository.getTransmitters(), value);
 		}
 
 		return false;
