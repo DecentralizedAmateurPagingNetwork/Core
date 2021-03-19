@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
@@ -98,18 +99,21 @@ public class TransmissionManager {
 	}
 
 	public void handleNews(News news) {
-		Rubric rubric = null;
+		Set<String> transmitterGroups = null;
 
 		final CoreRepository repo = transmitterManager.getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.unlock();
 		try {
-			rubric = repo.getRubrics().get(news.getRubricName());
+			Rubric rubric = repo.getRubrics().get(news.getRubricName());
+			if (rubric != null) {
+				transmitterGroups = new TreeSet<>(rubric.getTransmitterGroupNames());
+			}
 		} finally {
 			lock.unlock();
 		}
 
-		if (rubric == null) {
+		if (transmitterGroups == null) {
 			logger.error("Failed to send news, could not get rubric for name: {}", news.getRubricName());
 			return;
 		}
@@ -125,25 +129,28 @@ public class TransmissionManager {
 	}
 
 	public void handleNewsAsCall(News news) {
-		Rubric rubric = null;
+		Set<String> transmitterGroups = null;
 
 		final CoreRepository repo = transmitterManager.getRepository();
 		Lock lock = repo.getLock().readLock();
 		lock.unlock();
 		try {
-			rubric = repo.getRubrics().get(news.getRubricName());
+			Rubric rubric = repo.getRubrics().get(news.getRubricName());
+			if (rubric != null) {
+				transmitterGroups = new TreeSet<>(rubric.getTransmitterGroupNames());
+			}
 		} finally {
 			lock.unlock();
 		}
 
-		if (rubric == null) {
+		if (transmitterGroups == null) {
 			logger.error("Failed to send news, could not get rubric for name: {}", news.getRubricName());
 			return;
 		}
 
 		try {
 			PagerMessage message = protocol.createMessageFromNewsAsCall(news);
-			transmitterManager.sendMessage(message, rubric.getTransmitterGroupNames());
+			transmitterManager.sendMessage(message, transmitterGroups);
 
 			logger.info("News sent to transmitters as call.");
 		} catch (Exception ex) {
