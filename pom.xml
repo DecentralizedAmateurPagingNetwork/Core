@@ -118,7 +118,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>lib</classpathPrefix>
-							<mainClass>org.dapnet.core.DAPNETCore</mainClass>
+							<mainClass>org.dapnet.core.Program</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
 						</manifest>
