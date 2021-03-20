@@ -21,6 +21,7 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
+import org.hibernate.validator.HibernateValidator;
 import org.jgroups.util.Util;
 
 import com.google.gson.Gson;
@@ -56,12 +57,17 @@ public final class StateManager implements CoreRepository {
 	public StateManager(String fileName) {
 		this.fileName = Objects.requireNonNull(fileName, "File name must not be null.");
 
-		GsonBuilder builder = new GsonBuilder();
+		final GsonBuilder builder = new GsonBuilder();
 		builder.setPrettyPrinting();
 		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
 		gson = builder.create();
 
-		validatorFactory = Validation.buildDefaultValidatorFactory();
+		// I'm not sure if that is the way to go but Hibernate's validator factory does
+		// not support constructor parameters. We would have to write our own constraint
+		// validator factory to pass the repository instance.
+		final CoreRepository repo = this;
+		validatorFactory = Validation.byProvider(HibernateValidator.class).configure().constraintValidatorPayload(repo)
+				.buildValidatorFactory();
 
 		setState(new State());
 	}
@@ -224,6 +230,7 @@ public final class StateManager implements CoreRepository {
 	 */
 	private void setState(State state) {
 		this.state = Objects.requireNonNull(state, "State must not be null.");
+
 		callsigns = new MapModelRepository<>(state.getCallSigns());
 		nodes = new MapModelRepository<>(state.getNodes());
 		users = new MapModelRepository<>(state.getUsers());

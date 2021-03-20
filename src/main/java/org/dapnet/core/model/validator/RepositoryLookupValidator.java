@@ -1,7 +1,5 @@
 package org.dapnet.core.model.validator;
 
-import java.util.Objects;
-
 import javax.sound.midi.Transmitter;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -12,20 +10,11 @@ import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 public class RepositoryLookupValidator implements ConstraintValidator<RepositoryLookup, String> {
 
-	private final CoreRepository repository;
 	private Class<?> objectType;
-
-	public RepositoryLookupValidator() {
-		// TODO Use custom implementation
-		repository = null;
-	}
-
-	public RepositoryLookupValidator(CoreRepository repository) {
-		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
-	}
 
 	@Override
 	public void initialize(RepositoryLookup constraintAnnotation) {
@@ -34,6 +23,8 @@ public class RepositoryLookupValidator implements ConstraintValidator<Repository
 
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
+		final CoreRepository repository = context.unwrap(HibernateConstraintValidatorContext.class)
+				.getConstraintValidatorPayload(CoreRepository.class);
 		if (repository == null) {
 			return true;
 		}
