@@ -47,7 +47,7 @@ port of the REST API.
    `admin` with password `admin` will be automatically created, which you can used to
    connect with the REST interface.
 4. After a successful startup you can start to play with the REST API
-   ([API Description](https://bitbucket.org/DAPNET/dapnet-core/wiki/Beschreibung%20der%20REST%20API))
+   ([API Description](https://github.com/DecentralizedAmateurPagingNetwork/Core/wiki/Beschreibung-der-REST-API))
 5. In case you created a new cluster please set all parameters of your node (e.g.
    longitude and latitude), set the `admin` user's mail address and especially set a new
    password.
