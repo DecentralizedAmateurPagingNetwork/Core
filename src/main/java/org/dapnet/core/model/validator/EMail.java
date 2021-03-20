@@ -31,7 +31,7 @@ import jakarta.validation.Payload;
 @Retention(RUNTIME)
 @Documented
 public @interface EMail {
-	String message() default "must be valid mail address";
+	String message() default "The value '${validatenValue}' is not a valid email address";
 
 	Class<?>[] groups() default {};
 

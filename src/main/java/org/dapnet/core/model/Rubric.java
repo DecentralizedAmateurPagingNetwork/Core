@@ -40,8 +40,7 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	@RepositoryLookup(TransmitterGroup.class)
-	private Set<String> transmitterGroupNames;
+	private Set<@RepositoryLookup(TransmitterGroup.class) String> transmitterGroupNames;
 
 	@NotNull
 	@Size(min = 1, max = 11)
@@ -49,8 +48,7 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	@RepositoryLookup(User.class)
-	private Set<String> ownerNames;
+	private Set<@RepositoryLookup(User.class) String> ownerNames;
 
 	public int getNumber() {
 		return number;

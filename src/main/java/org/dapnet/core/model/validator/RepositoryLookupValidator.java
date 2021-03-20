@@ -1,11 +1,10 @@
 package org.dapnet.core.model.validator;
 
-import javax.sound.midi.Transmitter;
-
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;

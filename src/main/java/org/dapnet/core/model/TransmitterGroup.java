@@ -37,13 +37,11 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterName")
-	@RepositoryLookup(Transmitter.class)
-	private Set<String> transmitterNames;
+	private Set<@RepositoryLookup(Transmitter.class) String> transmitterNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	@RepositoryLookup(User.class)
-	private Set<String> ownerNames;
+	private Set<@RepositoryLookup(User.class) String> ownerNames;
 
 	@Override
 	public String getName() {

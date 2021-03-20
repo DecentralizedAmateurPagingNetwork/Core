@@ -41,16 +41,11 @@ public class RestManager {
 	public void start() {
 		try {
 			final RestSettings settings = Settings.getRestSettings();
-
-			ResourceConfig rc = new ResourceConfig().packages("org/dapnet/core/rest");
-			// Register object instances for dependency injection
-			rc.register(stateManager);
-			rc.register(new RestSecurity(stateManager));
-			rc.register(restListener);
-
 			URI endpoint = new URI("http", null, settings.getHostname(), settings.getPort(), settings.getPath(), null,
 					null);
+			ResourceConfig rc = new ApplicationConfig(stateManager, restListener);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
+
 			logger.info("RestApi successfully started.");
 		} catch (Exception e) {
 			if (e.getCause() instanceof BindException) {

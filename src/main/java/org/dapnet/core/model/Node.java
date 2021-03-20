@@ -54,8 +54,7 @@ public class Node implements Serializable, NamedObject {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one ownerName")
-	@RepositoryLookup(User.class)
-	private Set<String> ownerNames;
+	private Set<@RepositoryLookup(User.class) String> ownerNames;
 
 	private String version;
 

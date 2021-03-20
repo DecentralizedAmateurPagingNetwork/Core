@@ -142,18 +142,7 @@ public final class StateManager implements CoreRepository {
 			newState = gson.fromJson(reader, State.class);
 		}
 
-		Set<ConstraintViolation<Object>> violations = validate(newState);
-		if (violations.isEmpty() || force) {
-			lock.writeLock().lock();
-
-			try {
-				setState(newState);
-			} finally {
-				lock.writeLock().unlock();
-			}
-		}
-
-		return violations;
+		return setAndValidateState(newState, force);
 	}
 
 	/**
@@ -188,19 +177,7 @@ public final class StateManager implements CoreRepository {
 	 */
 	public Set<ConstraintViolation<Object>> loadStateFromStream(InputStream istream, boolean force) throws Exception {
 		final State newState = (State) Util.objectFromStream(new DataInputStream(istream));
-
-		Set<ConstraintViolation<Object>> violations = validate(newState);
-		if (violations.isEmpty() || force) {
-			lock.writeLock().lock();
-
-			try {
-				setState(newState);
-			} finally {
-				lock.writeLock().unlock();
-			}
-		}
-
-		return violations;
+		return setAndValidateState(newState, force);
 	}
 
 	/**
@@ -234,6 +211,27 @@ public final class StateManager implements CoreRepository {
 		transmitterGroups = new MapModelRepository<>(state.getTransmitterGroups());
 		rubrics = new MapModelRepository<>(state.getRubrics());
 		news = new MapModelRepository<>(state.getNews());
+	}
+
+	private Set<ConstraintViolation<Object>> setAndValidateState(State newState, boolean force) {
+		lock.writeLock().lock();
+
+		try {
+			// Save the old state
+			final State oldState = state;
+			// Apply the new state
+			setState(newState);
+			// Check constraints
+			Set<ConstraintViolation<Object>> violations = validate(state);
+			if (!violations.isEmpty() && !force) {
+				// Discard the new state and use the old state
+				setState(oldState);
+			}
+
+			return violations;
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 }

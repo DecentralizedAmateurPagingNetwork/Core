@@ -33,13 +33,11 @@ public class Call implements Serializable {
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one callSignName")
-	@RepositoryLookup(CallSign.class)
-	private Set<String> callSignNames;
+	private Set<@RepositoryLookup(CallSign.class) String> callSignNames;
 
 	@NotNull
 	@Size(min = 1, message = "must contain at least one transmitterGroupName")
-	@RepositoryLookup(TransmitterGroup.class)
-	private Set<String> transmitterGroupNames;
+	private Set<@RepositoryLookup(TransmitterGroup.class) String> transmitterGroupNames;
 
 	// No Validation necessary
 	private boolean emergency;
