@@ -1,5 +1,5 @@
 # DAPNET CORE
-# At the moment, there is no need for new installations of DAPNET Cores of this version. A second one is under development. So please wait.
+_At the moment, there is no need for new installations of DAPNET Cores of this version. A second one is under development. So please wait._
 
 ## Introduction
 The DAPNET CORE offers the main functionality of the Decentralized Amateur Paging Network.
@@ -61,7 +61,7 @@ TODO
 ## More Information
 TODO
 
-**DAPNET CORE PROJECT | Copyright (C) 2017**
+**DAPNET CORE PROJECT | Copyright (C) 2021**
 
 **Institut für Hochfrequenztechnik | RWTH AACHEN UNIVERSITY**
 
