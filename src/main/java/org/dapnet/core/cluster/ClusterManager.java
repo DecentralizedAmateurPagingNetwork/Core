@@ -14,6 +14,7 @@
 
 package org.dapnet.core.cluster;
 
+import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Objects;
@@ -316,6 +317,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 
 			try {
 				stateManager.writeStateToFile();
+			} catch (FileNotFoundException ex) {
+				logger.fatal("Failed to write state file: {}", ex.getMessage());
 			} catch (Exception ex) {
 				logger.fatal("Failed to write state file.", ex);
 			}

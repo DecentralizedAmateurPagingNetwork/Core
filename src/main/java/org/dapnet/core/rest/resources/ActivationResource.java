@@ -15,7 +15,9 @@
 package org.dapnet.core.rest.resources;
 
 import java.util.Date;
+import java.util.concurrent.locks.Lock;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,6 +26,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Activation;
+import org.dapnet.core.model.CallSign;
+import org.dapnet.core.model.ModelRepository;
+import org.dapnet.core.model.Pager;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
@@ -44,6 +49,32 @@ public class ActivationResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
+		// TODO We should probably move this to a validator that is added to Activation
+		if (!isRicAvailable(activation.getNumber())) {
+			throw new BadRequestException("RIC already registered.");
+		}
+
 		return handleObject(activation, "postActivation", false, true);
 	}
+
+	private boolean isRicAvailable(int ric) {
+		Lock lock = getRepository().getLock().readLock();
+		lock.lock();
+
+		try {
+			final ModelRepository<CallSign> callsigns = getRepository().getCallSigns();
+			for (CallSign cs : callsigns.values()) {
+				for (Pager pgr : cs.getPagers()) {
+					if (pgr.getNumber() == ric) {
+						return false;
+					}
+				}
+			}
+		} finally {
+			lock.unlock();
+		}
+
+		return true;
+	}
+
 }

@@ -14,6 +14,7 @@
 
 package org.dapnet.core.cluster;
 
+import java.io.FileNotFoundException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -131,6 +132,8 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 
 		try {
 			stateManager.writeStateToFile();
+		} catch (FileNotFoundException ex) {
+			logger.fatal("Failed to write state file: {}", ex.getMessage());
 		} catch (Exception ex) {
 			logger.fatal("Failed to write state file.", ex);
 		}
