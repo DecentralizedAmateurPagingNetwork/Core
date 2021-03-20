@@ -22,9 +22,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.dapnet.core.model.validator.RepositoryLookup;
 import org.dapnet.core.model.validator.TimeSlot;
 import org.dapnet.core.rest.RestAuthorizable;
-import org.dapnet.core.transmission.PagerMessage;
-import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
-import org.dapnet.core.transmission.PagerMessage.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
 import jakarta.validation.constraints.Digits;
@@ -424,10 +421,6 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 	@Override
 	public String toString() {
 		return String.format("Transmitter{name='%s', status=%s}", name, status);
-	}
-
-	public PagerMessage createCallSignMessage() {
-		return new PagerMessage(name, identificationAddress, MessagePriority.CALL, FunctionalBits.ALPHANUM);
 	}
 
 }

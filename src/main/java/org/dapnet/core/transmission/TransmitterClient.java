@@ -2,12 +2,16 @@ package org.dapnet.core.transmission;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 import org.dapnet.core.model.Transmitter;
+import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
+import org.dapnet.core.transmission.PagerMessage.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
 /**
  * This class holds the client session.
@@ -33,11 +37,7 @@ final class TransmitterClient {
 	 * @throws NullPointerException If channel is null.
 	 */
 	public TransmitterClient(Channel channel) {
-		if (channel == null) {
-			throw new NullPointerException("channel");
-		}
-
-		this.channel = channel;
+		this.channel = Objects.requireNonNull(channel, "Channel must not be null.");
 	}
 
 	/**
@@ -114,7 +114,8 @@ final class TransmitterClient {
 	public void sendCallSignMessage() {
 		Transmitter theTransmitter = transmitter;
 		if (theTransmitter != null) {
-			PagerMessage msg = theTransmitter.createCallSignMessage();
+			PagerMessage msg = new PagerMessage(theTransmitter.getName(), theTransmitter.getIdentificationAddress(),
+					MessagePriority.CALL, FunctionalBits.ALPHANUM);
 			sendMessage(msg);
 		}
 	}
@@ -196,13 +197,12 @@ final class TransmitterClient {
 	}
 
 	/**
-	 * Closes the connection. This call will block until the connection is closed.
+	 * Closes the connection by calling {@code channel.close()}.
+	 * 
+	 * @return Channel future
 	 */
-	public void close() {
-		Channel theChannel = channel;
-		if (theChannel != null) {
-			theChannel.close().syncUninterruptibly();
-		}
+	public ChannelFuture close() {
+		return channel.close();
 	}
 
 	private int getNextSequenceNumber() {
@@ -232,7 +232,6 @@ final class TransmitterClient {
 	 * @author Philipp Thiel
 	 */
 	public static class Message {
-
 		private static final int MAX_RETRY_COUNT = 5;
 		private final int sequenceNumber;
 		private final PagerMessage message;

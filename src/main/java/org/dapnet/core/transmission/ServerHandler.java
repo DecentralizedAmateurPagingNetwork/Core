@@ -16,6 +16,7 @@ import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 import org.dapnet.core.transmission.TransmitterClient.AckType;
 import org.jgroups.stack.IpAddress;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -37,6 +38,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
 			.getPagingProtocolSettings();
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
+	private static final int CLOSE_TASK_DELAY_SEC = 5;
 	private final TransmitterManager manager;
 	private ConnectionState state = ConnectionState.OFFLINE;
 	private TransmitterClient client;
@@ -120,8 +122,15 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			if (client != null) {
 				Transmitter t = client.getTransmitter();
 				if (t != null) {
-					t.setStatus(Status.ERROR);
-					transmitterName = t.getName();
+					Lock lock = manager.getRepository().getLock().writeLock();
+					lock.lock();
+
+					try {
+						t.setStatus(Status.ERROR);
+						transmitterName = t.getName();
+					} finally {
+						lock.unlock();
+					}
 				}
 			}
 
@@ -141,7 +150,9 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		} catch (Exception ex) {
 			logger.error("Exception in exception handler", ex);
 		} finally {
-			ctx.close();
+			// Delay the channel close
+			Runnable closeTask = new SendAndCloseTask(ctx.channel());
+			ctx.executor().schedule(closeTask, CLOSE_TASK_DELAY_SEC, TimeUnit.SECONDS);
 		}
 	}
 
@@ -167,6 +178,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		if (!client.ackMessage(seq, type)) {
 			Transmitter t = client.getTransmitter();
 			if (t != null) {
+				// TODO Lock required?
 				logger.warn("Invalid ack received from {}: {}", t.getName(), msg);
 			} else {
 				logger.warn("Invalid ack received: {}", msg);
@@ -178,7 +190,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		Matcher authMatcher = AUTH_PATTERN.matcher(msg);
 		if (!authMatcher.matches()) {
 			logger.error("Invalid welcome message format: " + msg);
-			ctx.writeAndFlush("7 Invalid welcome message format").addListener(ChannelFutureListener.CLOSE);
+			SendAndCloseTask task = new SendAndCloseTask(ctx.channel(), "7 Invalid welcome message format");
+			ctx.executor().schedule(task, CLOSE_TASK_DELAY_SEC, TimeUnit.SECONDS);
 			return;
 		}
 
@@ -198,12 +211,14 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			if (transmitter == null) {
 				logger.error("The transmitter name is not registered: " + name + " connecting from "
 						+ ctx.channel().remoteAddress());
-				ctx.writeAndFlush("7 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
+				SendAndCloseTask task = new SendAndCloseTask(ctx.channel(), "7 Transmitter not registered");
+				ctx.executor().schedule(task, CLOSE_TASK_DELAY_SEC, TimeUnit.SECONDS);
 				return;
 			} else if (transmitter.getStatus() == Status.DISABLED) {
 				logger.error("Transmitter is disabled and not allowed to connect: " + name + " connecting from "
 						+ ctx.channel().remoteAddress());
-				ctx.writeAndFlush("7 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
+				SendAndCloseTask task = new SendAndCloseTask(ctx.channel(), "7 Transmitter disabled");
+				ctx.executor().schedule(task, CLOSE_TASK_DELAY_SEC, TimeUnit.SECONDS);
 				return;
 			}
 
@@ -211,15 +226,16 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			if (!transmitter.getAuthKey().equals(key)) {
 				logger.error("Wrong authentication key supplied for transmitter: " + name + " connecting from "
 						+ ctx.channel().remoteAddress());
-				ctx.writeAndFlush("7 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
+				SendAndCloseTask task = new SendAndCloseTask(ctx.channel(), "7 Invalid credentials");
+				ctx.executor().schedule(task, CLOSE_TASK_DELAY_SEC, TimeUnit.SECONDS);
 				return;
 			}
 		} finally {
 			lock.unlock();
 		}
 
-		// Close existing connection if necessary. This is a no-op if the
-		// transmitter is not connected.
+		// Close existing connection if necessary. This is a no-op if the transmitter is
+		// not connected.
 		manager.disconnectFrom(transmitter);
 
 		lock = repo.getLock().writeLock();
@@ -246,10 +262,20 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		if (syncHandler.isDone()) {
 			syncHandler = null;
+			String msg = null;
 
 			// Send timeslots to client
 			Transmitter t = client.getTransmitter();
-			String msg = String.format("%d:%s\n", MessageEncoder.MT_SLOTS, t.getTimeSlot());
+
+			Lock lock = manager.getRepository().getLock().readLock();
+			lock.lock();
+
+			try {
+				msg = String.format("%d:%s\n", MessageEncoder.MT_SLOTS, t.getTimeSlot());
+			} finally {
+				lock.unlock();
+			}
+
 			ctx.writeAndFlush(msg);
 
 			state = ConnectionState.TIMESLOTS_SENT;
@@ -284,5 +310,32 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		p.addListener((f) -> {
 			timeoutFuture.cancel(false);
 		});
+	}
+
+	private static class SendAndCloseTask implements Runnable {
+		private final Channel channel;
+		private final String message;
+
+		public SendAndCloseTask(Channel channel) {
+			this(channel, null);
+		}
+
+		public SendAndCloseTask(Channel channel, String message) {
+			this.channel = channel;
+			this.message = message;
+		}
+
+		@Override
+		public void run() {
+			if (channel == null) {
+				return;
+			}
+
+			if (message != null) {
+				channel.writeAndFlush(message).addListener(ChannelFutureListener.CLOSE);
+			} else {
+				channel.close();
+			}
+		}
 	}
 }

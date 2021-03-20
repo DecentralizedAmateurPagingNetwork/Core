@@ -191,7 +191,7 @@ public class TransmitterManager {
 		Transmitter t = client.getTransmitter();
 		if (t == null) {
 			logger.warn("Client has no associated transmitter object.");
-			client.close();
+			client.close().syncUninterruptibly();
 			return;
 		}
 
@@ -275,7 +275,7 @@ public class TransmitterManager {
 	 * Disconnects from all connected transmitters.
 	 */
 	public void disconnectFromAll() {
-		connectedClients.values().forEach(cl -> cl.close());
+		connectedClients.values().forEach(cl -> cl.close().syncUninterruptibly());
 
 		TransmitterManagerListener theListener = listener;
 		if (theListener != null) {
@@ -291,7 +291,7 @@ public class TransmitterManager {
 	public void disconnectFrom(Transmitter t) {
 		TransmitterClient cl = connectedClients.remove(NamedObject.normalize(t.getName()));
 		if (cl != null) {
-			cl.close();
+			cl.close().syncUninterruptibly();
 		}
 	}
 
