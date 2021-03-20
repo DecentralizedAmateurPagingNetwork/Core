@@ -13,9 +13,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
-import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.rest.RestSecurity;
 

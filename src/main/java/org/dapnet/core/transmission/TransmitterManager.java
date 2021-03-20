@@ -11,9 +11,9 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
 import org.dapnet.core.model.TransmitterGroup;

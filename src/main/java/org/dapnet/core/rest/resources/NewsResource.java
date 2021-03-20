@@ -26,8 +26,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.dapnet.core.model.News;
 import org.dapnet.core.model.CoreRepository;
+import org.dapnet.core.model.News;
 import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
