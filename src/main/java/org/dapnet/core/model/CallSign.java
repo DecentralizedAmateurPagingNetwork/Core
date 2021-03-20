@@ -18,12 +18,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.dapnet.core.model.validator.RepositoryLookup;
 import org.dapnet.core.rest.RestAuthorizable;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 1L;

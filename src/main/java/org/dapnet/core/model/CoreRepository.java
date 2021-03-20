@@ -1,7 +1,10 @@
 package org.dapnet.core.model;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
+
+import jakarta.validation.ConstraintViolation;
 
 /**
  * DAPNET Core repository interface providing access to the models.
@@ -79,5 +82,14 @@ public interface CoreRepository {
 	 * @return Statistics
 	 */
 	CoreStatistics getStatistics();
+
+	/**
+	 * Validates the given object.
+	 * 
+	 * @param <T>    Object type
+	 * @param object Object to validate
+	 * @return Set of constraint violations
+	 */
+	<T> Set<ConstraintViolation<T>> validate(T object);
 
 }

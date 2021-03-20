@@ -20,13 +20,13 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
-import javax.validation.ConstraintViolation;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Program;
 import org.dapnet.core.model.StateManager;
 import org.jgroups.Message;
+
+import jakarta.validation.ConstraintViolation;
 
 public class MessageListener implements org.jgroups.MessageListener {
 	private static final Logger logger = LogManager.getLogger();

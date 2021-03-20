@@ -17,10 +17,6 @@ package org.dapnet.core.rest.resources;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
@@ -30,8 +26,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.CoreRepository;
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.rest.ExclusionStrategies;
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.dapnet.core.rest.RestAuthorizable;
@@ -42,6 +38,9 @@ import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 public abstract class AbstractResource {
 	@Context
@@ -117,12 +116,9 @@ public abstract class AbstractResource {
 		return checkAuthorization(level, null);
 	}
 
-	// Validation Helper
-	protected static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-
-	protected void validateObject(Object object) {
-		Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
-		if (constraintViolations.size() != 0) {
+	protected <T> void validateObject(T object) {
+		Set<ConstraintViolation<T>> constraintViolations = repository.validate(object);
+		if (!constraintViolations.isEmpty()) {
 			throw new ConstraintViolationException(constraintViolations);
 		}
 	}

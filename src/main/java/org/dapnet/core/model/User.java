@@ -17,11 +17,11 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.dapnet.core.model.validator.EMail;
 import org.dapnet.core.rest.RestAuthorizable;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class User implements Serializable, RestAuthorizable, NamedObject {
 	private static final long serialVersionUID = 1L;

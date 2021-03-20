@@ -14,16 +14,16 @@
 
 package org.dapnet.core.model.validator;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class TimeSlotValidator implements ConstraintValidator<TimeSlot, String> {
 	@Override
-	public void initialize(TimeSlot constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
+		if (value == null || value.isEmpty()) {
+			return false;
+		}
+
 		/*
 		 * Only [0-F] in correct order with only occurrence Examples for valid Strings:
 		 * 0123768EF 47E 0F 4 Examples for invalid Strings: 98754 47H 33
@@ -40,6 +40,7 @@ public class TimeSlotValidator implements ConstraintValidator<TimeSlot, String> 
 				return false;
 			}
 		}
+
 		return true;
 	}
 }

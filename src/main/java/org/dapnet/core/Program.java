@@ -23,8 +23,6 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.validation.ConstraintViolation;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.cluster.ClusterManager;
@@ -33,6 +31,8 @@ import org.dapnet.core.rest.RestManager;
 import org.dapnet.core.scheduler.SchedulerManager;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.dapnet.core.transmission.TransmitterServer;
+
+import jakarta.validation.ConstraintViolation;
 
 public class Program {
 

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 public class ConstraintViolationExceptionDescriptor extends ExceptionDescriptor {
 	private static final long serialVersionUID = -3338439259161824779L;

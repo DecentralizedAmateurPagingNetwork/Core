@@ -14,7 +14,6 @@
 
 package org.dapnet.core.rest.exceptionHandling;
 
-import javax.validation.ConstraintViolationException;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.InternalServerErrorException;
@@ -36,6 +35,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonSyntaxException;
+
+import jakarta.validation.ConstraintViolationException;
 
 @Provider
 public class ExceptionHandler implements ExceptionMapper<Exception> {

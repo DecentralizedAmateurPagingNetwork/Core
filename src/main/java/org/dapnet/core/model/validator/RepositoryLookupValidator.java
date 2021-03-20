@@ -1,8 +1,6 @@
 package org.dapnet.core.model.validator;
 
 import javax.sound.midi.Transmitter;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.CoreRepository;
@@ -11,6 +9,9 @@ import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.TransmitterGroup;
 import org.dapnet.core.model.User;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class RepositoryLookupValidator implements ConstraintValidator<RepositoryLookup, String> {
 

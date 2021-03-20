@@ -16,16 +16,16 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
-
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.hibernate.validator.HibernateValidator;
 import org.jgroups.util.Util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * The state manager is responsible for managing the DAPNET Core state and
@@ -121,6 +121,11 @@ public final class StateManager implements CoreRepository {
 		return state.getStatistics();
 	}
 
+	@Override
+	public <T> Set<ConstraintViolation<T>> validate(T object) {
+		return validatorFactory.getValidator().validate(object);
+	}
+
 	/**
 	 * Loads the state from the given state file.
 	 * 
@@ -210,17 +215,6 @@ public final class StateManager implements CoreRepository {
 		} finally {
 			lock.readLock().unlock();
 		}
-	}
-
-	/**
-	 * Validates an object using the current validator instance.
-	 * 
-	 * @param <T>    Object type
-	 * @param object Object to validate
-	 * @return Constraint violations
-	 */
-	public <T> Set<ConstraintViolation<T>> validate(T object) {
-		return validatorFactory.getValidator().validate(object);
 	}
 
 	/**

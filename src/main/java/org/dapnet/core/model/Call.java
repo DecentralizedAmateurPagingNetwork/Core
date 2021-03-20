@@ -18,10 +18,10 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.dapnet.core.model.validator.RepositoryLookup;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class Call implements Serializable {
 	private static final long serialVersionUID = 1L;
