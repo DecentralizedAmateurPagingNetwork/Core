@@ -33,6 +33,7 @@ import org.dapnet.core.rest.GsonTypeAdapterFactory;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.rest.RestSecurity;
+import org.dapnet.core.rest.StringTrimJsonDeserializer;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 
@@ -64,12 +65,13 @@ public abstract class AbstractResource {
 	}
 
 	private static GsonBuilder createBuilder() {
-		GsonBuilder build = new GsonBuilder();
-		build.serializeNulls();
-		build.setPrettyPrinting();
-		build.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
+		GsonBuilder builder = new GsonBuilder();
+		builder.serializeNulls();
+		builder.setPrettyPrinting();
+		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
+		builder.registerTypeAdapter(String.class, new StringTrimJsonDeserializer());
 
-		return build;
+		return builder;
 	}
 
 	protected CoreRepository getRepository() {

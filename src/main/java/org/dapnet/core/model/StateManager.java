@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.dapnet.core.rest.GsonTypeAdapterFactory;
+import org.dapnet.core.rest.StringTrimJsonDeserializer;
 import org.hibernate.validator.HibernateValidator;
 import org.jgroups.util.Util;
 
@@ -60,6 +61,7 @@ public final class StateManager implements CoreRepository {
 		final GsonBuilder builder = new GsonBuilder();
 		builder.setPrettyPrinting();
 		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
+		builder.registerTypeAdapter(String.class, new StringTrimJsonDeserializer());
 		gson = builder.create();
 
 		// I'm not sure if that is the way to go but Hibernate's validator factory does
