@@ -17,13 +17,18 @@ package org.dapnet.core.cluster;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Program;
+import org.dapnet.core.model.ModelRepository;
+import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.Transmitter;
 import org.jgroups.Address;
 import org.jgroups.Event;
 import org.jgroups.MergeView;
@@ -87,12 +92,17 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			lock.lock();
 
 			try {
+				final Set<String> nodeNames = new TreeSet<>();
+
 				for (Address addr : view.getMembers()) {
-					Node node = stateManager.getNodes().get(addr.toString());
+					final Node node = stateManager.getNodes().get(addr.toString());
 					if (node == null) {
 						logger.warn("Unknown node in view: " + addr);
 						continue;
 					}
+
+					// Add node name to set of active nodes (used for resetting transmitter status)
+					nodeNames.add(NamedObject.normalize(node.getName()));
 
 					// Try to set version information
 					if (addr instanceof ExtendedUUID) {
@@ -111,8 +121,8 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 					}
 				}
 
-				// Update node states:
-				updateNodeStates();
+				updateNodeStatus();
+				resetTransmitterStatus(nodeNames);
 			} finally {
 				lock.unlock();
 			}
@@ -155,7 +165,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 						clusterManager.getChannel().getState(majorSubgroup.getMembers().get(0), 5000);
 						break; // Success
 					} catch (Exception e) {
-						logger.warn("Failed to receive State");
+						logger.warn("Failed to receive State: {}", e.getMessage());
 						logger.warn(e);
 						if (numberOfAttempts++ > 5) {
 							throw e;
@@ -181,7 +191,7 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 			return majorSubgroup;
 		}
 
-		private void updateNodeStates() {
+		private void updateNodeStatus() {
 			// All nodes in the view are already in state, since they would be
 			// otherwise rejected while authorization
 			// (expect of first node, which might not be in the state, but will
@@ -203,6 +213,21 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 					}
 					// else if node is UNKNOWN or SUSPENDED which is the correct
 					// status
+				}
+			}
+		}
+
+		private void resetTransmitterStatus(Set<String> nodeNames) {
+			if (nodeNames == null) {
+				return;
+			}
+
+			// Set transmitter status to OFFLINE for all transmitters that are not in the
+			// new subgroup
+			final ModelRepository<Transmitter> transmitters = stateManager.getTransmitters();
+			for (Transmitter tr : transmitters.values()) {
+				if (!nodeNames.contains(NamedObject.normalize(tr.getNodeName()))) {
+					tr.setStatus(Transmitter.Status.OFFLINE);
 				}
 			}
 		}
