@@ -17,9 +17,9 @@ package org.dapnet.core.model;
 import java.io.Serializable;
 import java.util.Set;
 
-import org.dapnet.core.model.validator.EMail;
 import org.dapnet.core.rest.RestAuthorizable;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -36,17 +36,27 @@ public class User implements Serializable, RestAuthorizable, NamedObject {
 	private String hash;
 
 	@NotNull
-	@EMail
+	@Email
 	private String mail;
 
 	private boolean admin;
 
-	// Used in case of creating new cluster
 	public User(String name, String hash, String mail, boolean admin) {
 		this.name = name;
 		this.hash = hash;
 		this.mail = mail;
 		this.admin = admin;
+	}
+
+	public User(User other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		name = other.name;
+		hash = other.hash;
+		mail = other.mail;
+		admin = other.admin;
 	}
 
 	@Override

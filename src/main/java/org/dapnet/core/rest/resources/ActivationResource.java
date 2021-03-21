@@ -14,7 +14,7 @@
 
 package org.dapnet.core.rest.resources;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.concurrent.locks.Lock;
 
 import javax.ws.rs.BadRequestException;
@@ -44,20 +44,20 @@ public class ActivationResource extends AbstractResource {
 		// Create Activation
 		Activation activation = gson.fromJson(activationJSON, Activation.class);
 		if (activation != null) {
-			activation.setTimestamp(new Date());
+			activation.setTimestamp(Instant.now());
 		} else {
 			throw new EmptyBodyException();
 		}
 
 		// TODO We should probably move this to a validator that is added to Activation
-		if (!isRicAvailable(activation.getNumber())) {
+		if (isRicRegistered(activation.getNumber())) {
 			throw new BadRequestException("RIC already registered.");
 		}
 
 		return handleObject(activation, "postActivation", false, true);
 	}
 
-	private boolean isRicAvailable(int ric) {
+	private boolean isRicRegistered(int ric) {
 		Lock lock = getRepository().getLock().readLock();
 		lock.lock();
 
@@ -66,7 +66,7 @@ public class ActivationResource extends AbstractResource {
 			for (CallSign cs : callsigns.values()) {
 				for (Pager pgr : cs.getPagers()) {
 					if (pgr.getNumber() == ric) {
-						return false;
+						return true;
 					}
 				}
 			}
@@ -74,7 +74,7 @@ public class ActivationResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return true;
+		return false;
 	}
 
 }

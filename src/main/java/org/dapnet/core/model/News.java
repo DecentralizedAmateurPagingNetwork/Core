@@ -52,6 +52,21 @@ public class News implements Serializable {
 	@RepositoryLookup(User.class)
 	private String ownerName;
 
+	public News() {
+	}
+
+	public News(News other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		text = other.text;
+		rubricName = other.rubricName;
+		number = other.number;
+		timestamp = other.timestamp;
+		ownerName = other.ownerName;
+	}
+
 	public String getText() {
 		return text;
 	}

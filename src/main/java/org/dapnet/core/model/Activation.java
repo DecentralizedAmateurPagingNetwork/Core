@@ -15,22 +15,19 @@
 package org.dapnet.core.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 
+import org.dapnet.core.model.validator.PagerAddress;
 import org.dapnet.core.model.validator.RepositoryLookup;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class Activation implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
-	@Min(value = 0)
-	@Max(value = 2097151)
+	@PagerAddress(checkDuplicates = false)
 	private int number;
 
 	@NotNull
@@ -40,7 +37,20 @@ public class Activation implements Serializable {
 
 	// Internally set
 	@NotNull
-	private Date timestamp;
+	private Instant timestamp;
+
+	public Activation() {
+	}
+
+	public Activation(Activation other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		number = other.number;
+		transmitterGroupNames = ModelUtils.copy(other.transmitterGroupNames);
+		timestamp = other.timestamp;
+	}
 
 	public int getNumber() {
 		return number;
@@ -58,11 +68,11 @@ public class Activation implements Serializable {
 		this.transmitterGroupNames = transmitterGroupNames;
 	}
 
-	public Date getTimestamp() {
+	public Instant getTimestamp() {
 		return timestamp;
 	}
 
-	public void setTimestamp(Date timestamp) {
+	public void setTimestamp(Instant timestamp) {
 		this.timestamp = timestamp;
 	}
 

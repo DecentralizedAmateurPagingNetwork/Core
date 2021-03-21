@@ -16,6 +16,7 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.dapnet.core.model.validator.RepositoryLookup;
@@ -42,12 +43,27 @@ public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 
 	@NotNull
 	@Valid
-	@Size(min = 1, message = "must contain at least one pager")
+	@Size(min = 1, message = "Must contain at least one pager")
 	private Collection<Pager> pagers;
 
 	@NotNull
-	@Size(min = 1, message = "must contain at least one ownerName")
+	@Size(min = 1, message = "Must contain at least one ownerName")
 	private Set<@RepositoryLookup(User.class) String> ownerNames;
+
+	public CallSign() {
+	}
+
+	public CallSign(CallSign other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		name = other.name;
+		description = other.description;
+		numeric = other.numeric;
+		pagers = copyPagers(other.pagers);
+		ownerNames = ModelUtils.copy(other.ownerNames);
+	}
 
 	@Override
 	public String getName() {
@@ -94,5 +110,16 @@ public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 	@Override
 	public String toString() {
 		return String.format("CallSign{name='%s'}", name);
+	}
+
+	private static Collection<Pager> copyPagers(Collection<Pager> src) {
+		if (src == null) {
+			return null;
+		}
+
+		Collection<Pager> result = new LinkedList<>();
+		src.forEach(p -> result.add(new Pager(p)));
+
+		return result;
 	}
 }

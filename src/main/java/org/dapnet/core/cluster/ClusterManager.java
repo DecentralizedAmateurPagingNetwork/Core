@@ -174,7 +174,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// ### Quorum
 	// #######################################################################################################
 	public void checkQuorum() {
-		int activeNodeCount = 0; // Count of online and unknown Nodes
+		// Count of online and unknown Nodes
+		int activeNodeCount = 0;
 		int onlineNodeCount = 0;
 
 		Lock lock = stateManager.getLock().readLock();

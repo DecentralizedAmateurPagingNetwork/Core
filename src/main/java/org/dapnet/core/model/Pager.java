@@ -16,22 +16,32 @@ package org.dapnet.core.model;
 
 import java.io.Serializable;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import org.dapnet.core.model.validator.PagerAddress;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class Pager implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
-	@Min(value = 0)
-	@Max(value = 2097151, message = "pager number is limited to 21 bits")
+	@PagerAddress(checkDuplicates = false)
 	private int number;
 
 	@NotNull
 	@Size(min = 3, max = 20)
 	private String name;
+
+	public Pager() {
+	}
+
+	public Pager(Pager other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		number = other.number;
+		name = other.name;
+	}
 
 	public int getNumber() {
 		return number;

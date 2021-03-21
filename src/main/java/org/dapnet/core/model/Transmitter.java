@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.dapnet.core.model.validator.PagerAddress;
 import org.dapnet.core.model.validator.RepositoryLookup;
 import org.dapnet.core.model.validator.TimeSlot;
 import org.dapnet.core.rest.RestAuthorizable;
@@ -113,12 +114,43 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 	@NotNull
 	private Usage usage;
 
-	@Min(value = 0)
-	@Max(value = 2097151, message = "address is limited to 21 bits")
+	@PagerAddress(nullable = true, checkDuplicates = false)
 	private int identificationAddress = 1;
 
 	private Instant lastConnected;
 	private Instant connectedSince;
+
+	public Transmitter() {
+	}
+
+	public Transmitter(Transmitter other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		name = other.name;
+		authKey = other.authKey;
+		longitude = other.longitude;
+		latitude = other.latitude;
+		power = other.power;
+		nodeName = other.nodeName;
+		address = other.address != null ? other.address.copy() : null;
+		timeSlot = other.timeSlot;
+		ownerNames = ModelUtils.copy(other.ownerNames);
+		deviceType = other.deviceType;
+		deviceVersion = other.deviceVersion;
+		callCount = new AtomicLong(other.callCount.get());
+		status = other.status;
+		antennaAboveGroundLevel = other.antennaAboveGroundLevel;
+		antennaType = other.antennaType;
+		antennaDirection = other.antennaDirection;
+		antennaGainDbi = other.antennaGainDbi;
+		lastUpdate = other.lastUpdate;
+		usage = other.usage;
+		identificationAddress = other.identificationAddress;
+		lastConnected = other.lastConnected;
+		connectedSince = other.connectedSince;
+	}
 
 	@Override
 	public String getName() {

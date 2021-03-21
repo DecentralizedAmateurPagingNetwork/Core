@@ -43,6 +43,20 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 	@Size(min = 1, message = "must contain at least one ownerName")
 	private Set<@RepositoryLookup(User.class) String> ownerNames;
 
+	public TransmitterGroup() {
+	}
+
+	public TransmitterGroup(TransmitterGroup other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		name = other.name;
+		description = other.description;
+		transmitterNames = ModelUtils.copy(other.transmitterNames);
+		ownerNames = ModelUtils.copy(other.ownerNames);
+	}
+
 	@Override
 	public String getName() {
 		return name;

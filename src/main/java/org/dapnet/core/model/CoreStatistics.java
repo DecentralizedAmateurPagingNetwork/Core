@@ -10,6 +10,18 @@ public class CoreStatistics implements Serializable {
 	private AtomicLong calls = new AtomicLong();
 	private AtomicLong news = new AtomicLong();
 
+	public CoreStatistics() {
+	}
+
+	public CoreStatistics(CoreStatistics other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		calls = new AtomicLong(other.calls.get());
+		news = new AtomicLong(other.news.get());
+	}
+
 	public long getCalls() {
 		return calls.get();
 	}

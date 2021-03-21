@@ -143,7 +143,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 
 	private void createFirstUser() {
 		logger.info("Creating first user");
-		User user = new User("admin", "admin", "admin@admin.de", true);
+		User user = new User("admin", "admin", "admin@example.com", true);
 
 		try {
 			user.setHash(HashUtil.createHash(user.getHash()));

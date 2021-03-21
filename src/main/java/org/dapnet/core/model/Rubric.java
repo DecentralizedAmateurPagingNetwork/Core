@@ -50,6 +50,21 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 	@Size(min = 1, message = "must contain at least one ownerName")
 	private Set<@RepositoryLookup(User.class) String> ownerNames;
 
+	public Rubric() {
+	}
+
+	public Rubric(Rubric other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		name = other.name;
+		number = other.number;
+		transmitterGroupNames = ModelUtils.copy(other.transmitterGroupNames);
+		label = other.label;
+		ownerNames = ModelUtils.copy(other.ownerNames);
+	}
+
 	public int getNumber() {
 		return number;
 	}

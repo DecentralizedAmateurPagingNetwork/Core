@@ -51,6 +51,22 @@ public class Call implements Serializable {
 	@RepositoryLookup(User.class)
 	private String ownerName;
 
+	public Call() {
+	}
+
+	public Call(Call other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		text = other.text;
+		callSignNames = ModelUtils.copy(other.callSignNames);
+		transmitterGroupNames = ModelUtils.copy(other.transmitterGroupNames);
+		emergency = other.emergency;
+		timestamp = other.timestamp;
+		ownerName = other.ownerName;
+	}
+
 	public Instant getTimestamp() {
 		return timestamp;
 	}

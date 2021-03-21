@@ -28,7 +28,6 @@ import jakarta.validation.constraints.Size;
 
 public class Node implements Serializable, NamedObject {
 	private static final long serialVersionUID = 1L;
-	private static volatile State state;
 
 	// ID
 	@NotNull
@@ -68,6 +67,20 @@ public class Node implements Serializable, NamedObject {
 		this.latitude = latitude;
 		this.address = address;
 		this.status = status;
+	}
+
+	public Node(Node other) {
+		if (other == null) {
+			throw new NullPointerException("Other object must not be null.");
+		}
+
+		name = other.name;
+		longitude = other.longitude;
+		latitude = other.latitude;
+		address = other.address != null ? other.address.copy() : null;
+		status = other.status;
+		ownerNames = ModelUtils.copy(other.ownerNames);
+		version = other.version;
 	}
 
 	public Status getStatus() {
@@ -130,13 +143,5 @@ public class Node implements Serializable, NamedObject {
 	@Override
 	public String toString() {
 		return String.format("Node{status=%s, name='%s'}", status, name);
-	}
-
-	public static State getState() {
-		return state;
-	}
-
-	public static void setState(State statePar) {
-		state = statePar;
 	}
 }
