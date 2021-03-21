@@ -31,8 +31,18 @@ public @interface PagerAddress {
 
 	Class<? extends Payload>[] payload() default {};
 
+	/**
+	 * Whether the pager address can be null.
+	 * 
+	 * @return Enable or disable null check
+	 */
 	boolean nullable() default false;
 
+	/**
+	 * Check for duplicate pager addresses in the repository.
+	 * 
+	 * @return Enable or disable duplicate check
+	 */
 	boolean checkDuplicates() default false;
 
 }

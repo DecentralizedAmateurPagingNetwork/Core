@@ -79,7 +79,7 @@ public class Node implements Serializable, NamedObject {
 		latitude = other.latitude;
 		address = other.address != null ? other.address.copy() : null;
 		status = other.status;
-		ownerNames = ModelUtils.copy(other.ownerNames);
+		ownerNames = ModelUtils.copyStringSet(other.ownerNames);
 		version = other.version;
 	}
 

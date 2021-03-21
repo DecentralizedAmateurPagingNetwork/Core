@@ -53,8 +53,8 @@ public class TransmitterGroup implements Serializable, RestAuthorizable, NamedOb
 
 		name = other.name;
 		description = other.description;
-		transmitterNames = ModelUtils.copy(other.transmitterNames);
-		ownerNames = ModelUtils.copy(other.ownerNames);
+		transmitterNames = ModelUtils.copyStringSet(other.transmitterNames);
+		ownerNames = ModelUtils.copyStringSet(other.ownerNames);
 	}
 
 	@Override

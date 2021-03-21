@@ -60,9 +60,9 @@ public class Rubric implements Serializable, RestAuthorizable, NamedObject {
 
 		name = other.name;
 		number = other.number;
-		transmitterGroupNames = ModelUtils.copy(other.transmitterGroupNames);
+		transmitterGroupNames = ModelUtils.copyStringSet(other.transmitterGroupNames);
 		label = other.label;
-		ownerNames = ModelUtils.copy(other.ownerNames);
+		ownerNames = ModelUtils.copyStringSet(other.ownerNames);
 	}
 
 	public int getNumber() {

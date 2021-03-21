@@ -136,7 +136,7 @@ public class Transmitter implements Serializable, RestAuthorizable, NamedObject 
 		nodeName = other.nodeName;
 		address = other.address != null ? other.address.copy() : null;
 		timeSlot = other.timeSlot;
-		ownerNames = ModelUtils.copy(other.ownerNames);
+		ownerNames = ModelUtils.copyStringSet(other.ownerNames);
 		deviceType = other.deviceType;
 		deviceVersion = other.deviceVersion;
 		callCount = new AtomicLong(other.callCount.get());

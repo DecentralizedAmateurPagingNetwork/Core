@@ -62,7 +62,7 @@ public class CallSign implements Serializable, RestAuthorizable, NamedObject {
 		description = other.description;
 		numeric = other.numeric;
 		pagers = copyPagers(other.pagers);
-		ownerNames = ModelUtils.copy(other.ownerNames);
+		ownerNames = ModelUtils.copyStringSet(other.ownerNames);
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class Activation implements Serializable {
 		}
 
 		number = other.number;
-		transmitterGroupNames = ModelUtils.copy(other.transmitterGroupNames);
+		transmitterGroupNames = ModelUtils.copyStringSet(other.transmitterGroupNames);
 		timestamp = other.timestamp;
 	}
 

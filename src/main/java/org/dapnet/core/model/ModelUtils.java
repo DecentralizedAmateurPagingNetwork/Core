@@ -19,7 +19,7 @@ public final class ModelUtils {
 	 * @param other Set to copy from
 	 * @return Copied set or {@code null} if given set is {@code null}
 	 */
-	public static Set<String> copy(Set<String> other) {
+	public static Set<String> copyStringSet(Set<String> other) {
 		Set<String> result = null;
 
 		if (other != null) {

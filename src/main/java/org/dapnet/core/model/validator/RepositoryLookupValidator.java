@@ -12,6 +12,11 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+/**
+ * This class implements a constraint validator for repository key lookup.
+ * 
+ * @author Philipp Thiel
+ */
 public class RepositoryLookupValidator implements ConstraintValidator<RepositoryLookup, String> {
 
 	private Class<?> objectType;

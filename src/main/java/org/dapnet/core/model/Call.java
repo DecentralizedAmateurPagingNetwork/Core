@@ -60,8 +60,8 @@ public class Call implements Serializable {
 		}
 
 		text = other.text;
-		callSignNames = ModelUtils.copy(other.callSignNames);
-		transmitterGroupNames = ModelUtils.copy(other.transmitterGroupNames);
+		callSignNames = ModelUtils.copyStringSet(other.callSignNames);
+		transmitterGroupNames = ModelUtils.copyStringSet(other.transmitterGroupNames);
 		emergency = other.emergency;
 		timestamp = other.timestamp;
 		ownerName = other.ownerName;
