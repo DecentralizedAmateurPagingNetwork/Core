@@ -15,8 +15,8 @@
 package org.dapnet.core.transmission;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
@@ -184,7 +184,7 @@ public class TransmissionManager {
 
 	public void handleCall(Call call) {
 		try {
-			List<PagerMessage> messages = protocol.createMessagesFromCall(call);
+			Collection<PagerMessage> messages = protocol.createMessagesFromCall(call);
 			transmitterManager.sendMessages(messages, call.getTransmitterGroupNames());
 
 			logger.info("Call sent to {} CallSigns, to {} Pagers, using {} TransmitterGroups.",

@@ -15,7 +15,7 @@
 package org.dapnet.core.transmission;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
 
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
@@ -41,5 +41,5 @@ public interface PagerProtocol {
 
 	PagerMessage createMessageFromActivation(Activation avtivation);
 
-	List<PagerMessage> createMessagesFromCall(Call call);
+	Collection<PagerMessage> createMessagesFromCall(Call call);
 }

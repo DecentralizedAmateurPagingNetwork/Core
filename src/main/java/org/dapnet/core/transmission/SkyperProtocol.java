@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -61,7 +62,7 @@ public class SkyperProtocol implements PagerProtocol {
 	}
 
 	@Override
-	public List<PagerMessage> createMessagesFromCall(Call call) {
+	public Collection<PagerMessage> createMessagesFromCall(Call call) {
 		MessagePriority priority = call.isEmergency() ? MessagePriority.EMERGENCY : MessagePriority.CALL;
 		Instant now = Instant.now();
 
@@ -75,7 +76,7 @@ public class SkyperProtocol implements PagerProtocol {
 
 			final ModelRepository<CallSign> callsigns = repository.getCallSigns();
 
-			List<PagerMessage> messages = new LinkedList<>();
+			Collection<PagerMessage> messages = new LinkedList<>();
 			for (String name : call.getCallSignNames()) {
 				CallSign callsign = callsigns.get(name);
 				if (callsign == null) {
