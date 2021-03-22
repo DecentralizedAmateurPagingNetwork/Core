@@ -10,6 +10,7 @@ import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager.Type;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 
 /**
  * Alphapoc pager protocol implementation.
@@ -31,8 +32,8 @@ class AlphapocProtocol implements PagerProtocol {
 	 * @param repository Repository to use
 	 */
 	public AlphapocProtocol(CoreRepository repository) {
-		// TODO Use proper factory
-		callFactory = new SkyperCallMessageFactory(repository, AlphapocProtocol::encode);
+		callFactory = new AlphanumCallMessageFactory(repository, AlphapocProtocol::encode, Type.ALPHAPOC,
+				SubAddress.ADDR_D);
 		newsFactory = new RicNewsMessageFactory(repository, AlphapocProtocol::encode);
 		timeFactory = new AlphapocTimeMessageFactory();
 		idFactory = new TransmitterIdentificationMessageFactory();

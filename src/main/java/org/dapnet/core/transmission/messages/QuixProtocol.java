@@ -13,35 +13,31 @@ import org.dapnet.core.model.Rubric;
 import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 
 /**
- * Swissphone pager protocol implementation.
+ * Quix Ultra pager protocol implementation.
  * 
  * @author Philipp Thiel
  */
-class SwissphoneProtocol implements PagerProtocol {
+class QuixProtocol implements PagerProtocol {
 
 	// TODO Use proper charset
 	private static final Charset PAGER_CHARSET = new DE_ASCII7();
 	private final PagerMessageFactory<Call> callFactory;
-	private final PagerMessageFactory<News> newsFactory;
-	private final PagerMessageFactory<ZonedDateTime> timeFactory;
 	private final PagerMessageFactory<TransmitterIdentification> idFactory;
 
 	/**
-	 * Constructs a new Alphapoc pager protocol instance.
+	 * Constructs a new Quix Ultra pager protocol instance.
 	 * 
 	 * @param repository Repository to use
 	 */
-	public SwissphoneProtocol(CoreRepository repository) {
-		callFactory = new AlphanumCallMessageFactory(repository, SwissphoneProtocol::encode, Type.SWISSPHONE,
-				SubAddress.ADDR_D);
-		newsFactory = new RicNewsMessageFactory(repository, SwissphoneProtocol::encode);
-		timeFactory = new SwissphoneTimeMessageFactory();
+	public QuixProtocol(CoreRepository repository) {
+		callFactory = new AlphanumCallMessageFactory(repository, QuixProtocol::encode, Type.QUIX_ULTRA,
+				SubAddress.ADDR_C);
 		idFactory = new TransmitterIdentificationMessageFactory();
 	}
 
 	@Override
 	public Type getPagerType() {
-		return Type.SWISSPHONE;
+		return Type.QUIX_ULTRA;
 	}
 
 	@Override
@@ -56,17 +52,17 @@ class SwissphoneProtocol implements PagerProtocol {
 
 	@Override
 	public PagerMessageFactory<Rubric> getRubricFactory() {
-		return null; // Rubrics not supported
+		return null; // TODO Rubrics not yet supported
 	}
 
 	@Override
 	public PagerMessageFactory<News> getNewsFactory() {
-		return newsFactory;
+		return null; // TODO News not yet supported
 	}
 
 	@Override
 	public PagerMessageFactory<ZonedDateTime> getTimeFactory() {
-		return timeFactory;
+		return null; // TODO Time not yet supported
 	}
 
 	@Override

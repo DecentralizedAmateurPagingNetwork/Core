@@ -65,7 +65,7 @@ public class TransmissionManager {
 		// Register pager protocols
 		PagerProtocolFactory protocolFactory = new DefaultPagerProtocolFactory();
 		for (Pager.Type type : Pager.Type.values()) {
-			PagerProtocol protocol = protocolFactory.getProtocol(Pager.Type.SKYPER, stateManager);
+			PagerProtocol protocol = protocolFactory.getProtocol(type, stateManager);
 			if (protocol != null) {
 				pagerProtocols.put(type, protocol);
 			} else {

@@ -19,6 +19,8 @@ public final class DefaultPagerProtocolFactory implements PagerProtocolFactory {
 			return new AlphapocProtocol(repository);
 		case SWISSPHONE:
 			return new SwissphoneProtocol(repository);
+		case QUIX_ULTRA:
+			return new QuixProtocol(repository);
 		default:
 			return null;
 		}

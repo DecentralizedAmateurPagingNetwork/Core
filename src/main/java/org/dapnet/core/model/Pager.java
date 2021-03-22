@@ -30,7 +30,7 @@ public class Pager implements Serializable {
 	 * @author Philipp Thiel
 	 */
 	public enum Type {
-		SKYPER, ALPHAPOC, SWISSPHONE
+		SKYPER, ALPHAPOC, SWISSPHONE, QUIX_ULTRA
 	}
 
 	@NotNull
