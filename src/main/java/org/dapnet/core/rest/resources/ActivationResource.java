@@ -15,6 +15,7 @@
 package org.dapnet.core.rest.resources;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.concurrent.locks.Lock;
 
 import javax.ws.rs.BadRequestException;
@@ -27,7 +28,6 @@ import javax.ws.rs.core.Response;
 
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.CallSign;
-import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.Pager;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
@@ -62,8 +62,8 @@ public class ActivationResource extends AbstractResource {
 		lock.lock();
 
 		try {
-			final ModelRepository<CallSign> callsigns = getRepository().getCallSigns();
-			for (CallSign cs : callsigns.values()) {
+			final Collection<CallSign> callsigns = getRepository().getCallSigns().values();
+			for (CallSign cs : callsigns) {
 				for (Pager pgr : cs.getPagers()) {
 					if (pgr.getNumber() == ric) {
 						return true;

@@ -16,7 +16,10 @@ import java.util.Set;
 public interface ModelRepository<T> {
 
 	/**
-	 * Gets a collection of all values.
+	 * Gets an unmodifyable collection of all values. Note that this is a one-time
+	 * snapshot of the state and getting the collection might take some time,
+	 * depending on the implementation. It is advisable to keep a reference to the
+	 * collection for immediate operations.
 	 * 
 	 * @return Value collection
 	 */

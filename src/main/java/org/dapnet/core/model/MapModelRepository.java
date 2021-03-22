@@ -1,6 +1,8 @@
 package org.dapnet.core.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +29,8 @@ final class MapModelRepository<T> implements ModelRepository<T> {
 
 	@Override
 	public Collection<T> values() {
-		return map.values();
+		Collection<T> result = new ArrayList<>(map.values());
+		return Collections.unmodifiableCollection(result);
 	}
 
 	@Override

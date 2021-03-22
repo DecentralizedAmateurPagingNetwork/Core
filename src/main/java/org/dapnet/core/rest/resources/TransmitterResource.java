@@ -74,6 +74,8 @@ public class TransmitterResource extends AbstractResource {
 			lock.unlock();
 		}
 
+		// We do not need to keep the lock here because the resulting collection
+		// contains independent elements
 		return getObject(result, status);
 	}
 
