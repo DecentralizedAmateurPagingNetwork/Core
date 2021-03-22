@@ -75,6 +75,7 @@ public class Settings implements Serializable {
 				createDefaultSettings();
 			}
 		}
+
 		return settings;
 	}
 

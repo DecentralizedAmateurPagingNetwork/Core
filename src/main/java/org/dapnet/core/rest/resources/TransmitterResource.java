@@ -44,7 +44,7 @@ public class TransmitterResource extends AbstractResource {
 
 	@GET
 	public Response getTransmitters() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
 
 		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
@@ -60,7 +60,7 @@ public class TransmitterResource extends AbstractResource {
 	@GET
 	@Path("public_list")
 	public Response getPublicTransmitters() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
 		Collection<PublicTransmitterInfo> result = null;
 
 		final CoreRepository repo = getRepository();
@@ -88,7 +88,7 @@ public class TransmitterResource extends AbstractResource {
 
 		try {
 			Transmitter obj = repo.getTransmitters().get(transmitterName);
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY, obj);
+			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC, obj);
 			return getObject(obj, status);
 		} finally {
 			lock.unlock();

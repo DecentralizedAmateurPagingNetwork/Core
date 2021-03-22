@@ -32,6 +32,8 @@ import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
+import com.mchange.rmi.NotAuthorizedException;
+
 @Path("/news")
 @Produces(MediaType.APPLICATION_JSON)
 public class NewsResource extends AbstractResource {
@@ -67,7 +69,12 @@ public class NewsResource extends AbstractResource {
 		news = gson.fromJson(newsJSON, News.class);
 		if (news != null) {
 			news.setTimestamp(Instant.now());
-			news.setOwnerName(new LoginData(httpHeaders).getUsername());
+			LoginData login = LoginData.fromHttpHeaders(httpHeaders);
+			if (login != null) {
+				news.setOwnerName(login.getUsername());
+			} else {
+				throw new NotAuthorizedException("Could not get login data.");
+			}
 		} else {
 			throw new EmptyBodyException();
 		}

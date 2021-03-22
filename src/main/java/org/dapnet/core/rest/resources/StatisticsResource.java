@@ -25,7 +25,7 @@ public class StatisticsResource extends AbstractResource {
 
 	@GET
 	public Response get() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
 
 		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();

@@ -21,29 +21,44 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
-import org.dapnet.core.Settings;
-import org.dapnet.core.model.StateManager;
+import org.dapnet.core.model.CoreRepository;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-public class RestManager {
+/**
+ * The REST manager implementation. This class is responsible for providing the
+ * REST server.
+ * 
+ * @author Philipp Thiel
+ */
+public final class RestManager {
 	private static final Logger logger = LogManager.getLogger();
-	private final StateManager stateManager;
+	private final RestSettings settings;
+	private final CoreRepository repository;
 	private final RestListener restListener;
 	private HttpServer server;
 
-	public RestManager(StateManager stateManager, RestListener restListener) {
-		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
+	/**
+	 * Constructs a new REST manager instance.
+	 * 
+	 * @param repository   Repository to use
+	 * @param restListener REST listener to use
+	 */
+	public RestManager(RestSettings settings, CoreRepository repository, RestListener restListener) {
+		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
+		this.repository = Objects.requireNonNull(repository, "State manager must not be null.");
 		this.restListener = Objects.requireNonNull(restListener, "REST listener must not be null.");
 	}
 
+	/**
+	 * Starts the REST server asynchronously.
+	 */
 	public void start() {
 		try {
-			final RestSettings settings = Settings.getRestSettings();
 			URI endpoint = new URI("http", null, settings.getHostname(), settings.getPort(), settings.getPath(), null,
 					null);
-			ResourceConfig rc = new ApplicationConfig(stateManager, restListener);
+			ResourceConfig rc = new ApplicationConfig(repository, restListener);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
 
 			logger.info("RestApi successfully started.");
@@ -58,6 +73,9 @@ public class RestManager {
 		}
 	}
 
+	/**
+	 * Stops the rest manager.
+	 */
 	public void stop() {
 		if (server != null) {
 			server.shutdownNow();

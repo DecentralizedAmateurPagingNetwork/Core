@@ -16,6 +16,19 @@ package org.dapnet.core.rest;
 
 import java.util.Set;
 
+/**
+ * Interface for objects that provide a list of owner names. This is used to
+ * check if a user can modify an object if he owns it.
+ * 
+ * @author Philipp Thiel
+ */
 public interface RestAuthorizable {
+
+	/**
+	 * Gets a set of owner names.
+	 * 
+	 * @return Owner names
+	 */
 	Set<String> getOwnerNames();
+
 }

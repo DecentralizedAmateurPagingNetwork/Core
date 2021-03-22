@@ -32,6 +32,12 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
+/**
+ * Custom gson type adapter factory for DAPNET models.
+ * 
+ * @author Philipp Thiel
+ *
+ */
 public class GsonTypeAdapterFactory implements TypeAdapterFactory {
 
 	@SuppressWarnings("unchecked")

@@ -32,7 +32,7 @@ public class CoreResource extends AbstractResource {
 	@Path("/core_version")
 	@GET
 	public Response getCoreVersion() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
 		VersionWrapper version = new VersionWrapper(Program.getCoreVersion());
 		return getObject(version, status);
 	}
@@ -40,7 +40,7 @@ public class CoreResource extends AbstractResource {
 	@Path("/api_version")
 	@GET
 	public Response getApiVersion() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
 		VersionWrapper version = new VersionWrapper(Program.getApiVersion());
 		return getObject(version, status);
 	}
@@ -48,7 +48,7 @@ public class CoreResource extends AbstractResource {
 	@Path("/version")
 	@GET
 	public Response getVersion() throws Exception {
-		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
 		return getObject(version, status);
 	}
 

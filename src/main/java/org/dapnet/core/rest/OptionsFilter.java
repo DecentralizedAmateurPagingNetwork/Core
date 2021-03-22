@@ -9,6 +9,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Provider;
 
+/**
+ * HTTP Options filter implementation.
+ * 
+ * @author Philipp Thiel
+ */
 @Provider
 @PreMatching
 public class OptionsFilter implements ContainerRequestFilter {

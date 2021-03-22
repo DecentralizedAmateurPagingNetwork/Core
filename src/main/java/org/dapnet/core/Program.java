@@ -34,6 +34,11 @@ import org.dapnet.core.transmission.TransmitterServer;
 
 import jakarta.validation.ConstraintViolation;
 
+/**
+ * This class contains DAPNET Core application entry point.
+ * 
+ * @author Philipp Thiel
+ */
 public class Program {
 
 	private static final Logger logger = LogManager.getLogger();
@@ -102,17 +107,18 @@ public class Program {
 			transmissionManager = new TransmissionManager(stateManager);
 
 			logger.info("Starting Cluster");
-			clusterManager = new ClusterManager(stateManager, transmissionManager, enforceStartup);
+			clusterManager = new ClusterManager(stateManager, transmissionManager);
 
 			logger.info("Starting Transmitter Server");
 			transmitterServer = new TransmitterServer(transmissionManager.getTransmitterManager());
 			transmitterServer.start();
 
 			logger.info("Starting SchedulerManager");
-			schedulerManager = new SchedulerManager(stateManager, transmissionManager, clusterManager);
+			schedulerManager = new SchedulerManager(Settings.getSchedulerSettings(), stateManager, transmissionManager,
+					clusterManager);
 
 			logger.info("Starting RestManager");
-			restManager = new RestManager(stateManager, clusterManager);
+			restManager = new RestManager(Settings.getRestSettings(), stateManager, clusterManager);
 			restManager.start();
 
 			logger.info("DAPNETCore started");

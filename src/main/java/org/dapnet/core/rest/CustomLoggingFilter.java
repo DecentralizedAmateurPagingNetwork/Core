@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -31,6 +32,11 @@ import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 
+/**
+ * Implementation of a custom logging filter to log REST requests and responses.
+ * 
+ * @author Philipp Thiel
+ */
 @Provider
 public class CustomLoggingFilter extends LoggingFeature implements ContainerRequestFilter, ContainerResponseFilter {
 	private static final Logger logger = LogManager.getLogger();
@@ -42,7 +48,13 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		// Append username is available
 		String user = null;
 		try {
-			user = new LoginData(requestContext.getHeaders().get("Authorization").get(0)).getUsername();
+			final List<String> authorization = requestContext.getHeaders().get("Authorization");
+			if (authorization != null && !authorization.isEmpty()) {
+				LoginData login = LoginData.fromToken(authorization.get(0));
+				if (login != null) {
+					user = login.getUsername();
+				}
+			}
 		} catch (Exception e) {
 		}
 
@@ -106,8 +118,9 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		}
 	}
 
+	// TODO Isn't this obsoleted by the CorsFilter class
 	// Add Header to allow Web Module running on other server than DAPNET Core
-	private void addHeader(ContainerResponseContext responseContext) {
+	private static void addHeader(ContainerResponseContext responseContext) {
 		responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
 		responseContext.getHeaders().add("Access-Control-Allow-Headers",
 				"Origin, X-Requested-With, Content-Type, Accept, Key, Authorization");

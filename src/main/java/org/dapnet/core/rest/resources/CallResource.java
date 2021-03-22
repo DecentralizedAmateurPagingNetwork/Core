@@ -34,6 +34,8 @@ import org.dapnet.core.rest.LoginData;
 import org.dapnet.core.rest.RestSecurity;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 
+import com.mchange.rmi.NotAuthorizedException;
+
 @Path("/calls")
 @Produces(MediaType.APPLICATION_JSON)
 public class CallResource extends AbstractResource {
@@ -75,7 +77,12 @@ public class CallResource extends AbstractResource {
 		Call call = gson.fromJson(callJSON, Call.class);
 		if (call != null) {
 			call.setTimestamp(Instant.now());
-			call.setOwnerName(new LoginData(httpHeaders).getUsername());
+			LoginData login = LoginData.fromHttpHeaders(httpHeaders);
+			if (login != null) {
+				call.setOwnerName(login.getUsername());
+			} else {
+				throw new NotAuthorizedException("Could not get login data.");
+			}
 		} else {
 			throw new EmptyBodyException();
 		}

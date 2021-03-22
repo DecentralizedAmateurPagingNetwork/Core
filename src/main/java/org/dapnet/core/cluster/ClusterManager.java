@@ -44,7 +44,12 @@ import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.util.ExtendedUUID;
 import org.jgroups.util.RspList;
 
-public class ClusterManager implements TransmitterManagerListener, RestListener {
+/**
+ * The cluster manager is responsible for the DAPNET cluster connection.
+ * 
+ * @author Philipp Thiel
+ */
+public final class ClusterManager implements TransmitterManagerListener, RestListener {
 	private static final Logger logger = LogManager.getLogger();
 
 	private final StateManager stateManager;
@@ -59,8 +64,14 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private volatile boolean quorum = true;
 	private volatile boolean stopping = false;
 
-	public ClusterManager(StateManager stateManager, TransmissionManager transmissionManager, boolean enforceStartup)
-			throws Exception {
+	/**
+	 * Constructs a new cluster manager instance.
+	 * 
+	 * @param stateManager        State manager
+	 * @param transmissionManager Transmission manager
+	 * @throws Exception if cluster construction failed
+	 */
+	public ClusterManager(StateManager stateManager, TransmissionManager transmissionManager) throws Exception {
 		this.stateManager = Objects.requireNonNull(stateManager, "State manager must not be null.");
 
 		// Register Transmission
@@ -69,8 +80,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		transmitterManager = transmissionManager.getTransmitterManager();
 		transmitterManager.setListener(this);
 
-		// Load State from file
-		initState(enforceStartup);
+		// Perform additional state initialization
+		initState();
 
 		// Create Channel
 		channel = new JChannel(Settings.getClusterSettings().getClusterConfigurationFile());
@@ -105,7 +116,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 	}
 
-	private void initState(boolean enforceStartup) {
+	private void initState() {
 		Lock lock = stateManager.getLock().writeLock();
 		lock.lock();
 
@@ -117,6 +128,11 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 	}
 
+	/**
+	 * Gets the state manager.
+	 * 
+	 * @return State manager
+	 */
 	public StateManager getStateManager() {
 		return stateManager;
 	}
@@ -144,6 +160,9 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 		}
 	}
 
+	/**
+	 * Stops the cluster manager.
+	 */
 	public void stop() {
 		stopping = true;
 		transmitterManager.disconnectFromAll();

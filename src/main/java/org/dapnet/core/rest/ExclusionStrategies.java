@@ -21,9 +21,20 @@ import org.dapnet.core.model.User;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 
+/**
+ * Defines gson exclusion strategies.
+ * 
+ * @author Philipp Thiel
+ */
 public final class ExclusionStrategies {
 
+	/**
+	 * The user exclusion strategy (limited access)
+	 */
 	public static final ExclusionStrategy USER = new UserStrategy();
+	/**
+	 * The admin exclusion strategy (full access, only passwords hidden)
+	 */
 	public static final ExclusionStrategy ADMIN = new AdminStrategy();
 
 	private ExclusionStrategies() {

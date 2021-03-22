@@ -25,11 +25,26 @@ import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.User;
 
-public class RestSecurity {
+/**
+ * This class implements REST-related security handling.
+ * 
+ * @author Philipp Thiel
+ */
+public final class RestSecurity {
+	/**
+	 * Enumeration of security levels.
+	 * 
+	 * @author Philipp Thiel
+	 */
 	public enum SecurityLevel {
-		ADMIN_ONLY, OWNER_ONLY, USER_ONLY, EVERYBODY
+		ADMIN_ONLY, OWNER_ONLY, USER_ONLY, PUBLIC
 	}
 
+	/**
+	 * Enumeration of security status (i.e. the check result).
+	 * 
+	 * @author Philipp Thiel
+	 */
 	public enum SecurityStatus {
 		UNAUTHORIZED, FORBIDDEN, ADMIN, OWNER, USER, ANYBODY, INTERNAL_ERROR
 	}
@@ -37,17 +52,31 @@ public class RestSecurity {
 	private static final Logger logger = LogManager.getLogger(RestSecurity.class.getName());
 	private final CoreRepository repository;
 
+	/**
+	 * Constructs a new REST security instance.
+	 * 
+	 * @param repository Repository to use
+	 * @throws NullPointerException if the given repository is {@code null}
+	 */
 	public RestSecurity(CoreRepository repository) {
 		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
 	}
 
+	/**
+	 * Gets the security status for the given autorizable object.
+	 * 
+	 * @param httpHeaders      HTTP headers
+	 * @param minSecurityLevel Minimum security level
+	 * @param restAuthorizable Object involved in access checking
+	 * @return Security status
+	 */
 	public SecurityStatus getStatus(HttpHeaders httpHeaders, SecurityLevel minSecurityLevel,
 			RestAuthorizable restAuthorizable) {
 		// Get LoginData
 		LoginData loginData;
 
 		try {
-			loginData = new LoginData(httpHeaders);
+			loginData = LoginData.fromHttpHeaders(httpHeaders);
 		} catch (Exception e) {
 			// No Authorization Data in Http Header
 			logger.info("No Authorization Data in HttpHeader");

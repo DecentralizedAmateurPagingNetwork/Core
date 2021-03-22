@@ -7,6 +7,11 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
+/**
+ * Implementation of the CORS filter.
+ * 
+ * @author Philipp Thiel
+ */
 @Provider
 public class CorsFilter implements ContainerResponseFilter {
 

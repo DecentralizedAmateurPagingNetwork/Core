@@ -18,9 +18,10 @@ import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.Settings;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.transmission.TransmissionManager;
@@ -30,12 +31,40 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 
+/**
+ * The scheduler manager is responsible for running scheduled tasks.
+ * 
+ * @author Philipp Thiel
+ */
 public class SchedulerManager {
 	private static final Logger logger = LogManager.getLogger();
+	private final SchedulerSettings settings;
 	private final Scheduler scheduler;
 
-	public SchedulerManager(StateManager stateManager, TransmissionManager transmissionManager,
-			ClusterManager clusterManager) throws SchedulerException {
+	/**
+	 * Constructs a new scheduler manager instance.
+	 * 
+	 * @param settings            Scheduler settings
+	 * @param stateManager        State manager
+	 * @param transmissionManager Transmission manager
+	 * @param clusterManager      Cluster manager
+	 * @throws SchedulerException if the scheduler could not be created or started
+	 */
+	public SchedulerManager(SchedulerSettings settings, StateManager stateManager,
+			TransmissionManager transmissionManager, ClusterManager clusterManager) throws SchedulerException {
+		if (stateManager == null) {
+			throw new NullPointerException("State manager must not be null.");
+		}
+
+		if (transmissionManager == null) {
+			throw new NullPointerException("Transmission manager must not be null.");
+		}
+
+		if (clusterManager == null) {
+			throw new NullPointerException("Cluster manager must not be null.");
+		}
+
+		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
 		this.scheduler = StdSchedulerFactory.getDefaultScheduler();
 
 		scheduler.getContext().put("stateManager", stateManager);
@@ -56,7 +85,8 @@ public class SchedulerManager {
 	private void registerTimeTransmissionJob() throws SchedulerException {
 		JobDetail job = newJob(TimeTransmissionJob.class).withIdentity("timeTransmissionJob", "main").build();
 		CronTrigger trigger = newTrigger().withIdentity("timeTransmissionTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getTimeTransmissionCron())).build();
+				.withSchedule(cronSchedule(settings.getTimeTransmissionCron())).build();
+
 		scheduler.scheduleJob(job, trigger);
 	}
 
@@ -64,7 +94,8 @@ public class SchedulerManager {
 		JobDetail job = newJob(RubricNameTransmissionJob.class).withIdentity("rubricNameTransmissionJob", "main")
 				.build();
 		CronTrigger trigger = newTrigger().withIdentity("rubricNameTransmissionTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getRubricNameTransmissionCron())).build();
+				.withSchedule(cronSchedule(settings.getRubricNameTransmissionCron())).build();
+
 		scheduler.scheduleJob(job, trigger);
 	}
 
@@ -72,21 +103,24 @@ public class SchedulerManager {
 		JobDetail stateSavingJob = newJob(StateSavingJob.class).withIdentity("stateSavingJob", "main").build();
 
 		CronTrigger stateSavingTrigger = newTrigger().withIdentity("stateSavingTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateSavingCron())).build();
+				.withSchedule(cronSchedule(settings.getStateSavingCron())).build();
+
 		scheduler.scheduleJob(stateSavingJob, stateSavingTrigger);
 	}
 
 	private void registerStateCleaningJob() throws SchedulerException {
 		JobDetail job = newJob(StateCleaningJob.class).withIdentity("stateCleaningJob", "main").build();
 		CronTrigger trigger = newTrigger().withIdentity("stateCleaningTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getStateCleaningCron())).build();
+				.withSchedule(cronSchedule(settings.getStateCleaningCron())).build();
+
 		scheduler.scheduleJob(job, trigger);
 	}
 
 	private void registerNewsTransmissionJob() throws SchedulerException {
 		JobDetail job = newJob(NewsTransmissionJob.class).withIdentity("newsTransmissionJob", "main").build();
 		CronTrigger trigger = newTrigger().withIdentity("newsTransmissionTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getNewsTransmissionCron())).build();
+				.withSchedule(cronSchedule(settings.getNewsTransmissionCron())).build();
+
 		scheduler.scheduleJob(job, trigger);
 	}
 
@@ -94,10 +128,14 @@ public class SchedulerManager {
 		JobDetail job = newJob(TransmitterIdentificationJob.class).withIdentity("transmitterIdentificationJob", "main")
 				.build();
 		CronTrigger trigger = newTrigger().withIdentity("transmitterIdentificationTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getTransmitterIdentificationCron())).build();
+				.withSchedule(cronSchedule(settings.getTransmitterIdentificationCron())).build();
+
 		scheduler.scheduleJob(job, trigger);
 	}
 
+	/**
+	 * Stops the scheduler.
+	 */
 	public void stop() {
 		try {
 			scheduler.shutdown();
