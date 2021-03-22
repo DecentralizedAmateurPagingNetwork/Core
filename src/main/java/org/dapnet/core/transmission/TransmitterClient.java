@@ -6,8 +6,9 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 
 import org.dapnet.core.model.Transmitter;
-import org.dapnet.core.transmission.PagerMessage.FunctionalBits;
-import org.dapnet.core.transmission.PagerMessage.MessagePriority;
+import org.dapnet.core.transmission.messages.PagerMessage;
+import org.dapnet.core.transmission.messages.PagerMessage.FunctionalBits;
+import org.dapnet.core.transmission.messages.PagerMessage.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.Channel;

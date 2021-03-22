@@ -44,7 +44,6 @@ public class SchedulerManager {
 		scheduler.start();
 
 		registerTimeTransmissionJob();
-		registerLocalTimeTransmissionJob();
 		registerRubricNameTransmissionJob();
 		registerNewsTransmissionJob();
 		registerStateSavingJob();
@@ -58,13 +57,6 @@ public class SchedulerManager {
 		JobDetail job = newJob(TimeTransmissionJob.class).withIdentity("timeTransmissionJob", "main").build();
 		CronTrigger trigger = newTrigger().withIdentity("timeTransmissionTrigger", "main")
 				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getTimeTransmissionCron())).build();
-		scheduler.scheduleJob(job, trigger);
-	}
-
-	private void registerLocalTimeTransmissionJob() throws SchedulerException {
-		JobDetail job = newJob(LocalTimeTransmissionJob.class).withIdentity("localTimeTransmissionJob", "main").build();
-		CronTrigger trigger = newTrigger().withIdentity("localTimeTransmissionTrigger", "main")
-				.withSchedule(cronSchedule(Settings.getSchedulerSettings().getLocalTimeTransmissionCron())).build();
 		scheduler.scheduleJob(job, trigger);
 	}
 

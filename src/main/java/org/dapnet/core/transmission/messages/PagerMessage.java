@@ -12,7 +12,7 @@
  * 52074 Aachen
  */
 
-package org.dapnet.core.transmission;
+package org.dapnet.core.transmission.messages;
 
 import java.time.Instant;
 

@@ -16,6 +16,7 @@ import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
+import org.dapnet.core.transmission.messages.PagerMessage;
 import org.dapnet.core.model.TransmitterGroup;
 
 /**
@@ -65,6 +66,15 @@ public class TransmitterManager {
 	 */
 	public void sendMessage(PagerMessage message) {
 		connectedClients.values().forEach(c -> c.sendMessage(message));
+	}
+
+	/**
+	 * Sends messages to all connected transmitters.
+	 * 
+	 * @param messages Messages to send
+	 */
+	public void sendMessages(Collection<PagerMessage> messages) {
+		connectedClients.values().forEach(c -> c.sendMessages(messages));
 	}
 
 	/**
@@ -149,6 +159,40 @@ public class TransmitterManager {
 			TransmitterClient cl = connectedClients.get(transmitterName);
 			if (cl != null) {
 				cl.sendMessage(message);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Sends messages to a specific connected transmitter only if it is in one of
+	 * the given transmitter groups.
+	 * 
+	 * @param messages              Messages to send.
+	 * @param transmitterName       Transmitter name.
+	 * @param transmitterGroupNames Transmitter groups to check.
+	 * @return {@code true} if the message was sent.
+	 */
+	public boolean sendMessagesIfInGroups(Collection<PagerMessage> messages, String transmitterName,
+			Set<String> transmitterGroupNames) {
+		Set<String> transmitters = null;
+
+		Lock lock = repository.getLock().readLock();
+		lock.lock();
+
+		try {
+			transmitters = getTransmitterNames(transmitterGroupNames);
+		} finally {
+			lock.unlock();
+		}
+
+		transmitterName = NamedObject.normalize(transmitterName);
+		if (transmitters.contains(transmitterName)) {
+			TransmitterClient cl = connectedClients.get(transmitterName);
+			if (cl != null) {
+				cl.sendMessages(messages);
 				return true;
 			}
 		}

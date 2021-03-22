@@ -5,6 +5,7 @@ import java.util.List;
 import org.dapnet.core.Settings;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 import org.dapnet.core.transmission.TransmitterClient.Message;
+import org.dapnet.core.transmission.messages.PagerMessage;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,6 +31,8 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {
 		PagerMessage pm = msg.getMessage();
+
+		// TODO Adapt this for different pager types
 
 		// Mostly adapted from Sven Jung
 		// See Diplomarbeit Jansen Page 30

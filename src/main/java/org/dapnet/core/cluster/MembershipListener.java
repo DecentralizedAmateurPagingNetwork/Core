@@ -163,10 +163,9 @@ public class MembershipListener implements org.jgroups.MembershipListener {
 				while (true) {
 					try {
 						clusterManager.getChannel().getState(majorSubgroup.getMembers().get(0), 5000);
-						break; // Success
+						break;
 					} catch (Exception e) {
 						logger.warn("Failed to receive State: {}", e.getMessage());
-						logger.warn(e);
 						if (numberOfAttempts++ > 5) {
 							throw e;
 						}

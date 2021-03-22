@@ -14,11 +14,14 @@
 
 package org.dapnet.core.transmission;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
@@ -27,78 +30,84 @@ import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.News;
+import org.dapnet.core.model.Pager;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.TransmitterGroup;
+import org.dapnet.core.transmission.messages.DefaultPagerProtocolFactory;
+import org.dapnet.core.transmission.messages.PagerMessage;
+import org.dapnet.core.transmission.messages.PagerMessageFactory;
+import org.dapnet.core.transmission.messages.PagerProtocol;
+import org.dapnet.core.transmission.messages.PagerProtocolFactory;
 
+/**
+ * This class implements the transmission manager responsible for sending
+ * messages to transmitters.
+ * 
+ * @author Philipp Thiel
+ */
 public class TransmissionManager {
 	private static final Logger logger = LogManager.getLogger();
-	private final PagerProtocol protocol;
+	private final ConcurrentMap<Pager.Type, PagerProtocol> pagerProtocols = new ConcurrentHashMap<>();
 	private final TransmitterManager transmitterManager;
 
+	/**
+	 * Constructs a new transmission manager instance.
+	 * 
+	 * @param stateManager State manager to use
+	 * @throws NullPointerException if the state manager is {@code null}
+	 */
 	public TransmissionManager(StateManager stateManager) {
-		protocol = new SkyperProtocol(stateManager);
 		transmitterManager = new TransmitterManager(stateManager);
+
+		// Register pager protocols
+		PagerProtocolFactory protocolFactory = new DefaultPagerProtocolFactory();
+		for (Pager.Type type : Pager.Type.values()) {
+			PagerProtocol protocol = protocolFactory.getProtocol(Pager.Type.SKYPER, stateManager);
+			if (protocol != null) {
+				pagerProtocols.put(type, protocol);
+			} else {
+				logger.warn("Pager type '{}' is not supported by protocol factory.", type);
+			}
+		}
 	}
 
-	public void handleTime(LocalDateTime time) {
-		// Skyper Time
-		try {
-			PagerMessage message = protocol.createMessageFromTime(time);
-			transmitterManager.sendMessage(message);
-
-			logger.info("Time sent to transmitters in Skyper format.");
-		} catch (Exception e) {
-			logger.error("Failed to send Time in Skyper format.", e);
+	/**
+	 * Sends a time messages to all transmitters. The time messages are created for
+	 * all pager protocols that support them.
+	 * 
+	 * @param time Time to send
+	 */
+	public void sendTime(ZonedDateTime time) {
+		if (time == null) {
+			throw new NullPointerException("Time must not be null.");
 		}
 
-		// Swissphone Time
-		try {
-			PagerMessage message = protocol.createMessageFromTimeSwissphone(time);
-			transmitterManager.sendMessage(message);
-
-			logger.info("Time sent to transmitters in Swissphone format.");
-		} catch (Exception e) {
-			logger.error("Failed to send Time in Swissphone format.", e);
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			addMessagesFromProtocol(time, protocol.getTimeFactory(), messages);
 		}
 
-		// AlphaPoc Time
 		try {
-			PagerMessage message = protocol.createMessageFromTimeAlphaPoc(time);
-			transmitterManager.sendMessage(message);
-
-			logger.info("Time sent to transmitters in AlphaPoc format.");
-		} catch (Exception e) {
-			logger.error("Failed to send Time in AlphaPoc format.", e);
+			transmitterManager.sendMessages(messages);
+		} catch (Exception ex) {
+			logger.error("Failed to send messages.", ex);
 		}
-
 	}
 
-	public void handleLocalTime(LocalDateTime time) {
-		// Swissphone Time in local time
-		try {
-			PagerMessage message = protocol.createMessageFromLocalTimeSwissphone(time);
-			transmitterManager.sendMessage(message);
-
-			logger.info("Local time sent to transmitters in Swissphone format.");
-		} catch (Exception e) {
-			logger.error("Failed to send local time in Swissphone format.", e);
+	/**
+	 * Sends news messages for pagers that support rubrics to all transmitter groups
+	 * belonging to the rubric in the news. This will not create messages for pagers
+	 * that do not support rubrics, see {@link handeNewsAsCall}.
+	 * 
+	 * @param news News to send
+	 */
+	public void sendNewsAsRubric(News news) {
+		if (news == null) {
+			throw new NullPointerException("News must not be null.");
 		}
 
-		// AlphaPoc Time in local time
-		try {
-			PagerMessage message = protocol.createMessageFromLocalTimeAlphaPoc(time);
-			transmitterManager.sendMessage(message);
-
-			logger.info("Local time sent to transmitters in AlphaPoc format.");
-		} catch (Exception e) {
-			logger.error("Failed to send local time in AlphaPoc format.", e);
-		}
-
-	}
-
-	public void handleNews(News news) {
 		Set<String> transmitterGroups = null;
 
 		final CoreRepository repo = transmitterManager.getRepository();
@@ -115,21 +124,42 @@ public class TransmissionManager {
 		}
 
 		if (transmitterGroups == null) {
-			logger.error("Failed to send news, could not get rubric for name: {}", news.getRubricName());
+			logger.error("Failed to send news, could not get transmitter groups for rubric '{}'.",
+					news.getRubricName());
 			return;
 		}
 
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			if (protocol.getRubricFactory() != null) {
+				addMessagesFromProtocol(news, protocol.getNewsFactory(), messages);
+			} else {
+				logger.debug("Pager protocol for '{}' does not support sending news to rubrics.",
+						protocol.getPagerType());
+			}
+		}
+
 		try {
-			PagerMessage message = protocol.createMessageFromNews(news);
-			transmitterManager.sendMessage(message, transmitterGroups);
+			transmitterManager.sendMessages(messages, transmitterGroups);
 
 			logger.info("News sent to transmitters.");
 		} catch (Exception e) {
-			logger.error("Failed to send News", e);
+			logger.error("Failed to send news", e);
 		}
 	}
 
-	public void handleNewsAsCall(News news) {
+	/**
+	 * Sends a news message as a regular call to all transmitter groups belonging to
+	 * the news. This will not create messages for pagers that support rubrics, see
+	 * {@link handeNewsAsRubric}.
+	 * 
+	 * @param news News to send
+	 */
+	public void sendNewsAsCall(News news) {
+		if (news == null) {
+			throw new NullPointerException("News must not be null.");
+		}
+
 		Set<String> transmitterGroups = null;
 
 		final CoreRepository repo = transmitterManager.getRepository();
@@ -146,35 +176,79 @@ public class TransmissionManager {
 		}
 
 		if (transmitterGroups == null) {
-			logger.error("Failed to send news, could not get rubric for name: {}", news.getRubricName());
+			logger.error("Failed to send news, could not get transmitter groups for rubric '{}'.",
+					news.getRubricName());
 			return;
 		}
 
-		try {
-			PagerMessage message = protocol.createMessageFromNewsAsCall(news);
-			transmitterManager.sendMessage(message, transmitterGroups);
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			if (protocol.getRubricFactory() == null) {
+				addMessagesFromProtocol(news, protocol.getNewsFactory(), messages);
+			} else {
+				logger.debug("Pager protocol for '{}' does not require sending news as calls.",
+						protocol.getPagerType());
+			}
+		}
 
-			logger.info("News sent to transmitters as call.");
-		} catch (Exception ex) {
-			logger.error("Failed to send News as call", ex);
+		try {
+			transmitterManager.sendMessages(messages, transmitterGroups);
+
+			logger.info("News sent to transmitters.");
+		} catch (Exception e) {
+			logger.error("Failed to send news", e);
 		}
 	}
 
-	public void handleRubric(Rubric rubric) {
+	/**
+	 * Sends a rubric message to all transmitter groups belonging to the rubric.
+	 * This will only create messages for pagers that support rubrics.
+	 * 
+	 * @param rubric Rubric to send
+	 */
+	public void sendRubric(Rubric rubric) {
+		if (rubric == null) {
+			throw new NullPointerException("Rubric must not be null.");
+		}
+
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			addMessagesFromProtocol(rubric, protocol.getRubricFactory(), messages);
+		}
+
 		try {
-			PagerMessage message = protocol.createMessageFromRubric(rubric);
-			transmitterManager.sendMessage(message, rubric.getTransmitterGroupNames());
+			transmitterManager.sendMessages(messages, rubric.getTransmitterGroupNames());
 
 			logger.info("Rubric {} sent to transmitters.", rubric.getName());
 		} catch (Exception e) {
-			logger.error("Failed to send Rubric " + rubric.getName(), e);
+			logger.error("Failed to send rubric " + rubric.getName(), e);
 		}
 	}
 
-	public void handleRubricToTransmitter(Rubric rubric, String transmitterName) {
+	/**
+	 * Sends a rubric message to the specified transmitter. This will only create
+	 * messages for pagers that support rubrics.
+	 * 
+	 * @param rubric          Rubric to send
+	 * @param transmitterName Transmitter name
+	 */
+	public void sendRubricToTransmitter(Rubric rubric, String transmitterName) {
+		if (rubric == null) {
+			throw new NullPointerException("Rubric must not be null.");
+		}
+
+		if (transmitterName == null) {
+			throw new NullPointerException("Transmitter name must not be null.");
+		}
+
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			addMessagesFromProtocol(rubric, protocol.getRubricFactory(), messages);
+		}
+
 		try {
-			PagerMessage message = protocol.createMessageFromRubric(rubric);
-			if (transmitterManager.sendMessageIfInGroups(message, transmitterName, rubric.getTransmitterGroupNames())) {
+			if (transmitterManager.sendMessagesIfInGroups(messages, transmitterName,
+					rubric.getTransmitterGroupNames())) {
 				logger.info("Rubric {} sent to transmitter {}", rubric.getName(), transmitterName);
 			}
 		} catch (Exception ex) {
@@ -182,9 +256,22 @@ public class TransmissionManager {
 		}
 	}
 
-	public void handleCall(Call call) {
+	/**
+	 * Sends a call message to the transmitter groups belonging to the call.
+	 * 
+	 * @param call Call to send
+	 */
+	public void sendCall(Call call) {
+		if (call == null) {
+			throw new NullPointerException("Call must not be null.");
+		}
+
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			addMessagesFromProtocol(call, protocol.getCallFactory(), messages);
+		}
+
 		try {
-			Collection<PagerMessage> messages = protocol.createMessagesFromCall(call);
 			transmitterManager.sendMessages(messages, call.getTransmitterGroupNames());
 
 			logger.info("Call sent to {} CallSigns, to {} Pagers, using {} TransmitterGroups.",
@@ -210,20 +297,33 @@ public class TransmissionManager {
 				lock.unlock();
 			}
 		} catch (Exception e) {
-			logger.error("Failed to send Call", e);
+			logger.error("Failed to send call.", e);
 		}
 	}
 
-	public void handleActivation(Activation activation) {
-		try {
-			PagerMessage message = protocol.createMessageFromActivation(activation);
+	/**
+	 * Sends an activation message to the transmitter groups belonging to the
+	 * activation. This will only create messages for pagers that require
+	 * activation.
+	 * 
+	 * @param activation Activation to send
+	 */
+	public void sendActivation(Activation activation) {
+		if (activation == null) {
+			throw new NullPointerException("Activation must not be null.");
+		}
 
-			transmitterManager.sendMessage(message, activation.getTransmitterGroupNames());
+		final Collection<PagerMessage> messages = new LinkedList<>();
+		for (PagerProtocol protocol : pagerProtocols.values()) {
+			addMessagesFromProtocol(activation, protocol.getActivationFactory(), messages);
+		}
+
+		try {
+			transmitterManager.sendMessages(messages, activation.getTransmitterGroupNames());
 
 			logger.info("Activation sent to transmitters.");
 		} catch (Exception e) {
-			logger.error("Failed to send Activation", e);
-			return;
+			logger.error("Failed to send activation.", e);
 		}
 
 		// Send info message
@@ -244,7 +344,7 @@ public class TransmissionManager {
 		// }
 	}
 
-	public void handleIdentification() {
+	public void sendIdentification() {
 		try {
 			transmitterManager.sendCallSigns();
 
@@ -256,5 +356,24 @@ public class TransmissionManager {
 
 	public TransmitterManager getTransmitterManager() {
 		return transmitterManager;
+	}
+
+	private <T> void addMessagesFromProtocol(T object, PagerMessageFactory<T> factory,
+			Collection<PagerMessage> messages) {
+		if (factory == null) {
+			logger.debug("Object type '{}' not supported by protocol.", object.getClass());
+			return;
+		}
+
+		try {
+			Collection<PagerMessage> created = factory.createMessage(object);
+			if (created != null) {
+				messages.addAll(created);
+			} else {
+				logger.warn("No messages created for type '{}'", object.getClass());
+			}
+		} catch (Exception ex) {
+			logger.error("Failed to create messages.", ex);
+		}
 	}
 }

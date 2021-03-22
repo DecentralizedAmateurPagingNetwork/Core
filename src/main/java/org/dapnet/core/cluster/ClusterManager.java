@@ -132,8 +132,8 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 				news.put(r.getName(), nl);
 			}
 
-			nl.setHandler(transmissionManager::handleNews);
-			nl.setAddHandler(transmissionManager::handleNewsAsCall);
+			nl.setHandler(transmissionManager::sendNewsAsRubric);
+			nl.setAddHandler(transmissionManager::sendNewsAsCall);
 		}
 	}
 

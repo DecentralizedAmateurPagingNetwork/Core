@@ -14,8 +14,7 @@
 
 package org.dapnet.core.scheduler;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,10 +36,10 @@ public class TimeTransmissionJob implements Job {
 			schedulerContext = context.getScheduler().getContext();
 			TransmissionManager transmissionManager = (TransmissionManager) schedulerContext.get("transmissionManager");
 
-			// Possibility to implement TimeZones by adding here a
-			// TransmitterGroup
-			LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-			transmissionManager.handleTime(now);
+			// TODO We could also add a time zone to the transmitter/transmitter group and
+			// send out local time?
+			ZonedDateTime now = ZonedDateTime.now();
+			transmissionManager.sendTime(now);
 		} catch (SchedulerException e) {
 			logger.error("Failed to execute TimeTransmissionJob", e);
 		}

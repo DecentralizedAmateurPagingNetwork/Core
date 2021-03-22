@@ -41,7 +41,7 @@ public class RubricNameTransmissionJob implements Job {
 			lock.lock();
 
 			try {
-				stateManager.getRubrics().values().forEach(r -> transmissionManager.handleRubric(r));
+				stateManager.getRubrics().values().forEach(r -> transmissionManager.sendRubric(r));
 			} finally {
 				lock.unlock();
 			}

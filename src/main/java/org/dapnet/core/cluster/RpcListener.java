@@ -123,7 +123,7 @@ public class RpcListener {
 			}
 
 			// Transmit new Call
-			clusterManager.getTransmissionManager().handleCall(call);
+			clusterManager.getTransmissionManager().sendCall(call);
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
@@ -152,7 +152,7 @@ public class RpcListener {
 			}
 
 			// Transmit Activation
-			clusterManager.getTransmissionManager().handleActivation(activation);
+			clusterManager.getTransmissionManager().sendActivation(activation);
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
@@ -488,8 +488,8 @@ public class RpcListener {
 				ModelRepository<NewsList> news = stateManager.getNews();
 				if (!news.containsKey(rubricName)) {
 					NewsList nl = new NewsList();
-					nl.setHandler(clusterManager.getTransmissionManager()::handleNews);
-					nl.setAddHandler(clusterManager.getTransmissionManager()::handleNewsAsCall);
+					nl.setHandler(clusterManager.getTransmissionManager()::sendNewsAsRubric);
+					nl.setAddHandler(clusterManager.getTransmissionManager()::sendNewsAsCall);
 
 					news.put(rubricName, nl);
 				}
@@ -502,7 +502,7 @@ public class RpcListener {
 			}
 
 			// Transmit new Rubric
-			clusterManager.getTransmissionManager().handleRubric(rubric);
+			clusterManager.getTransmissionManager().sendRubric(rubric);
 
 			return response = RpcResponse.OK;
 		} catch (Exception e) {
@@ -1016,7 +1016,7 @@ public class RpcListener {
 
 				final TransmissionManager manager = clusterManager.getTransmissionManager();
 				for (Rubric r : stateManager.getRubrics().values()) {
-					manager.handleRubricToTransmitter(r, transmitterName);
+					manager.sendRubricToTransmitter(r, transmitterName);
 				}
 			} finally {
 				lock.unlock();

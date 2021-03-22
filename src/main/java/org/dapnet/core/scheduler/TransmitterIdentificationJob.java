@@ -17,7 +17,7 @@ public class TransmitterIdentificationJob implements Job {
 			SchedulerContext schedulerContext = context.getScheduler().getContext();
 			ClusterManager clusterManager = (ClusterManager) schedulerContext.get("clusterManager");
 
-			clusterManager.getTransmissionManager().handleIdentification();
+			clusterManager.getTransmissionManager().sendIdentification();
 		} catch (Throwable cause) {
 			LOGGER.fatal("Failed to execute transmitter identification job.", cause);
 		}

@@ -1,4 +1,4 @@
-package org.dapnet.core.transmission;
+package org.dapnet.core.transmission.messages;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -7,7 +7,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
-final class DE_ASCII7 extends Charset {
+public final class DE_ASCII7 extends Charset {
 
 	private static final String[] ALIASES = { "DE-ASCII", "ASCII7_DE" };
 

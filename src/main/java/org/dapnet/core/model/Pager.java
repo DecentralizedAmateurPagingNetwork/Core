@@ -24,6 +24,18 @@ import jakarta.validation.constraints.Size;
 public class Pager implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Enumeration of supported pager types.
+	 * 
+	 * @author Philipp Thiel
+	 */
+	public enum Type {
+		SKYPER, ALPHAPOC, SWISSPHONE
+	}
+
+	@NotNull
+	private Type type = Type.SKYPER;
+
 	@PagerAddress(checkDuplicates = false)
 	private int number;
 
@@ -39,8 +51,17 @@ public class Pager implements Serializable {
 			throw new NullPointerException("Other object must not be null.");
 		}
 
+		type = other.type;
 		number = other.number;
 		name = other.name;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	public int getNumber() {
