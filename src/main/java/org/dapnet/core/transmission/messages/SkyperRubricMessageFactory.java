@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 
 /**
  * Skyper rubric message factory.
@@ -14,6 +17,7 @@ import org.dapnet.core.model.Rubric;
  */
 class SkyperRubricMessageFactory implements PagerMessageFactory<Rubric> {
 
+	private static final int RUBRIC_ADDRESS = 4512;
 	private final Function<String, String> encoder;
 
 	/**
@@ -38,8 +42,8 @@ class SkyperRubricMessageFactory implements PagerMessageFactory<Rubric> {
 			sb.append(String.valueOf((char) ((int) label.charAt(i) + 1)));
 		}
 
-		PagerMessage message = new PagerMessage(sb.toString(), 4512, PagerMessage.MessagePriority.RUBRIC,
-				PagerMessage.FunctionalBits.ALPHANUM);
+		PagerMessage message = new PagerMessage(Priority.RUBRIC, RUBRIC_ADDRESS, SubAddress.ADDR_D,
+				ContentType.ALPHANUMERIC, sb.toString());
 
 		return List.of(message);
 	}

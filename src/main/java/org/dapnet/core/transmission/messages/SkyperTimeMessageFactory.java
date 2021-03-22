@@ -6,6 +6,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
+
 /**
  * Skyper time message factory.
  * 
@@ -14,6 +18,7 @@ import java.util.List;
 class SkyperTimeMessageFactory implements PagerMessageFactory<ZonedDateTime> {
 
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HHmmss   ddMMyy");
+	private static final int TIME_ADDRESS = 2504;
 	private final boolean uselocalTime;
 
 	/**
@@ -36,8 +41,8 @@ class SkyperTimeMessageFactory implements PagerMessageFactory<ZonedDateTime> {
 			timeString = DATE_FORMATTER.format(utcTime);
 		}
 
-		PagerMessage message = new PagerMessage(timeString, 2504, PagerMessage.MessagePriority.TIME,
-				PagerMessage.FunctionalBits.NUMERIC);
+		PagerMessage message = new PagerMessage(Priority.TIME, TIME_ADDRESS, SubAddress.ADDR_A, ContentType.NUMERIC,
+				timeString);
 
 		return List.of(message);
 	}

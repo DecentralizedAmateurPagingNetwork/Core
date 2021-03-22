@@ -7,6 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
+
 /**
  * Swissphone time message factory.
  * 
@@ -16,6 +20,8 @@ class SwissphoneTimeMessageFactory implements PagerMessageFactory<ZonedDateTime>
 
 	private static final DateTimeFormatter DATE_FORMATTER_SWISSPHONE = DateTimeFormatter
 			.ofPattern("'XTIME='HHmmddMMyy");
+	private static final int UTC_ADDRESS = 200;
+	private static final int LOCAL_ADDRESS = 208;
 
 	@Override
 	public Collection<PagerMessage> createMessage(ZonedDateTime payload) {
@@ -23,16 +29,16 @@ class SwissphoneTimeMessageFactory implements PagerMessageFactory<ZonedDateTime>
 
 		// UTC
 		final ZonedDateTime utcTime = payload.withZoneSameInstant(ZoneOffset.UTC);
-		String s = DATE_FORMATTER_SWISSPHONE.format(utcTime);
-		String s2 = s + s;
-		PagerMessage msg = new PagerMessage(s2, 200, PagerMessage.MessagePriority.TIME,
-				PagerMessage.FunctionalBits.ALPHANUM);
+		String timeStr = DATE_FORMATTER_SWISSPHONE.format(utcTime);
+		timeStr = timeStr + timeStr;
+		PagerMessage msg = new PagerMessage(Priority.TIME, UTC_ADDRESS, SubAddress.ADDR_D, ContentType.ALPHANUMERIC,
+				timeStr);
 		result.add(msg);
 
 		// Local time
-		s = DATE_FORMATTER_SWISSPHONE.format(payload);
-		s2 = s + s;
-		msg = new PagerMessage(s2, 208, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
+		timeStr = DATE_FORMATTER_SWISSPHONE.format(payload);
+		timeStr = timeStr + timeStr;
+		msg = new PagerMessage(Priority.TIME, LOCAL_ADDRESS, SubAddress.ADDR_D, ContentType.ALPHANUMERIC, timeStr);
 		result.add(msg);
 
 		return Collections.unmodifiableCollection(result);

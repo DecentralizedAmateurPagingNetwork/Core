@@ -16,62 +16,120 @@ package org.dapnet.core.transmission.messages;
 
 import java.time.Instant;
 
+/**
+ * This class represents a pager message. It contains all data required to
+ * generate the actual radio message.
+ * 
+ * @author Philipp Thiel
+ */
 public class PagerMessage implements Comparable<PagerMessage> {
-	private final String text;
-	private final int address;
-	private final Instant timestamp;
-	private final MessagePriority priority;
-	private final FunctionalBits functionalBits;
-
-	public enum MessagePriority {
+	/**
+	 * Enumeration of message priorities. This can be used to prioritize messages in
+	 * waiting queues. It does not affect the content of the transmitted radio
+	 * message.
+	 * 
+	 * @author Philipp Thiel
+	 */
+	public enum Priority {
 		EMERGENCY, TIME, CALL, NEWS, ACTIVATION, RUBRIC
 	}
 
-	public enum FunctionalBits {
-		NUMERIC(0), TONE(1), ACTIVATION(2), ALPHANUM(3);
+	/**
+	 * The message content type.
+	 * 
+	 * @author Philipp Thiel
+	 */
+	public enum ContentType {
+		NUMERIC, ALPHANUMERIC
+	}
+
+	/**
+	 * Enumeration of the POCSAG sub-address.
+	 * 
+	 * @author Philipp Thiel
+	 *
+	 */
+	public enum SubAddress {
+		ADDR_A(0), ADDR_B(1), ADDR_C(2), ADDR_D(3);
 
 		private int value;
 
-		private FunctionalBits(int value) {
+		private SubAddress(int value) {
 			this.value = value;
 		}
 
+		/**
+		 * Gets the integer value of the sub-address.
+		 * 
+		 * @return Integer value
+		 */
 		public int getValue() {
 			return value;
 		}
 	}
 
-	public PagerMessage(Instant timestamp, String text, int address, MessagePriority priority,
-			FunctionalBits functionalBits) {
-		this.text = text;
-		this.address = address;
+	private final Instant timestamp;
+	private final Priority priority;
+	private final int address;
+	private final SubAddress subAddress;
+	private final ContentType type;
+	private final String content;
+
+	/**
+	 * Constructs a new pager message.
+	 * 
+	 * @param timestamp  Timestamp (used for message ordering)
+	 * @param priority   Priority (used for message ordering)
+	 * @param address    Destination address
+	 * @param subAddress Sub-address
+	 * @param type       Content type
+	 * @param content    Message content
+	 */
+	public PagerMessage(Instant timestamp, Priority priority, int address, SubAddress subAddress, ContentType type,
+			String content) {
 		this.timestamp = timestamp;
 		this.priority = priority;
-		this.functionalBits = functionalBits;
+		this.address = address;
+		this.subAddress = subAddress;
+		this.type = type;
+		this.content = content;
 	}
 
-	public PagerMessage(String text, int address, MessagePriority priority, FunctionalBits functionalBits) {
-		this(Instant.now(), text, address, priority, functionalBits);
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public int getAddress() {
-		return address;
+	/**
+	 * Constructs a new pager message.
+	 * 
+	 * @param priority   Priority (used for message ordering)
+	 * @param address    Destination address
+	 * @param subAddress Sub-address
+	 * @param type       Content type
+	 * @param content    Message content
+	 */
+	public PagerMessage(Priority priority, int address, SubAddress subAddress, ContentType type, String content) {
+		this(Instant.now(), priority, address, subAddress, type, content);
 	}
 
 	public Instant getTimestamp() {
 		return timestamp;
 	}
 
-	public MessagePriority getPriority() {
+	public ContentType getContentType() {
+		return type;
+	}
+
+	public Priority getPriority() {
 		return priority;
 	}
 
-	public FunctionalBits getFunctionalBits() {
-		return functionalBits;
+	public int getAddress() {
+		return address;
+	}
+
+	public SubAddress getSubAddress() {
+		return subAddress;
+	}
+
+	public String getContent() {
+		return content;
 	}
 
 	@Override

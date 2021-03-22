@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Objects;
 
 import org.dapnet.core.model.Activation;
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 
 /**
  * Skyper activation message factory.
@@ -42,8 +45,8 @@ class SkyperActivationMessageFactory implements PagerMessageFactory<Activation> 
 			sb.append(String.valueOf(c));
 		}
 
-		PagerMessage message = new PagerMessage(sb.toString(), payload.getNumber(),
-				PagerMessage.MessagePriority.ACTIVATION, PagerMessage.FunctionalBits.ACTIVATION);
+		PagerMessage message = new PagerMessage(Priority.ACTIVATION, payload.getNumber(), SubAddress.ADDR_C,
+				ContentType.ALPHANUMERIC, sb.toString());
 
 		return List.of(message);
 	}

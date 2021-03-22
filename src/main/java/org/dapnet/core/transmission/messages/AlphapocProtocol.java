@@ -23,6 +23,7 @@ class AlphapocProtocol implements PagerProtocol {
 	private final PagerMessageFactory<Call> callFactory;
 	private final PagerMessageFactory<News> newsFactory;
 	private final PagerMessageFactory<ZonedDateTime> timeFactory;
+	private final PagerMessageFactory<TransmitterIdentification> idFactory;
 
 	/**
 	 * Constructs a new Alphapoc pager protocol instance.
@@ -32,8 +33,9 @@ class AlphapocProtocol implements PagerProtocol {
 	public AlphapocProtocol(CoreRepository repository) {
 		// TODO Use proper factory
 		callFactory = new SkyperCallMessageFactory(repository, AlphapocProtocol::encode);
-		newsFactory = new RicNewsMessageFactory(repository);
+		newsFactory = new RicNewsMessageFactory(repository, AlphapocProtocol::encode);
 		timeFactory = new AlphapocTimeMessageFactory();
+		idFactory = new TransmitterIdentificationMessageFactory();
 	}
 
 	@Override
@@ -64,6 +66,11 @@ class AlphapocProtocol implements PagerProtocol {
 	@Override
 	public PagerMessageFactory<ZonedDateTime> getTimeFactory() {
 		return timeFactory;
+	}
+
+	@Override
+	public PagerMessageFactory<TransmitterIdentification> getTransmitterIdentificationFactory() {
+		return idFactory;
 	}
 
 	private static String encode(String text) {

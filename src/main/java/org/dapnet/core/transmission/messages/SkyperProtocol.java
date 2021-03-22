@@ -70,6 +70,11 @@ class SkyperProtocol implements PagerProtocol {
 		return timeFactory;
 	}
 
+	@Override
+	public PagerMessageFactory<TransmitterIdentification> getTransmitterIdentificationFactory() {
+		return null; // Not supported
+	}
+
 	private static String encode(String text) {
 		if (text != null) {
 			byte[] encoded = text.getBytes(PAGER_CHARSET);

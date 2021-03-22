@@ -2,6 +2,7 @@ package org.dapnet.core.transmission;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,8 +17,8 @@ import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
-import org.dapnet.core.transmission.messages.PagerMessage;
 import org.dapnet.core.model.TransmitterGroup;
+import org.dapnet.core.transmission.messages.PagerMessage;
 
 /**
  * This class manages connected transmitters.
@@ -47,6 +48,15 @@ public class TransmitterManager {
 	 */
 	public CoreRepository getRepository() {
 		return repository;
+	}
+
+	/**
+	 * Gets an unmodifyable collection of the currently connected clients.
+	 * 
+	 * @return Collection of transmitter clients
+	 */
+	public Collection<TransmitterClient> getConnectedClients() {
+		return Collections.unmodifiableCollection(connectedClients.values());
 	}
 
 	/**
@@ -211,19 +221,6 @@ public class TransmitterManager {
 		if (cl != null) {
 			cl.sendMessages(messages);
 		}
-	}
-
-	/**
-	 * Sends a message containing the callsign to each connected transmitter.
-	 */
-	public void sendCallSigns() {
-		connectedClients.values().forEach(tx -> {
-			try {
-				tx.sendCallSignMessage();
-			} catch (Throwable cause) {
-				logger.error("Failed to send callsign to transmitter.", cause);
-			}
-		});
 	}
 
 	/**

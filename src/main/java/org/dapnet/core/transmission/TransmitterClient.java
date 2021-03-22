@@ -7,8 +7,6 @@ import java.util.PriorityQueue;
 
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.transmission.messages.PagerMessage;
-import org.dapnet.core.transmission.messages.PagerMessage.FunctionalBits;
-import org.dapnet.core.transmission.messages.PagerMessage.MessagePriority;
 import org.jgroups.stack.IpAddress;
 
 import io.netty.channel.Channel;
@@ -106,19 +104,6 @@ final class TransmitterClient {
 		}
 
 		this.transmitter = transmitter;
-	}
-
-	/**
-	 * Sends a message containing the transmitter name (callsign) to the connected
-	 * transmitter.
-	 */
-	public void sendCallSignMessage() {
-		Transmitter theTransmitter = transmitter;
-		if (theTransmitter != null) {
-			PagerMessage msg = new PagerMessage(theTransmitter.getName(), theTransmitter.getIdentificationAddress(),
-					MessagePriority.CALL, FunctionalBits.ALPHANUM);
-			sendMessage(msg);
-		}
 	}
 
 	/**

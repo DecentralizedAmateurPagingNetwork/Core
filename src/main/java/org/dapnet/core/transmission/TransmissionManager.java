@@ -40,6 +40,7 @@ import org.dapnet.core.transmission.messages.PagerMessage;
 import org.dapnet.core.transmission.messages.PagerMessageFactory;
 import org.dapnet.core.transmission.messages.PagerProtocol;
 import org.dapnet.core.transmission.messages.PagerProtocolFactory;
+import org.dapnet.core.transmission.messages.TransmitterIdentification;
 
 /**
  * This class implements the transmission manager responsible for sending
@@ -344,13 +345,37 @@ public class TransmissionManager {
 		// }
 	}
 
+	/**
+	 * Sends transmitter identification messages for all connected transmitters.
+	 */
 	public void sendIdentification() {
+		Lock lock = transmitterManager.getRepository().getLock().readLock();
+		lock.lock();
+
 		try {
-			transmitterManager.sendCallSigns();
+			final Collection<TransmitterClient> clients = transmitterManager.getConnectedClients();
+			for (TransmitterClient client : clients) {
+				final Transmitter tx = client.getTransmitter();
+				if (tx == null) {
+					logger.warn("Transmitter data not set, cannot send identification.");
+					continue;
+				}
+
+				final Collection<PagerMessage> messages = new LinkedList<>();
+				final TransmitterIdentification id = new TransmitterIdentification(tx.getName(),
+						tx.getIdentificationAddress());
+				for (PagerProtocol proto : pagerProtocols.values()) {
+					addMessagesFromProtocol(id, proto.getTransmitterIdentificationFactory(), messages);
+				}
+
+				client.sendMessages(messages);
+			}
 
 			logger.info("Transmitter identifications sent.");
 		} catch (Exception e) {
-			logger.error("Failed to send transmitter identifications.");
+			logger.error("Failed to send transmitter identifications.", e);
+		} finally {
+			lock.unlock();
 		}
 	}
 

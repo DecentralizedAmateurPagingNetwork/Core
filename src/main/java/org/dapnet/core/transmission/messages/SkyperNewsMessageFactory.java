@@ -9,6 +9,9 @@ import java.util.function.Function;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Rubric;
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 
 /**
  * Skyper news message factory.
@@ -17,6 +20,7 @@ import org.dapnet.core.model.Rubric;
  */
 class SkyperNewsMessageFactory implements PagerMessageFactory<News> {
 
+	private static final int NEWS_ADDRESS = 4520;
 	private final CoreRepository repository;
 	private final Function<String, String> encoder;
 
@@ -57,8 +61,8 @@ class SkyperNewsMessageFactory implements PagerMessageFactory<News> {
 			sb.append(String.valueOf((char) ((int) text.charAt(i) + 1)));
 		}
 
-		PagerMessage message = new PagerMessage(sb.toString(), 4520, PagerMessage.MessagePriority.NEWS,
-				PagerMessage.FunctionalBits.ALPHANUM);
+		PagerMessage message = new PagerMessage(Priority.NEWS, NEWS_ADDRESS, SubAddress.ADDR_D,
+				ContentType.ALPHANUMERIC, sb.toString());
 
 		return List.of(message);
 	}

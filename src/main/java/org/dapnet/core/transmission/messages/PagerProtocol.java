@@ -58,4 +58,12 @@ public interface PagerProtocol {
 	 */
 	PagerMessageFactory<ZonedDateTime> getTimeFactory();
 
+	/**
+	 * Gets the transmitter identification message factory.
+	 * 
+	 * @return Transmitter identification message factory or {@code null} if not
+	 *         supported
+	 */
+	PagerMessageFactory<TransmitterIdentification> getTransmitterIdentificationFactory();
+
 }

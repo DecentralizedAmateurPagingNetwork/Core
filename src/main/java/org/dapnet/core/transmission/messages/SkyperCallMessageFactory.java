@@ -17,8 +17,9 @@ import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.Pager;
-import org.dapnet.core.transmission.messages.PagerMessage.FunctionalBits;
-import org.dapnet.core.transmission.messages.PagerMessage.MessagePriority;
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 
 /**
  * Skyper call message factory.
@@ -47,7 +48,7 @@ class SkyperCallMessageFactory implements PagerMessageFactory<Call> {
 	public Collection<PagerMessage> createMessage(Call payload) {
 		final Collection<PagerMessage> messages = new LinkedList<>();
 
-		MessagePriority priority = payload.isEmergency() ? MessagePriority.EMERGENCY : MessagePriority.CALL;
+		Priority priority = payload.isEmergency() ? Priority.EMERGENCY : Priority.CALL;
 		Instant now = Instant.now();
 
 		Lock lock = repository.getLock().readLock();
@@ -67,16 +68,19 @@ class SkyperCallMessageFactory implements PagerMessageFactory<Call> {
 					continue;
 				}
 
-				FunctionalBits mode;
+				ContentType type;
+				SubAddress mode;
 				String text;
 				if (!callsign.isNumeric()) {
 					// Support for alphanumeric messages -> create ALPHANUM message
-					mode = FunctionalBits.ALPHANUM;
+					mode = SubAddress.ADDR_D;
+					type = ContentType.ALPHANUMERIC;
 					text = encoder.apply(payload.getText());
 				} else if (numeric) {
 					// No support for alphanumeric messages but text is numeric -> create NUMERIC
 					// message
-					mode = FunctionalBits.NUMERIC;
+					mode = SubAddress.ADDR_A;
+					type = ContentType.NUMERIC;
 					text = payload.getText().toUpperCase();
 				} else {
 					// No support for alphanumeric messages and non-numeric message -> skip
@@ -85,7 +89,8 @@ class SkyperCallMessageFactory implements PagerMessageFactory<Call> {
 				}
 
 				for (Pager pager : callsign.getPagers()) {
-					messages.add(new PagerMessage(now, text, pager.getNumber(), priority, mode));
+					PagerMessage message = new PagerMessage(now, priority, pager.getNumber(), mode, type, text);
+					messages.add(message);
 				}
 			}
 		} finally {

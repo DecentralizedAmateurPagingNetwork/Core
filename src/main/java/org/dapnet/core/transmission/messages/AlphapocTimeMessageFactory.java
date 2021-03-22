@@ -7,6 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.dapnet.core.transmission.messages.PagerMessage.ContentType;
+import org.dapnet.core.transmission.messages.PagerMessage.Priority;
+import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
+
 /**
  * Alphapoc time message factory.
  * 
@@ -16,6 +20,8 @@ class AlphapocTimeMessageFactory implements PagerMessageFactory<ZonedDateTime> {
 
 	private static final DateTimeFormatter DATE_FORMATTER_ALPHAPOC = DateTimeFormatter
 			.ofPattern("'YYYYMMDDHHMMSS'yyMMddHHmm'00'");
+	private static final int UTC_ADDRESS = 216;
+	private static final int LOCAL_ADDRESS = 224;
 
 	@Override
 	public Collection<PagerMessage> createMessage(ZonedDateTime payload) {
@@ -23,14 +29,14 @@ class AlphapocTimeMessageFactory implements PagerMessageFactory<ZonedDateTime> {
 
 		// UTC
 		final ZonedDateTime utcTime = payload.withZoneSameInstant(ZoneOffset.UTC);
-		String s = DATE_FORMATTER_ALPHAPOC.format(utcTime);
-		PagerMessage msg = new PagerMessage(s, 216, PagerMessage.MessagePriority.TIME,
-				PagerMessage.FunctionalBits.ALPHANUM);
+		String timeStr = DATE_FORMATTER_ALPHAPOC.format(utcTime);
+		PagerMessage msg = new PagerMessage(Priority.TIME, UTC_ADDRESS, SubAddress.ADDR_D, ContentType.ALPHANUMERIC,
+				timeStr);
 		result.add(msg);
 
 		// Local time
-		s = DATE_FORMATTER_ALPHAPOC.format(payload);
-		msg = new PagerMessage(s, 224, PagerMessage.MessagePriority.TIME, PagerMessage.FunctionalBits.ALPHANUM);
+		timeStr = DATE_FORMATTER_ALPHAPOC.format(payload);
+		msg = new PagerMessage(Priority.TIME, LOCAL_ADDRESS, SubAddress.ADDR_D, ContentType.ALPHANUMERIC, timeStr);
 		result.add(msg);
 
 		return Collections.unmodifiableCollection(result);

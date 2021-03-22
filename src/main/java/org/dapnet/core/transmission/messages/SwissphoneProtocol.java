@@ -8,8 +8,8 @@ import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.News;
-import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.Pager.Type;
+import org.dapnet.core.model.Rubric;
 
 /**
  * Swissphone pager protocol implementation.
@@ -23,6 +23,7 @@ class SwissphoneProtocol implements PagerProtocol {
 	private final PagerMessageFactory<Call> callFactory;
 	private final PagerMessageFactory<News> newsFactory;
 	private final PagerMessageFactory<ZonedDateTime> timeFactory;
+	private final PagerMessageFactory<TransmitterIdentification> idFactory;
 
 	/**
 	 * Constructs a new Alphapoc pager protocol instance.
@@ -32,8 +33,9 @@ class SwissphoneProtocol implements PagerProtocol {
 	public SwissphoneProtocol(CoreRepository repository) {
 		// TODO Use proper factory
 		callFactory = new SkyperCallMessageFactory(repository, SwissphoneProtocol::encode);
-		newsFactory = new RicNewsMessageFactory(repository);
+		newsFactory = new RicNewsMessageFactory(repository, SwissphoneProtocol::encode);
 		timeFactory = new SwissphoneTimeMessageFactory();
+		idFactory = new TransmitterIdentificationMessageFactory();
 	}
 
 	@Override
@@ -64,6 +66,11 @@ class SwissphoneProtocol implements PagerProtocol {
 	@Override
 	public PagerMessageFactory<ZonedDateTime> getTimeFactory() {
 		return timeFactory;
+	}
+
+	@Override
+	public PagerMessageFactory<TransmitterIdentification> getTransmitterIdentificationFactory() {
+		return idFactory;
 	}
 
 	private static String encode(String text) {
