@@ -203,8 +203,6 @@ final class TransmitterClient {
 			if (msg != null) {
 				currentMessage = new Message(getNextSequenceNumber(), msg);
 				channel.writeAndFlush(currentMessage);
-			} else {
-				return;
 			}
 		} else if (retransmit) {
 			channel.writeAndFlush(currentMessage);
