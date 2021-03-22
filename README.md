@@ -8,7 +8,7 @@ controls connected paging transmitter. All functions can be accessed via the RES
 
 ## Installation and Requirements
 Using the packed release version no installation is required. All external libraries are
-included. Just make sure a JAVA 8+ runtime environment is available.
+included. Just make sure a JAVA 11+ runtime environment is available.
 
 
 ## Usage
