@@ -15,9 +15,11 @@
 package org.dapnet.core.rest.resources;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -53,6 +55,26 @@ public class TransmitterResource extends AbstractResource {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	@GET
+	@Path("public_list")
+	public Response getPublicTransmitters() throws Exception {
+		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.EVERYBODY);
+		Collection<PublicTransmitterInfo> result = null;
+
+		final CoreRepository repo = getRepository();
+		Lock lock = repo.getLock().readLock();
+		lock.lock();
+
+		try {
+			final Collection<Transmitter> transmitters = repo.getTransmitters().values();
+			result = transmitters.stream().map(PublicTransmitterInfo::new).collect(Collectors.toList());
+		} finally {
+			lock.unlock();
+		}
+
+		return getObject(result, status);
 	}
 
 	@GET
@@ -139,5 +161,46 @@ public class TransmitterResource extends AbstractResource {
 		}
 
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);
+	}
+
+	public static final class PublicTransmitterInfo {
+		private String name;
+		private String latitude;
+		private String longitude;
+		private Transmitter.Status status;
+		private Transmitter.Usage usage;
+
+		public PublicTransmitterInfo(Transmitter transmitter) {
+			if (transmitter == null) {
+				throw new NullPointerException("Transmitter must not be null.");
+			}
+
+			name = transmitter.getName();
+			latitude = transmitter.getLatitude();
+			longitude = transmitter.getLongitude();
+			status = transmitter.getStatus();
+			usage = transmitter.getUsage();
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String getLatitude() {
+			return latitude;
+		}
+
+		public String getLongitude() {
+			return longitude;
+		}
+
+		public Transmitter.Status getStatus() {
+			return status;
+		}
+
+		public Transmitter.Usage getUsage() {
+			return usage;
+		}
+
 	}
 }
