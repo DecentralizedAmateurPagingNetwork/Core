@@ -58,10 +58,10 @@ public class TransmitterResource extends AbstractResource {
 	}
 
 	@GET
-	@Path("public_list")
+	@Path("public_transmitter_map")
 	public Response getPublicTransmitters() throws Exception {
 		RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.PUBLIC);
-		Collection<PublicTransmitterInfo> result = null;
+		Collection<PublicMapInfo> result = null;
 
 		final CoreRepository repo = getRepository();
 		Lock lock = repo.getLock().readLock();
@@ -69,7 +69,7 @@ public class TransmitterResource extends AbstractResource {
 
 		try {
 			final Collection<Transmitter> transmitters = repo.getTransmitters().values();
-			result = transmitters.stream().map(PublicTransmitterInfo::new).collect(Collectors.toList());
+			result = transmitters.stream().map(PublicMapInfo::new).collect(Collectors.toList());
 		} finally {
 			lock.unlock();
 		}
@@ -165,14 +165,16 @@ public class TransmitterResource extends AbstractResource {
 		return deleteObject(oldTransmitter, "deleteTransmitter", true);
 	}
 
-	public static final class PublicTransmitterInfo {
+	@SuppressWarnings("unused")
+	private static final class PublicMapInfo {
+
 		private String name;
 		private String latitude;
 		private String longitude;
 		private Transmitter.Status status;
 		private Transmitter.Usage usage;
 
-		public PublicTransmitterInfo(Transmitter transmitter) {
+		public PublicMapInfo(Transmitter transmitter) {
 			if (transmitter == null) {
 				throw new NullPointerException("Transmitter must not be null.");
 			}
@@ -182,26 +184,6 @@ public class TransmitterResource extends AbstractResource {
 			longitude = transmitter.getLongitude();
 			status = transmitter.getStatus();
 			usage = transmitter.getUsage();
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getLatitude() {
-			return latitude;
-		}
-
-		public String getLongitude() {
-			return longitude;
-		}
-
-		public Transmitter.Status getStatus() {
-			return status;
-		}
-
-		public Transmitter.Usage getUsage() {
-			return usage;
 		}
 
 	}

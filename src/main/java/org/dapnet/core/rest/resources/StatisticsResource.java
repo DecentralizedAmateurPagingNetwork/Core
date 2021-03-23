@@ -39,7 +39,8 @@ public class StatisticsResource extends AbstractResource {
 		}
 	}
 
-	public static final class ObjectCounts {
+	@SuppressWarnings("unused")
+	final class ObjectCounts {
 		private final int users;
 		private final int calls;
 		private final long callsTotal;
@@ -67,51 +68,6 @@ public class StatisticsResource extends AbstractResource {
 			transmittersOnline = (int) repo.getTransmitters().values().stream()
 					.filter(t -> t.getStatus() == Transmitter.Status.ONLINE).count();
 		}
-
-		public int getUsers() {
-			return users;
-		}
-
-		public int getCalls() {
-			return calls;
-		}
-
-		public long getCallsTotal() {
-			return callsTotal;
-		}
-
-		public int getCallSigns() {
-			return callSigns;
-		}
-
-		public int getNews() {
-			return news;
-		}
-
-		public long getNewsTotal() {
-			return newsTotal;
-		}
-
-		public int getRubrics() {
-			return rubrics;
-		}
-
-		public int getNodesTotal() {
-			return nodesTotal;
-		}
-
-		public int getNodesOnline() {
-			return nodesOnline;
-		}
-
-		public int getTransmittersTotal() {
-			return transmittersTotal;
-		}
-
-		public int getTransmittersOnline() {
-			return transmittersOnline;
-		}
-
 	}
 
 }
