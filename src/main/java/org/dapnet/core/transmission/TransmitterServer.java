@@ -1,9 +1,10 @@
 package org.dapnet.core.transmission;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
-import org.dapnet.core.Settings;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
@@ -20,8 +21,8 @@ public class TransmitterServer {
 	private final EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 	public TransmitterServer(TransmitterManager manager) {
-		this.port = Settings.getTransmissionSettings().getServerSettings().getPort();
-		this.manager = manager;
+		this.manager = Objects.requireNonNull(manager, "Transmitter manager must not be null.");
+		this.port = manager.getSettings().getTransmissionSettings().getServerSettings().getPort();
 	}
 
 	public void start() {

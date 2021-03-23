@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 import org.dapnet.core.cluster.ClusterManager;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.transmission.TransmissionManager;
@@ -44,14 +45,18 @@ public class SchedulerManager {
 	/**
 	 * Constructs a new scheduler manager instance.
 	 * 
-	 * @param settings            Scheduler settings
+	 * @param settings            Settings to use
 	 * @param stateManager        State manager
 	 * @param transmissionManager Transmission manager
 	 * @param clusterManager      Cluster manager
 	 * @throws SchedulerException if the scheduler could not be created or started
 	 */
-	public SchedulerManager(SchedulerSettings settings, StateManager stateManager,
-			TransmissionManager transmissionManager, ClusterManager clusterManager) throws SchedulerException {
+	public SchedulerManager(Settings settings, StateManager stateManager, TransmissionManager transmissionManager,
+			ClusterManager clusterManager) throws SchedulerException {
+		if (settings == null) {
+			throw new NullPointerException("Settings must not be null.");
+		}
+
 		if (stateManager == null) {
 			throw new NullPointerException("State manager must not be null.");
 		}
@@ -64,9 +69,10 @@ public class SchedulerManager {
 			throw new NullPointerException("Cluster manager must not be null.");
 		}
 
-		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
+		this.settings = Objects.requireNonNull(settings.getSchedulerSettings());
 		this.scheduler = StdSchedulerFactory.getDefaultScheduler();
 
+		scheduler.getContext().put("settings", settings);
 		scheduler.getContext().put("stateManager", stateManager);
 		scheduler.getContext().put("transmissionManager", transmissionManager);
 		scheduler.getContext().put("clusterManager", clusterManager);

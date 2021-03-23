@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CoreRepository;
+import org.dapnet.core.model.ModelSettings;
 import org.dapnet.core.model.StateManager;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -38,17 +39,18 @@ public class StateCleaningJob implements Job {
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		try {
-			SchedulerContext schedulerContext = context.getScheduler().getContext();
-			StateManager stateManager = (StateManager) schedulerContext.get("stateManager");
+			final SchedulerContext schedulerContext = context.getScheduler().getContext();
+			final StateManager stateManager = (StateManager) schedulerContext.get("stateManager");
+			final Settings settings = (Settings) schedulerContext.get("settings");
 
-			Lock lock = stateManager.getLock().writeLock();
+			final Lock lock = stateManager.getLock().writeLock();
 			lock.lock();
 
 			try {
-				Instant now = Instant.now();
+				final Instant now = Instant.now();
 
-				cleanCalls(stateManager, now);
-				cleanNews(stateManager, now);
+				cleanCalls(settings.getModelSettings(), stateManager, now);
+				cleanNews(settings.getModelSettings(), stateManager, now);
 				// FIXME This is broken
 				// cleanTransmitters(clusterManager, now);
 			} finally {
@@ -63,8 +65,8 @@ public class StateCleaningJob implements Job {
 		}
 	}
 
-	private static void cleanCalls(CoreRepository repo, Instant now) {
-		Duration exp = Duration.ofMinutes(Settings.getModelSettings().getCallExpirationTimeInMinutes());
+	private static void cleanCalls(ModelSettings settings, CoreRepository repo, Instant now) {
+		final Duration exp = Duration.ofMinutes(settings.getCallExpirationTimeInMinutes());
 
 		Iterator<Call> it = repo.getCalls().iterator();
 		while (it.hasNext()) {
@@ -75,13 +77,13 @@ public class StateCleaningJob implements Job {
 		}
 	}
 
-	private static void cleanNews(CoreRepository repo, Instant now) {
-		Duration ttl = Duration.ofMinutes(Settings.getModelSettings().getNewsExpirationTimeInMinutes());
+	private static void cleanNews(ModelSettings settings, CoreRepository repo, Instant now) {
+		final Duration ttl = Duration.ofMinutes(settings.getNewsExpirationTimeInMinutes());
 		repo.getNews().values().forEach(nl -> nl.removeExpired(now, ttl));
 	}
 
 //	private static void cleanTransmitters(ClusterManager manager, Instant now) {
-//		Duration exp = Duration.ofDays(Settings.getModelSettings().getTransmitterExpirationDays());
+//		final Duration exp = Duration.ofDays(Settings.getModelSettings().getTransmitterExpirationDays());
 //
 //		Collection<Transmitter> transmitters = new ArrayList<>(manager.getState().getTransmitters().values());
 //		for (Transmitter t : transmitters) {

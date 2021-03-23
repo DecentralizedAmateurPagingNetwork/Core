@@ -48,6 +48,7 @@ public class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
 	private final ClusterManager clusterManager;
 	private final StateManager stateManager;
+	private final Settings settings;
 
 	/**
 	 * Constructs a new RPC listener instance.
@@ -57,6 +58,7 @@ public class RpcListener {
 	public RpcListener(ClusterManager clusterManager) {
 		this.clusterManager = Objects.requireNonNull(clusterManager, "Cluster manager must not be null.");
 		stateManager = Objects.requireNonNull(clusterManager.getStateManager(), "State manager must not be null.");
+		settings = clusterManager.getTransmitterManager().getSettings();
 	}
 
 	/**
@@ -118,7 +120,7 @@ public class RpcListener {
 
 			stateManager.getStatistics().incrementCalls();
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -195,7 +197,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -256,7 +258,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -304,7 +306,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -341,7 +343,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -386,7 +388,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -441,7 +443,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (response == RpcResponse.OK && Settings.getModelSettings().isSavingImmediately()) {
+			if (response == RpcResponse.OK && settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -497,7 +499,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -546,7 +548,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -592,7 +594,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -640,7 +642,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -702,7 +704,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -752,7 +754,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -828,7 +830,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -873,7 +875,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 
@@ -988,7 +990,7 @@ public class RpcListener {
 				lock.unlock();
 			}
 
-			if (Settings.getModelSettings().isSavingImmediately()) {
+			if (settings.getModelSettings().isSavingImmediately()) {
 				stateManager.writeStateToFile();
 			}
 

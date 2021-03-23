@@ -81,8 +81,7 @@ public final class RestSecurity {
 		}
 
 		if (loginData == null) {
-			// No Authorization Data in Http Header
-			logger.info("No Authorization Data in HttpHeader");
+			logger.debug("No Authorization Data in HttpHeader");
 			return checkAuthorization(minSecurityLevel, SecurityStatus.ANYBODY);
 		}
 

@@ -26,6 +26,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CoreRepository;
@@ -56,16 +57,17 @@ public class TransmissionManager {
 	/**
 	 * Constructs a new transmission manager instance.
 	 * 
+	 * @param Settings     Core settings to use
 	 * @param stateManager State manager to use
 	 * @throws NullPointerException if the state manager is {@code null}
 	 */
-	public TransmissionManager(StateManager stateManager) {
-		transmitterManager = new TransmitterManager(stateManager);
+	public TransmissionManager(Settings settings, StateManager stateManager) {
+		transmitterManager = new TransmitterManager(settings, stateManager);
 
 		// Register pager protocols
 		PagerProtocolFactory protocolFactory = new DefaultPagerProtocolFactory();
 		for (Pager.Type type : Pager.Type.values()) {
-			PagerProtocol protocol = protocolFactory.getProtocol(type, stateManager);
+			PagerProtocol protocol = protocolFactory.getProtocol(type, settings, stateManager);
 			if (protocol != null) {
 				pagerProtocols.put(type, protocol);
 			} else {

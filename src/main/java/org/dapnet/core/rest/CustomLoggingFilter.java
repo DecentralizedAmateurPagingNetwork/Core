@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -42,9 +43,12 @@ import org.glassfish.jersey.message.internal.ReaderWriter;
 public class CustomLoggingFilter extends LoggingFeature implements ContainerRequestFilter, ContainerResponseFilter {
 	private static final Logger logger = LogManager.getLogger();
 
+	@Inject
+	private Settings settings;
+
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
-		if (!Settings.getRestSettings().logRequests()) {
+		if (!settings.getRestSettings().logRequests()) {
 			return;
 		}
 
@@ -104,7 +108,7 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 			throws IOException {
 		addHeader(responseContext);
 
-		if (Settings.getRestSettings().logResponses()) {
+		if (settings.getRestSettings().logResponses()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Header: ").append(responseContext.getHeaders());
 			sb.append(" - Entity: ");

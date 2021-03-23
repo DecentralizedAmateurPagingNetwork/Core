@@ -4,14 +4,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 
-import org.dapnet.core.Settings;
 import org.dapnet.core.model.Activation;
 import org.dapnet.core.model.Call;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.News;
 import org.dapnet.core.model.Pager.Type;
 import org.dapnet.core.model.Rubric;
-import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 
 /**
  * Skyper pager protocol implementation.
@@ -32,9 +30,9 @@ class SkyperProtocol implements PagerProtocol {
 	 * 
 	 * @param repository Repository to use
 	 */
-	public SkyperProtocol(CoreRepository repository) {
+	public SkyperProtocol(CoreRepository repository, String activationCode) {
 		callFactory = new SkyperCallMessageFactory(repository, SkyperProtocol::encode);
-		activationFactory = new SkyperActivationMessageFactory(getActivationCode());
+		activationFactory = new SkyperActivationMessageFactory(getActivationCode(activationCode));
 		rubricFactory = new SkyperRubricMessageFactory(SkyperProtocol::encode);
 		newsFactory = new SkyperNewsMessageFactory(repository, SkyperProtocol::encode);
 		timeFactory = new SkyperTimeMessageFactory(false);
@@ -84,9 +82,12 @@ class SkyperProtocol implements PagerProtocol {
 		}
 	}
 
-	private static String[] getActivationCode() {
-		final PagingProtocolSettings settings = Settings.getTransmissionSettings().getPagingProtocolSettings();
-		return settings.getActivationCode().split(",");
+	private static String[] getActivationCode(String activationCode) {
+		if (activationCode != null) {
+			return activationCode.split(",");
+		} else {
+			throw new NullPointerException("Activation code must not be null.");
+		}
 	}
 
 }

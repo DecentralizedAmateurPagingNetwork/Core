@@ -1,8 +1,8 @@
 package org.dapnet.core.transmission;
 
 import java.util.List;
+import java.util.Objects;
 
-import org.dapnet.core.Settings;
 import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 import org.dapnet.core.transmission.TransmitterClient.Message;
 import org.dapnet.core.transmission.messages.PagerMessage;
@@ -25,8 +25,11 @@ class MessageEncoder extends MessageToMessageEncoder<Message> {
 	public static final int MT_NUMERIC = 5;
 	public static final int MT_ALPHANUM = 6;
 
-	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
-			.getPagingProtocolSettings();
+	private final PagingProtocolSettings settings;
+
+	public MessageEncoder(PagingProtocolSettings settings) {
+		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
+	}
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> out) throws Exception {

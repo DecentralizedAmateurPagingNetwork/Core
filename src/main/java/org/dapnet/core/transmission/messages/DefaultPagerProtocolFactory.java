@@ -1,5 +1,6 @@
 package org.dapnet.core.transmission.messages;
 
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Pager.Type;
 
@@ -11,10 +12,10 @@ import org.dapnet.core.model.Pager.Type;
 public final class DefaultPagerProtocolFactory implements PagerProtocolFactory {
 
 	@Override
-	public PagerProtocol getProtocol(Type type, CoreRepository repository) {
+	public PagerProtocol getProtocol(Type type, Settings settings, CoreRepository repository) {
 		switch (type) {
 		case SKYPER:
-			return new SkyperProtocol(repository);
+			return createSkyperProtocol(settings, repository);
 		case ALPHAPOC:
 			return new AlphapocProtocol(repository);
 		case SWISSPHONE:
@@ -24,6 +25,15 @@ public final class DefaultPagerProtocolFactory implements PagerProtocolFactory {
 		default:
 			return null;
 		}
+	}
+
+	private PagerProtocol createSkyperProtocol(Settings settings, CoreRepository repository) {
+		if (settings == null) {
+			throw new NullPointerException("Settings must not be null.");
+		}
+
+		String activationCode = settings.getTransmissionSettings().getPagingProtocolSettings().getActivationCode();
+		return new SkyperProtocol(repository, activationCode);
 	}
 
 }

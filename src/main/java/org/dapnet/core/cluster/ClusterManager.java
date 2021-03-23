@@ -24,7 +24,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.Program;
-import org.dapnet.core.Settings;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
@@ -83,8 +82,10 @@ public final class ClusterManager implements TransmitterManagerListener, RestLis
 		// Perform additional state initialization
 		initState();
 
+		final ClusterSettings settings = transmitterManager.getSettings().getClusterSettings();
+
 		// Create Channel
-		channel = new JChannel(Settings.getClusterSettings().getClusterConfigurationFile());
+		channel = new JChannel(settings.getClusterConfigurationFile());
 		channel.setName(readNodeName());
 		channel.addAddressGenerator(() -> {
 			ExtendedUUID address = ExtendedUUID.randomUUID(channel.getName());
@@ -106,7 +107,7 @@ public final class ClusterManager implements TransmitterManagerListener, RestLis
 		dispatcher.setMessageListener(messageListener);
 
 		// Create default RequestOptions
-		requestOptions = new RequestOptions(ResponseMode.GET_ALL, Settings.getClusterSettings().getResponseTimeout());
+		requestOptions = new RequestOptions(ResponseMode.GET_ALL, settings.getResponseTimeout());
 
 		try {
 			channel.connect(readChannelName());

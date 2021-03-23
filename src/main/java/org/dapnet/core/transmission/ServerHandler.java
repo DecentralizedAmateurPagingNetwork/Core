@@ -1,6 +1,7 @@
 package org.dapnet.core.transmission;
 
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
@@ -8,11 +9,9 @@ import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dapnet.core.Settings;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.Transmitter.Status;
-import org.dapnet.core.transmission.TransmissionSettings.PagingProtocolSettings;
 import org.dapnet.core.transmission.TransmitterClient.AckType;
 import org.jgroups.stack.IpAddress;
 
@@ -35,8 +34,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
 	private static final Pattern AUTH_PATTERN = Pattern
 			.compile("\\[([/\\-\\p{Alnum}]+) v(\\d[\\d\\.]+[\\p{Graph}]*) ([\\p{Alnum}_]+) (\\p{Alnum}+)\\]");
-	private static final PagingProtocolSettings settings = Settings.getTransmissionSettings()
-			.getPagingProtocolSettings();
 	private static final int HANDSHAKE_TIMEOUT_SEC = 30;
 	private static final int CLOSE_TASK_DELAY_SEC = 5;
 	private final TransmitterManager manager;
@@ -46,7 +43,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	private SyncTimeHandler syncHandler;
 
 	public ServerHandler(TransmitterManager manager) {
-		this.manager = manager;
+		this.manager = Objects.requireNonNull(manager, "Transmitter manager must not be null.");
 	}
 
 	@Override
@@ -79,7 +76,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		// once the handshake is finished.
 		client = new TransmitterClient(ctx.channel());
 
-		syncHandler = new SyncTimeHandler(settings.getNumberOfSyncLoops());
+		syncHandler = new SyncTimeHandler(
+				manager.getSettings().getTransmissionSettings().getPagingProtocolSettings().getNumberOfSyncLoops());
 
 		handshakePromise = ctx.newPromise();
 		initHandshakeTimeout(ctx);

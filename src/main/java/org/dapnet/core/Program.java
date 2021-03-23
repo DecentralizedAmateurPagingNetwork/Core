@@ -45,7 +45,8 @@ public class Program {
 	private static final String CORE_VERSION;
 	private static final String API_VERSION;
 	private static volatile Program dapnetCore;
-	private final StateManager stateManager = new StateManager(Settings.getModelSettings().getStateFile());
+	private volatile Settings settings;
+	private volatile StateManager stateManager;
 	private volatile ClusterManager clusterManager;
 	private volatile RestManager restManager;
 	private volatile TransmissionManager transmissionManager;
@@ -71,7 +72,20 @@ public class Program {
 		}
 	}
 
+	private void initSettings() {
+		final String fileName = System.getProperty("dapnet.core.settings", "config/Settings.json");
+
+		logger.info("Loading settings from '{}'", fileName);
+
+		settings = Settings.loadFromFile(fileName);
+		if (settings == null) {
+			throw new CoreStartupException("Could not create Core settings instance.");
+		}
+	}
+
 	private void initState(boolean force) {
+		stateManager = new StateManager(settings.getModelSettings().getStateFile());
+
 		Set<ConstraintViolation<Object>> violations = null;
 
 		try {
@@ -99,12 +113,13 @@ public class Program {
 
 	private void start(boolean enforceStartup) {
 		try {
-			logger.info("Starting DAPNETCore Version {} ...", CORE_VERSION);
+			logger.info("Starting DAPNET Core Version {} ...", CORE_VERSION);
 
+			initSettings();
 			initState(enforceStartup);
 
 			logger.info("Starting TransmissionManager");
-			transmissionManager = new TransmissionManager(stateManager);
+			transmissionManager = new TransmissionManager(settings, stateManager);
 
 			logger.info("Starting Cluster");
 			clusterManager = new ClusterManager(stateManager, transmissionManager);
@@ -114,25 +129,24 @@ public class Program {
 			transmitterServer.start();
 
 			logger.info("Starting SchedulerManager");
-			schedulerManager = new SchedulerManager(Settings.getSchedulerSettings(), stateManager, transmissionManager,
-					clusterManager);
+			schedulerManager = new SchedulerManager(settings, stateManager, transmissionManager, clusterManager);
 
 			logger.info("Starting RestManager");
-			restManager = new RestManager(Settings.getRestSettings(), stateManager, clusterManager);
+			restManager = new RestManager(settings, stateManager, clusterManager);
 			restManager.start();
 
-			logger.info("DAPNETCore started");
+			logger.info("DAPNET Core started");
 		} catch (CoreStartupException e) {
-			logger.fatal("Failed to start DAPNETCore: {}", e.getMessage());
+			logger.fatal("Failed to start DAPNET Core: {}", e.getMessage());
 			System.exit(1);
 		} catch (Exception e) {
-			logger.fatal("Failed to start DAPNETCore.", e);
+			logger.fatal("Failed to start DAPNET Core.", e);
 			System.exit(1);
 		}
 	}
 
 	private void stop() {
-		logger.info("Stopping DAPNETCore ...");
+		logger.info("Stopping DAPNET Core ...");
 
 		if (restManager != null) {
 			restManager.stop();
@@ -150,7 +164,7 @@ public class Program {
 			clusterManager.stop();
 		}
 
-		logger.info("DAPNETCore stopped");
+		logger.info("DAPNET Core stopped");
 	}
 
 	public static void main(String[] args) throws Exception {

@@ -1,6 +1,7 @@
 package org.dapnet.core.transmission;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -18,11 +19,12 @@ import io.netty.handler.codec.string.StringEncoder;
 class ServerInitializer extends ChannelInitializer<SocketChannel> {
 	private static final StringEncoder encoder = new StringEncoder(StandardCharsets.US_ASCII);
 	private static final StringDecoder decoder = new StringDecoder(StandardCharsets.US_ASCII);
-	private static final MessageEncoder msgEncoder = new MessageEncoder();
 	private final TransmitterManager manager;
+	private final MessageEncoder msgEncoder;
 
 	public ServerInitializer(TransmitterManager manager) {
-		this.manager = manager;
+		this.manager = Objects.requireNonNull(manager, "Transmitter manager must not be null.");
+		msgEncoder = new MessageEncoder(manager.getSettings().getTransmissionSettings().getPagingProtocolSettings());
 	}
 
 	@Override

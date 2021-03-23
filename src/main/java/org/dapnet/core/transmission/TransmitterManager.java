@@ -12,6 +12,7 @@ import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.ModelRepository;
 import org.dapnet.core.model.NamedObject;
@@ -28,6 +29,7 @@ import org.dapnet.core.transmission.messages.PagerMessage;
 public class TransmitterManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final ConcurrentMap<String, TransmitterClient> connectedClients = new ConcurrentHashMap<>();
+	private final Settings settings;
 	private final CoreRepository repository;
 	private volatile TransmitterManagerListener listener;
 
@@ -37,8 +39,18 @@ public class TransmitterManager {
 	 * @param repository Repository instance to use
 	 * @throws NullPointerException if the repository is {@code null}
 	 */
-	public TransmitterManager(CoreRepository repository) {
+	public TransmitterManager(Settings settings, CoreRepository repository) {
+		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
 		this.repository = Objects.requireNonNull(repository, "Repository must not be null.");
+	}
+
+	/**
+	 * Gets the Core settings instance.
+	 * 
+	 * @return Settings
+	 */
+	public Settings getSettings() {
+		return settings;
 	}
 
 	/**

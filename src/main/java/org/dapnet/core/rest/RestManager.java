@@ -21,6 +21,7 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
+import org.dapnet.core.Settings;
 import org.dapnet.core.model.CoreRepository;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -34,7 +35,7 @@ import org.glassfish.jersey.server.ResourceConfig;
  */
 public final class RestManager {
 	private static final Logger logger = LogManager.getLogger();
-	private final RestSettings settings;
+	private final Settings settings;
 	private final CoreRepository repository;
 	private final RestListener restListener;
 	private HttpServer server;
@@ -45,7 +46,7 @@ public final class RestManager {
 	 * @param repository   Repository to use
 	 * @param restListener REST listener to use
 	 */
-	public RestManager(RestSettings settings, CoreRepository repository, RestListener restListener) {
+	public RestManager(Settings settings, CoreRepository repository, RestListener restListener) {
 		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
 		this.repository = Objects.requireNonNull(repository, "State manager must not be null.");
 		this.restListener = Objects.requireNonNull(restListener, "REST listener must not be null.");
@@ -56,9 +57,9 @@ public final class RestManager {
 	 */
 	public void start() {
 		try {
-			URI endpoint = new URI("http", null, settings.getHostname(), settings.getPort(), settings.getPath(), null,
-					null);
-			ResourceConfig rc = new ApplicationConfig(repository, restListener);
+			URI endpoint = new URI("http", null, settings.getRestSettings().getHostname(),
+					settings.getRestSettings().getPort(), settings.getRestSettings().getPath(), null, null);
+			ResourceConfig rc = new ApplicationConfig(settings, repository, restListener);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
 
 			logger.info("RestApi successfully started.");
