@@ -72,12 +72,15 @@ public final class RestSecurity {
 	 */
 	public SecurityStatus getStatus(HttpHeaders httpHeaders, SecurityLevel minSecurityLevel,
 			RestAuthorizable restAuthorizable) {
-		// Get LoginData
-		LoginData loginData;
+		LoginData loginData = null;
 
 		try {
 			loginData = LoginData.fromHttpHeaders(httpHeaders);
 		} catch (Exception e) {
+			logger.warn("Failed to extract login data from HTTP headers.", e);
+		}
+
+		if (loginData == null) {
 			// No Authorization Data in Http Header
 			logger.info("No Authorization Data in HttpHeader");
 			return checkAuthorization(minSecurityLevel, SecurityStatus.ANYBODY);
