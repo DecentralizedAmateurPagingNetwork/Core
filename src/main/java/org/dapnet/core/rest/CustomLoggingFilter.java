@@ -29,6 +29,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.dapnet.core.Settings;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 
@@ -43,6 +44,10 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 
 	@Override
 	public void filter(ContainerRequestContext requestContext) throws IOException {
+		if (!Settings.getRestSettings().logRequests()) {
+			return;
+		}
+
 		StringBuilder sb = new StringBuilder();
 
 		// Append username is available
@@ -74,7 +79,7 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		logger.info("REST " + requestContext.getMethod() + " Request : " + sb.toString());
 	}
 
-	private String getEntityBody(ContainerRequestContext requestContext) {
+	private static String getEntityBody(ContainerRequestContext requestContext) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		InputStream in = requestContext.getEntityStream();
 		final StringBuilder b = new StringBuilder();
@@ -99,22 +104,24 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 			throws IOException {
 		addHeader(responseContext);
 
-		StringBuilder sb = new StringBuilder();
-		sb.append("Header: ").append(responseContext.getHeaders());
-		sb.append(" - Entity: ");
-		if (responseContext != null && responseContext.getEntity() != null) {
-			sb.append(responseContext.getEntity().toString().replace("\n", "").replace("\r", ""));
-		} else {
-			sb.append("null");
-		}
+		if (Settings.getRestSettings().logResponses()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Header: ").append(responseContext.getHeaders());
+			sb.append(" - Entity: ");
+			if (responseContext != null && responseContext.getEntity() != null) {
+				sb.append(responseContext.getEntity().toString().replace("\n", "").replace("\r", ""));
+			} else {
+				sb.append("null");
+			}
 
-		if (responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
-				|| responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR) {
-			logger.info(requestContext.getHeaderString("X-Forwarded-For") + " REST " + requestContext.getMethod()
-					+ " Response : " + sb.toString());
-		} else {
-			logger.error(requestContext.getHeaderString("X-Forwarded-For") + " REST " + requestContext.getMethod()
-					+ " Response : " + sb.toString());
+			if (responseContext.getStatusInfo().getFamily() == Response.Status.Family.SUCCESSFUL
+					|| responseContext.getStatusInfo().getFamily() == Response.Status.Family.CLIENT_ERROR) {
+				logger.info(requestContext.getHeaderString("X-Forwarded-For") + " REST " + requestContext.getMethod()
+						+ " Response : " + sb.toString());
+			} else {
+				logger.error(requestContext.getHeaderString("X-Forwarded-For") + " REST " + requestContext.getMethod()
+						+ " Response : " + sb.toString());
+			}
 		}
 	}
 

@@ -26,6 +26,8 @@ public class RestSettings implements Serializable {
 	private String hostname = "localhost";
 	private int port = 8080;
 	private String path = "/";
+	private boolean logRequests = true;
+	private boolean logResponses = true;
 
 	/**
 	 * Returns the host name to listen on.
@@ -52,6 +54,24 @@ public class RestSettings implements Serializable {
 	 */
 	public String getPath() {
 		return path;
+	}
+
+	/**
+	 * Whether to log REST requests
+	 * 
+	 * @return True to log requests.
+	 */
+	public boolean logRequests() {
+		return logRequests;
+	}
+
+	/**
+	 * Whether to log REST responses.
+	 * 
+	 * @return True to log responses.
+	 */
+	public boolean logResponses() {
+		return logResponses;
 	}
 
 }
