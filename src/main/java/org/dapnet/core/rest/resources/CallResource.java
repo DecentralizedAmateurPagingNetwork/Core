@@ -74,7 +74,7 @@ public class CallResource extends AbstractResource {
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
 		// Create Call
-		Call call = gson.fromJson(callJSON, Call.class);
+		Call call = getGsonProvider().getForRequest().fromJson(callJSON, Call.class);
 		if (call != null) {
 			call.setTimestamp(Instant.now());
 			LoginData login = LoginData.fromHttpHeaders(httpHeaders);

@@ -28,17 +28,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.rest.ExclusionStrategies;
-import org.dapnet.core.rest.GsonTypeAdapterFactory;
+import org.dapnet.core.rest.GsonProvider;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.StringTrimJsonDeserializer;
 import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -49,30 +44,14 @@ public abstract class AbstractResource {
 	@Context
 	protected HttpHeaders httpHeaders;
 
-	protected static final Gson gson;
-	protected static final Gson userGson;
-
 	@Inject
 	private CoreRepository repository;
 	@Inject
 	private RestSecurity restSecurity;
 	@Inject
 	private RestListener restListener;
-
-	static {
-		gson = createBuilder().addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
-		userGson = createBuilder().setExclusionStrategies(ExclusionStrategies.USER).create();
-	}
-
-	private static GsonBuilder createBuilder() {
-		GsonBuilder builder = new GsonBuilder();
-		builder.serializeNulls();
-		builder.setPrettyPrinting();
-		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
-		builder.registerTypeAdapter(String.class, new StringTrimJsonDeserializer());
-
-		return builder;
-	}
+	@Inject
+	private GsonProvider gsonProvider;
 
 	protected CoreRepository getRepository() {
 		return repository;
@@ -82,19 +61,8 @@ public abstract class AbstractResource {
 		return restListener;
 	}
 
-	protected Gson getExclusionGson(RestSecurity.SecurityStatus status) {
-		switch (status) {
-		case ADMIN:
-			return gson;
-		case OWNER:
-			return gson;
-		case USER:
-			return userGson;
-		case ANYBODY:
-			return userGson;
-		default:
-			return gson;
-		}
+	protected GsonProvider getGsonProvider() {
+		return gsonProvider;
 	}
 
 	// Authorization Helper
@@ -131,7 +99,7 @@ public abstract class AbstractResource {
 			throw new NotFoundException();
 		}
 
-		return Response.ok(getExclusionGson(status).toJson(object)).build();
+		return Response.ok(gsonProvider.getForResponse(status).toJson(object)).build();
 	}
 
 	public Response handleObject(Object object, String methodName, boolean creation, boolean quorumNeeded)
@@ -152,9 +120,10 @@ public abstract class AbstractResource {
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object },
 				new Class[] { object.getClass() })) {
 			if (creation) {
-				return Response.created(uriInfo.getAbsolutePath()).entity(gson.toJson(object)).build();
+				return Response.created(uriInfo.getAbsolutePath()).entity(gsonProvider.getForRequest().toJson(object))
+						.build();
 			} else {
-				return Response.ok(gson.toJson(object)).build();
+				return Response.ok(gsonProvider.getForRequest().toJson(object)).build();
 			}
 		} else {
 			throw new InternalServerErrorException();
@@ -176,7 +145,7 @@ public abstract class AbstractResource {
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
 				new Class[] { String.class })) {
 			// TODO Why do we return the deleted object here?
-			return Response.ok(gson.toJson(object)).build();
+			return Response.ok(gsonProvider.getForRequest().toJson(object)).build();
 		} else {
 			throw new InternalServerErrorException();
 		}

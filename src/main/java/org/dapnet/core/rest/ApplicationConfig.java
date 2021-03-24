@@ -50,6 +50,7 @@ final class ApplicationConfig extends ResourceConfig {
 			bind(repository).to(CoreRepository.class);
 			bind(new RestSecurity(repository)).to(RestSecurity.class);
 			bind(restListener).to(RestListener.class);
+			bind(new GsonProviderImpl(settings)).to(GsonProvider.class);
 		}
 
 	}

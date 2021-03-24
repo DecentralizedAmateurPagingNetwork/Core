@@ -88,7 +88,7 @@ public class RubricResource extends AbstractResource {
 		}
 
 		// Create Rubric
-		Rubric rubric = gson.fromJson(rubricJSON, Rubric.class);
+		Rubric rubric = getGsonProvider().getForRequest().fromJson(rubricJSON, Rubric.class);
 		if (rubric != null) {
 			rubric.setName(rubricName);
 		} else {

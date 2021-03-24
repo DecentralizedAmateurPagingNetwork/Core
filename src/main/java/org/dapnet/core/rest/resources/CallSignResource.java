@@ -89,7 +89,7 @@ public class CallSignResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		CallSign callSign = gson.fromJson(callSignJSON, CallSign.class);
+		CallSign callSign = getGsonProvider().getForRequest().fromJson(callSignJSON, CallSign.class);
 		if (callSign != null) {
 			callSign.setName(callSignName);
 		} else {

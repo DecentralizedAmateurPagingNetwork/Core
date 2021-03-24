@@ -26,7 +26,7 @@ import com.google.gson.FieldAttributes;
  * 
  * @author Philipp Thiel
  */
-public final class ExclusionStrategies {
+final class ExclusionStrategies {
 
 	/**
 	 * The user exclusion strategy (limited access)

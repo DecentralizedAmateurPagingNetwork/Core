@@ -92,7 +92,7 @@ public class TransmitterGroupResource extends AbstractResource {
 		}
 
 		// Create TransmitterGroup
-		transmitterGroup = gson.fromJson(transmitterGroupJSON, TransmitterGroup.class);
+		transmitterGroup = getGsonProvider().getForRequest().fromJson(transmitterGroupJSON, TransmitterGroup.class);
 		if (transmitterGroup != null) {
 			transmitterGroup.setName(transmitterGroupName);
 		} else {

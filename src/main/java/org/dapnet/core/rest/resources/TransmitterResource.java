@@ -120,7 +120,7 @@ public class TransmitterResource extends AbstractResource {
 		}
 
 		// Create Transmitter
-		Transmitter transmitter = gson.fromJson(transmitterJSON, Transmitter.class);
+		Transmitter transmitter = getGsonProvider().getForRequest().fromJson(transmitterJSON, Transmitter.class);
 		if (transmitter != null) {
 			// Only Status OFFLINE or DISABLED is accepted:
 			if (transmitter.getStatus() == null || transmitter.getStatus() != Transmitter.Status.DISABLED) {
