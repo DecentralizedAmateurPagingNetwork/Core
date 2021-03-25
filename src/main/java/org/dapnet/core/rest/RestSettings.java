@@ -28,6 +28,7 @@ public class RestSettings implements Serializable {
 	private String path = "/";
 	private boolean logRequests = true;
 	private boolean logResponses = true;
+	private boolean jsonFilterIpAddresses = false;
 
 	/**
 	 * Returns the host name to listen on.
@@ -72,6 +73,15 @@ public class RestSettings implements Serializable {
 	 */
 	public boolean logResponses() {
 		return logResponses;
+	}
+
+	/**
+	 * Whether to filter out IP addresses during JSON serialization.
+	 * 
+	 * @return True to filter out IP addresses.
+	 */
+	public boolean jsonFilterIpAddresses() {
+		return jsonFilterIpAddresses;
 	}
 
 }

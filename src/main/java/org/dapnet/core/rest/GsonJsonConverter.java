@@ -2,7 +2,9 @@ package org.dapnet.core.rest;
 
 import org.dapnet.core.Settings;
 import org.dapnet.core.rest.RestSecurity.SecurityStatus;
+import org.jgroups.stack.IpAddress;
 
+import com.google.gson.ExclusionStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -16,23 +18,46 @@ final class GsonJsonConverter implements JsonConverter {
 	private final Gson adminGson;
 	private final Gson userGson;
 
+	/**
+	 * Constructs a new object instance.
+	 * 
+	 * @param settings Settings to use
+	 * @throws NullPointerException if {@code settings == null}
+	 */
 	public GsonJsonConverter(Settings settings) {
 		if (settings == null) {
 			throw new NullPointerException("Settings must not be null.");
 		}
 
-		adminGson = createBuilder().addSerializationExclusionStrategy(ExclusionStrategies.ADMIN).create();
-		userGson = createBuilder().setExclusionStrategies(ExclusionStrategies.USER).create();
+		adminGson = createGson(settings, ExclusionStrategies.ADMIN);
+		userGson = createGson(settings, ExclusionStrategies.USER);
 	}
 
-	private static GsonBuilder createBuilder() {
+	/**
+	 * Creates a configured Gson instance.
+	 * 
+	 * @param settings              Settings to use
+	 * @param serializationStrategy Optional exclusion strategy to add for
+	 *                              serialization
+	 * @return Gson instance
+	 */
+	private static Gson createGson(Settings settings, ExclusionStrategy serializationStrategy) {
 		GsonBuilder builder = new GsonBuilder();
 		builder.serializeNulls();
 		builder.setPrettyPrinting();
 		builder.registerTypeAdapterFactory(new GsonTypeAdapterFactory());
 		builder.registerTypeAdapter(String.class, new StringTrimJsonDeserializer());
 
-		return builder;
+		if (settings.getRestSettings().jsonFilterIpAddresses()) {
+			ExclusionStrategy ipFilter = new ExclusionStrategies.SpecificClassFilter(IpAddress.class);
+			builder.addSerializationExclusionStrategy(ipFilter);
+		}
+
+		if (serializationStrategy != null) {
+			builder.addSerializationExclusionStrategy(serializationStrategy);
+		}
+
+		return builder.create();
 	}
 
 	@Override
@@ -51,6 +76,12 @@ final class GsonJsonConverter implements JsonConverter {
 		return gson.toJson(source);
 	}
 
+	/**
+	 * Gets the proper Gson instance for the given security status.
+	 * 
+	 * @param status Security status
+	 * @return Gson instance
+	 */
 	private Gson getForStatus(SecurityStatus status) {
 		switch (status) {
 		case ADMIN:
