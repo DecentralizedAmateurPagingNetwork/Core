@@ -74,7 +74,7 @@ public class NodeResource extends AbstractResource {
 
 		checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 
-		node = getGsonProvider().getForRequest().fromJson(nodeJSON, Node.class);
+		node = getJsonConverter().fromJson(nodeJSON, Node.class);
 		if (node != null) {
 			node.setName(nodeName);
 			node.setStatus(Node.Status.SUSPENDED);
