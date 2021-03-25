@@ -11,6 +11,9 @@ final class SkyperCharset extends AbstractPagerCharset {
 
 	private static final String[] ALIASES = { "DE-ASCII7", "ASCII7_DE" };
 
+	/**
+	 * Construct a new charset instance.
+	 */
 	public SkyperCharset() {
 		super("DE-SKYPER", ALIASES);
 	}
