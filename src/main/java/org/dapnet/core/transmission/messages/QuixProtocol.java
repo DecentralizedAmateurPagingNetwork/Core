@@ -20,7 +20,7 @@ import org.dapnet.core.transmission.messages.PagerMessage.SubAddress;
 class QuixProtocol implements PagerProtocol {
 
 	// TODO Use proper charset
-	private static final Charset PAGER_CHARSET = new DE_ASCII7();
+	private static final Charset PAGER_CHARSET = new SkyperCharset();
 	private final PagerMessageFactory<Call> callFactory;
 	private final PagerMessageFactory<TransmitterIdentification> idFactory;
 
