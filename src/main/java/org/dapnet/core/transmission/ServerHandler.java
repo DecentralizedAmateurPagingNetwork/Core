@@ -117,8 +117,8 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 		if (evt instanceof IdleStateEvent) {
 			IdleStateEvent idle = (IdleStateEvent) evt;
-			if (idle.state() == IdleState.READER_IDLE) {
-				handleReadTimeout(ctx);
+			if (idle.state() == IdleState.WRITER_IDLE && state == ConnectionState.ONLINE) {
+				ctx.writeAndFlush(KEEP_ALIVE_REQ);
 			}
 		}
 	}
@@ -154,16 +154,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 			logger.error("Exception in exception handler", ex);
 		} finally {
 			ctx.close();
-		}
-	}
-
-	private void handleReadTimeout(ChannelHandlerContext ctx) throws Exception {
-		switch (state) {
-		case ONLINE:
-			ctx.writeAndFlush(KEEP_ALIVE_REQ);
-			break;
-		default:
-			break;
 		}
 	}
 
