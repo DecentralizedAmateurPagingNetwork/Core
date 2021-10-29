@@ -18,7 +18,7 @@ import org.dapnet.core.model.Rubric;
  */
 class SkyperProtocol implements PagerProtocol {
 
-	private static final Charset PAGER_CHARSET = new DE_ASCII7();
+	private static final Charset PAGER_CHARSET = new SkyperCharset();
 	private final PagerMessageFactory<Call> callFactory;
 	private final PagerMessageFactory<Activation> activationFactory;
 	private final PagerMessageFactory<Rubric> rubricFactory;

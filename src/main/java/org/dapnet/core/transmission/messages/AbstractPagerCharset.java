@@ -7,17 +7,24 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
-public final class DE_ASCII7 extends Charset {
+/**
+ * Abstract base class for pager charsets. Only single-byte character sets are
+ * supported. Implementing classes must provide char-to-byte and byte-to-char
+ * mappings to implement the charset.
+ * 
+ * @author Philipp Thiel
+ */
+abstract class AbstractPagerCharset extends Charset {
 
-	private static final String[] ALIASES = { "DE-ASCII", "ASCII7_DE" };
-
-	public DE_ASCII7() {
-		super("DE-ASCII7", ALIASES);
-	}
-
-	@Override
-	public boolean contains(Charset cs) {
-		return (cs instanceof DE_ASCII7);
+	/**
+	 * Constructs a new object instance.
+	 * 
+	 * @param canonicalName Canonical name of the charset
+	 * @param aliases       Aliases for the charset or {@code null} if no aliases
+	 *                      are used
+	 */
+	protected AbstractPagerCharset(String canonicalName, String[] aliases) {
+		super(canonicalName, aliases);
 	}
 
 	@Override
@@ -30,7 +37,23 @@ public final class DE_ASCII7 extends Charset {
 		return new Encoder(this);
 	}
 
-	private static class Decoder extends CharsetDecoder {
+	/**
+	 * Maps a byte to a char. This is used by the decoder.
+	 * 
+	 * @param b Input byte
+	 * @return Output char
+	 */
+	protected abstract char mapToChar(byte b);
+
+	/**
+	 * Maps a char to a byte. This is used by the encoder.
+	 * 
+	 * @param c Input char
+	 * @return Output byte
+	 */
+	protected abstract byte mapToByte(char c);
+
+	private class Decoder extends CharsetDecoder {
 
 		public Decoder(Charset cs) {
 			super(cs, 1.0f, 1.0f);
@@ -45,7 +68,7 @@ public final class DE_ASCII7 extends Charset {
 			}
 		}
 
-		private static CoderResult decodeArrayLoop(ByteBuffer in, CharBuffer out) {
+		private CoderResult decodeArrayLoop(ByteBuffer in, CharBuffer out) {
 			byte[] sa = in.array();
 			int sp = in.arrayOffset() + in.position();
 			int sl = in.arrayOffset() + in.limit();
@@ -66,7 +89,7 @@ public final class DE_ASCII7 extends Charset {
 							return CoderResult.OVERFLOW;
 						}
 
-						da[dp] = toChar(b);
+						da[dp] = mapToChar(b);
 						++dp;
 						++sp;
 					} else {
@@ -81,7 +104,7 @@ public final class DE_ASCII7 extends Charset {
 			}
 		}
 
-		private static CoderResult decodeBufferLoop(ByteBuffer in, CharBuffer out) {
+		private CoderResult decodeBufferLoop(ByteBuffer in, CharBuffer out) {
 			int mark = in.position();
 			try {
 				while (in.hasRemaining()) {
@@ -91,7 +114,7 @@ public final class DE_ASCII7 extends Charset {
 							return CoderResult.OVERFLOW;
 						}
 
-						out.put(toChar(b));
+						out.put(mapToChar(b));
 						++mark;
 					} else {
 						return CoderResult.malformedForLength(1);
@@ -104,32 +127,9 @@ public final class DE_ASCII7 extends Charset {
 			}
 		}
 
-		private static char toChar(byte b) {
-			switch (b) {
-			case 64:
-				return 'ß';
-			case 91:
-				return 'Ä';
-			case 92:
-				return 'Ö';
-			case 93:
-				return 'Ü';
-			case 123:
-				return 'ä';
-			case 124:
-				return 'ö';
-			case 125:
-				return 'ü';
-			case 126:
-				return 'ß';
-			default:
-				return (char) b;
-			}
-		}
-
 	}
 
-	private static class Encoder extends CharsetEncoder {
+	private class Encoder extends CharsetEncoder {
 
 		public Encoder(Charset cs) {
 			super(cs, 1.0f, 1.0f);
@@ -144,7 +144,7 @@ public final class DE_ASCII7 extends Charset {
 			}
 		}
 
-		private static CoderResult encodeArrayLoop(CharBuffer in, ByteBuffer out) {
+		private CoderResult encodeArrayLoop(CharBuffer in, ByteBuffer out) {
 			char[] sa = in.array();
 			int sp = in.arrayOffset() + in.position();
 			int sl = in.arrayOffset() + in.limit();
@@ -164,7 +164,7 @@ public final class DE_ASCII7 extends Charset {
 						return CoderResult.OVERFLOW;
 					}
 
-					da[dp] = toByte(c);
+					da[dp] = mapToByte(c);
 					++dp;
 					++sp;
 				}
@@ -176,7 +176,7 @@ public final class DE_ASCII7 extends Charset {
 			}
 		}
 
-		private static CoderResult encodeBufferLoop(CharBuffer in, ByteBuffer out) {
+		private CoderResult encodeBufferLoop(CharBuffer in, ByteBuffer out) {
 			int mark = in.position();
 			try {
 				while (in.hasRemaining()) {
@@ -185,34 +185,13 @@ public final class DE_ASCII7 extends Charset {
 						return CoderResult.OVERFLOW;
 					}
 
-					out.put(toByte(c));
+					out.put(mapToByte(c));
 					++mark;
 				}
 
 				return CoderResult.UNDERFLOW;
 			} finally {
 				in.position(mark);
-			}
-		}
-
-		private static byte toByte(char c) {
-			switch (c) {
-			case 'Ä':
-				return 91;
-			case 'Ö':
-				return 92;
-			case 'Ü':
-				return 93;
-			case 'ä':
-				return 123;
-			case 'ö':
-				return 124;
-			case 'ü':
-				return 125;
-			case 'ß':
-				return 126;
-			default:
-				return (byte) (c & 0x7F);
 			}
 		}
 

@@ -42,7 +42,7 @@ public class ActivationResource extends AbstractResource {
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
 		// Create Activation
-		Activation activation = getGsonProvider().getForRequest().fromJson(activationJSON, Activation.class);
+		Activation activation = getJsonConverter().fromJson(activationJSON, Activation.class);
 		if (activation != null) {
 			activation.setTimestamp(Instant.now());
 		} else {

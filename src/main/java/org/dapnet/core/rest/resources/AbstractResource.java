@@ -28,7 +28,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.dapnet.core.model.CoreRepository;
 import org.dapnet.core.model.NamedObject;
-import org.dapnet.core.rest.GsonProvider;
+import org.dapnet.core.rest.JsonConverter;
 import org.dapnet.core.rest.RestAuthorizable;
 import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.rest.RestSecurity;
@@ -51,7 +51,7 @@ public abstract class AbstractResource {
 	@Inject
 	private RestListener restListener;
 	@Inject
-	private GsonProvider gsonProvider;
+	private JsonConverter jsonConverter;
 
 	protected CoreRepository getRepository() {
 		return repository;
@@ -61,8 +61,8 @@ public abstract class AbstractResource {
 		return restListener;
 	}
 
-	protected GsonProvider getGsonProvider() {
-		return gsonProvider;
+	protected JsonConverter getJsonConverter() {
+		return jsonConverter;
 	}
 
 	// Authorization Helper
@@ -99,7 +99,7 @@ public abstract class AbstractResource {
 			throw new NotFoundException();
 		}
 
-		return Response.ok(gsonProvider.getForResponse(status).toJson(object)).build();
+		return Response.ok(jsonConverter.toJson(object, status)).build();
 	}
 
 	public Response handleObject(Object object, String methodName, boolean creation, boolean quorumNeeded)
@@ -119,11 +119,11 @@ public abstract class AbstractResource {
 		// Send to Cluster
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object },
 				new Class[] { object.getClass() })) {
+			final String json = jsonConverter.toJson(object);
 			if (creation) {
-				return Response.created(uriInfo.getAbsolutePath()).entity(gsonProvider.getForRequest().toJson(object))
-						.build();
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
 			} else {
-				return Response.ok(gsonProvider.getForRequest().toJson(object)).build();
+				return Response.ok(json).build();
 			}
 		} else {
 			throw new InternalServerErrorException();
@@ -145,7 +145,7 @@ public abstract class AbstractResource {
 		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
 				new Class[] { String.class })) {
 			// TODO Why do we return the deleted object here?
-			return Response.ok(gsonProvider.getForRequest().toJson(object)).build();
+			return Response.ok(jsonConverter.toJson(object)).build();
 		} else {
 			throw new InternalServerErrorException();
 		}

@@ -84,7 +84,7 @@ public class UserResource extends AbstractResource {
 			oldUser = repo.getUsers().get(userName);
 
 			// Create User from received data
-			user = getGsonProvider().getForRequest().fromJson(userJSON, User.class);
+			user = getJsonConverter().fromJson(userJSON, User.class);
 			if (user != null) {
 				String hash = user.getHash();
 				if ((hash == null || hash.isEmpty()) && oldUser != null) {

@@ -14,6 +14,8 @@
 
 package org.dapnet.core.rest;
 
+import java.util.Objects;
+
 import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.Transmitter;
 import org.dapnet.core.model.User;
@@ -66,6 +68,37 @@ final class ExclusionStrategies {
 		@Override
 		public boolean shouldSkipClass(Class<?> clazz) {
 			return false;
+		}
+
+	}
+
+	/**
+	 * This class implements a filtered class exclusion strategy.
+	 * 
+	 * @author Philipp Thiel
+	 *
+	 */
+	public static class SpecificClassFilter implements ExclusionStrategy {
+
+		private final Class<?> filteredClass;
+
+		/**
+		 * Construcs a new object instance.
+		 * 
+		 * @param filteredClass Class to exclude from JSON
+		 */
+		public SpecificClassFilter(Class<?> filteredClass) {
+			this.filteredClass = Objects.requireNonNull(filteredClass, "Filtered class must not be null.");
+		}
+
+		@Override
+		public boolean shouldSkipField(FieldAttributes f) {
+			return filteredClass.equals(f.getDeclaredClass());
+		}
+
+		@Override
+		public boolean shouldSkipClass(Class<?> clazz) {
+			return filteredClass.equals(clazz);
 		}
 
 	}

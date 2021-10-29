@@ -66,7 +66,7 @@ public class NewsResource extends AbstractResource {
 		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
 
 		// Create News
-		news = getGsonProvider().getForRequest().fromJson(newsJSON, News.class);
+		news = getJsonConverter().fromJson(newsJSON, News.class);
 		if (news != null) {
 			news.setTimestamp(Instant.now());
 			LoginData login = LoginData.fromHttpHeaders(httpHeaders);
