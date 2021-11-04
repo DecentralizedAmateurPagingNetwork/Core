@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.Settings;
@@ -19,8 +18,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.ScheduledFuture;
 
 class ServerHandler extends SimpleChannelInboundHandler<String> {
@@ -30,8 +27,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	private static final Logger logger = LogManager.getLogger();
-	// Keep alive/ping message
-	private static final String KEEP_ALIVE_REQ = "2:PING";
 	// Ack message #04 +
 	private static final Pattern ACK_PATTERN = Pattern.compile("#(\\p{XDigit}{2}) ([-%\\+])");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
@@ -115,16 +110,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	@Override
-	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-		if (evt instanceof IdleStateEvent) {
-			IdleStateEvent idle = (IdleStateEvent) evt;
-			if (idle.state() == IdleState.READER_IDLE) {
-				handleReadTimeout(ctx);
-			}
-		}
-	}
-
-	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		state = ConnectionState.EXCEPTION_CAUGHT;
 
@@ -158,22 +143,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		}
 	}
 
-	private void handleReadTimeout(ChannelHandlerContext ctx) throws Exception {
-		switch (state) {
-		case ONLINE:
-			ctx.writeAndFlush(KEEP_ALIVE_REQ);
-			break;
-		default:
-			break;
-		}
-	}
-
 	private void handleMessageAck(String msg) throws Exception {
-		if (msg.startsWith(KEEP_ALIVE_REQ) || msg.equals("+")) {
-			// response to PING message, we can ignore it
-			return;
-		}
-
 		Matcher ackMatcher = ACK_PATTERN.matcher(msg);
 		if (!ackMatcher.matches()) {
 			throw new TransmitterException("Invalid response received: " + msg);
@@ -218,22 +188,19 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 
 		Transmitter t = manager.getTransmitter(name);
 		if (t == null) {
-			logger.error("The transmitter name is not registered: " + name + " connecting from "
-					+ ctx.channel().remoteAddress());
+			logger.error("The transmitter name is not registered: " + name + " connecting from " + ctx.channel().remoteAddress());
 			ctx.writeAndFlush("7 Transmitter not registered").addListener(ChannelFutureListener.CLOSE);
 			return;
 //			throw new TransmitterException("The transmitter name is not registered: " + name);
 		} else if (t.getStatus() == Status.DISABLED) {
-			logger.error("Transmitter is disabled and not allowed to connect: " + name + " connecting from "
-					+ ctx.channel().remoteAddress());
+			logger.error("Transmitter is disabled and not allowed to connect: " + name + " connecting from " + ctx.channel().remoteAddress());
 			ctx.writeAndFlush("7 Transmitter disabled").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
 
 		// Test authentication key
 		if (!t.getAuthKey().equals(key)) {
-			logger.error("Wrong authentication key supplied for transmitter: " + name + " connecting from "
-					+ ctx.channel().remoteAddress());
+			logger.error("Wrong authentication key supplied for transmitter: " + name + " connecting from " + ctx.channel().remoteAddress());
 			ctx.writeAndFlush("7 Invalid credentials").addListener(ChannelFutureListener.CLOSE);
 			return;
 		}
