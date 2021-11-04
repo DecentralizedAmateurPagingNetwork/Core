@@ -20,8 +20,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.ScheduledFuture;
 
 class ServerHandler extends SimpleChannelInboundHandler<String> {
@@ -31,8 +29,6 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 	}
 
 	private static final Logger logger = LogManager.getLogger();
-	// Keep alive request
-	private static final String KEEP_ALIVE_REQ = "2:PING";
 	// Ack message #04 +
 	private static final Pattern ACK_PATTERN = Pattern.compile("#(\\p{XDigit}{2}) ([-%\\+])");
 	// Welcome string [RasPager v1.0-SCP-#2345678 abcde]
@@ -158,22 +154,7 @@ class ServerHandler extends SimpleChannelInboundHandler<String> {
 		}
 	}
 
-	@Override
-	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-		if (evt instanceof IdleStateEvent) {
-			IdleStateEvent idle = (IdleStateEvent) evt;
-			if (idle.state() == IdleState.WRITER_IDLE && state == ConnectionState.ONLINE) {
-				ctx.writeAndFlush(KEEP_ALIVE_REQ);
-			}
-		}
-	}
-
 	private void handleMessageAck(String msg) throws Exception {
-		if (msg.startsWith(KEEP_ALIVE_REQ) || msg.equals("+")) {
-			// response to PING message, we can ignore it
-			return;
-		}
-
 		Matcher ackMatcher = ACK_PATTERN.matcher(msg);
 		if (!ackMatcher.matches()) {
 			throw new TransmitterException("Invalid response received: " + msg);

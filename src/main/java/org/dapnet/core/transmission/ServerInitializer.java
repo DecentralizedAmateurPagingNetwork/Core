@@ -10,7 +10,6 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * The server initializer initializes the newly created channel pipeline.
@@ -35,13 +34,6 @@ class ServerInitializer extends ChannelInitializer<SocketChannel> {
 		p.addLast(decoder);
 		p.addLast(encoder);
 		p.addLast(msgEncoder);
-
-		// Enable TX timeout handler aka ping request?
-		int txTimeout = manager.getSettings().getTransmissionSettings().getServerSettings().getTxTimeoutSeconds();
-		if (txTimeout > 0) {
-			p.addLast(new IdleStateHandler(0, txTimeout, 0));
-		}
-
 		p.addLast(new ServerHandler(manager));
 	}
 }

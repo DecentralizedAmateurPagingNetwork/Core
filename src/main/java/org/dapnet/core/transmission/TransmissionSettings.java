@@ -51,14 +51,9 @@ public final class TransmissionSettings implements Serializable {
 	public final class ServerSettings implements Serializable {
 		private static final long serialVersionUID = 5452321606678683312L;
 		private int port = 43434;
-		private int txTimeoutSeconds = 0;
 
 		public int getPort() {
 			return port;
-		}
-
-		public int getTxTimeoutSeconds() {
-			return txTimeoutSeconds;
 		}
 	}
 }
