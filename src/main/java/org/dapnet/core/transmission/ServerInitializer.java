@@ -20,7 +20,7 @@ class ServerInitializer extends ChannelInitializer<SocketChannel> {
 	private static final StringEncoder encoder = new StringEncoder(StandardCharsets.US_ASCII);
 	private static final StringDecoder decoder = new StringDecoder(StandardCharsets.US_ASCII);
 	private static final MessageEncoder msgEncoder = new MessageEncoder();
-	private static final int TIMEOUT = 30; // 30 seconds
+	private static final int TIMEOUT = 30;
 	private final TransmitterManager manager;
 
 	public ServerInitializer(TransmitterManager manager) {
@@ -34,7 +34,7 @@ class ServerInitializer extends ChannelInitializer<SocketChannel> {
 		p.addLast(decoder);
 		p.addLast(encoder);
 		p.addLast(msgEncoder);
-		p.addLast(new IdleStateHandler(0, TIMEOUT, 0));
+		p.addLast(new IdleStateHandler(TIMEOUT, 0, 0));
 		p.addLast(new ServerHandler(manager));
 	}
 }
