@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.rwth-aachen.afu.dapnet</groupId>
 	<artifactId>dapnet-core</artifactId>
-	<version>1.1.5.2</version>
+	<version>1.1.5.3-SNAPSHOT</version>
 	<name>DAPNET Core</name>
 	<organization>
 		<name>Amateurfunkgruppe der RWTH Aachen University</name>
