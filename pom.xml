@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.rwth-aachen.afu.dapnet</groupId>
 	<artifactId>dapnet-core</artifactId>
-	<version>1.1.5.4</version>
+	<version>1.1.5.5</version>
 	<name>DAPNET Core</name>
 	<organization>
 		<name>Amateurfunkgruppe der RWTH Aachen University</name>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>2.17.0</version>
+			<version>2.17.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
