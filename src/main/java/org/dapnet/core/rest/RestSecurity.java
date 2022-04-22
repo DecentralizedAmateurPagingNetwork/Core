@@ -63,7 +63,7 @@ public final class RestSecurity {
 	}
 
 	/**
-	 * Gets the security status for the given autorizable object.
+	 * Gets the security status for the given authorizable object.
 	 * 
 	 * @param httpHeaders      HTTP headers
 	 * @param minSecurityLevel Minimum security level

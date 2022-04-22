@@ -27,6 +27,11 @@ import javax.ws.rs.core.HttpHeaders;
  * @author Philipp Thiel
  */
 public class LoginData {
+	/**
+	 * Authorization header name.
+	 */
+	public static final String AUTHORIZATION_HEADER = "Authorization";
+
 	private String username;
 	private String password;
 
@@ -93,7 +98,7 @@ public class LoginData {
 	 *         extracted
 	 */
 	public static LoginData fromHttpHeaders(HttpHeaders headers) {
-		final List<String> authorization = headers.getRequestHeader("Authorization");
+		final List<String> authorization = headers.getRequestHeader(AUTHORIZATION_HEADER);
 		if (authorization == null || authorization.isEmpty()) {
 			return null;
 		}

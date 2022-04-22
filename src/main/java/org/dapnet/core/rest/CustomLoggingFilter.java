@@ -57,7 +57,7 @@ public class CustomLoggingFilter extends LoggingFeature implements ContainerRequ
 		// Append username is available
 		String user = null;
 		try {
-			final List<String> authorization = requestContext.getHeaders().get("Authorization");
+			final List<String> authorization = requestContext.getHeaders().get(LoginData.AUTHORIZATION_HEADER);
 			if (authorization != null && !authorization.isEmpty()) {
 				LoginData login = LoginData.fromToken(authorization.get(0));
 				if (login != null) {
