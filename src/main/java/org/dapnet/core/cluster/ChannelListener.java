@@ -22,8 +22,8 @@ import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.HashUtil;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.User;
-import org.jgroups.Channel;
 import org.jgroups.Event;
+import org.jgroups.JChannel;
 import org.jgroups.stack.IpAddress;
 
 public class ChannelListener implements org.jgroups.ChannelListener {
@@ -35,7 +35,7 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 	}
 
 	@Override
-	public void channelConnected(Channel channel) {
+	public void channelConnected(JChannel channel) {
 		try {
 			channel.getState(null, 0);
 		} catch (Exception e) {
@@ -68,11 +68,11 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 	}
 
 	@Override
-	public void channelDisconnected(Channel channel) {
+	public void channelDisconnected(JChannel channel) {
 	}
 
 	@Override
-	public void channelClosed(Channel channel) {
+	public void channelClosed(JChannel channel) {
 	}
 
 	private void createFirstNode() {

@@ -53,7 +53,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	private final JChannel channel;
 	private final ChannelListener channelListener;
 	private final MembershipListener membershipListener;
-	private final MessageListener messageListener;
+	private final ClusterStateListener stateListener;
 	private final RpcDispatcher dispatcher;
 	private final RequestOptions requestOptions;
 	private final TransmissionManager transmissionManager;
@@ -80,18 +80,18 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 			return address;
 		});
 
-		// Create Dispatcher (for creating Block on top of channel)
-		dispatcher = new RpcDispatcher(channel, new RpcListener(this));
-
 		// Create and register Listener
 		channelListener = new org.dapnet.core.cluster.ChannelListener(this);
-		dispatcher.addChannelListener(channelListener);
+		channel.addChannelListener(channelListener);
+
+		// Create Dispatcher (for creating Block on top of channel)
+		dispatcher = new RpcDispatcher(channel, new RpcListener(this));
 
 		membershipListener = new org.dapnet.core.cluster.MembershipListener(this);
 		dispatcher.setMembershipListener(membershipListener);
 
-		messageListener = new org.dapnet.core.cluster.MessageListener(this);
-		dispatcher.setMessageListener(messageListener);
+		stateListener = new org.dapnet.core.cluster.ClusterStateListener(this);
+		dispatcher.setStateListener(stateListener);
 
 		// Create default RequestOptions
 		requestOptions = new RequestOptions(ResponseMode.GET_ALL, Settings.getClusterSettings().getResponseTimeout());

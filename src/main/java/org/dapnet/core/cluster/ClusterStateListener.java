@@ -28,20 +28,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.DAPNETCore;
 import org.dapnet.core.model.State;
-import org.jgroups.Message;
 import org.jgroups.util.Util;
 
-public class MessageListener implements org.jgroups.MessageListener {
+public class ClusterStateListener implements org.jgroups.StateListener {
 	private static final Logger logger = LogManager.getLogger();
 	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 	private final ClusterManager clusterManager;
 
-	public MessageListener(ClusterManager clusterManager) {
+	public ClusterStateListener(ClusterManager clusterManager) {
 		this.clusterManager = clusterManager;
-	}
-
-	@Override
-	public void receive(Message message) {
 	}
 
 	@Override
