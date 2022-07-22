@@ -19,6 +19,7 @@ import java.util.concurrent.locks.Lock;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -90,6 +91,11 @@ public class NewsResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return handleObject(news, "postNews", true, false);
+		if (getRpcMethods().postNews(news)) {
+			final String json = getJsonConverter().toJson(news);
+			return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 }

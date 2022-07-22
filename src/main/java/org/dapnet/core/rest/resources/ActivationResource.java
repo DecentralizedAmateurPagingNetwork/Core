@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Lock;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -54,7 +55,12 @@ public class ActivationResource extends AbstractResource {
 			throw new BadRequestException("RIC already registered.");
 		}
 
-		return handleObject(activation, "postActivation", false, true);
+		if (getRpcMethods().postActivation(activation)) {
+			final String json = getJsonConverter().toJson(activation);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	private boolean isRicRegistered(int ric) {

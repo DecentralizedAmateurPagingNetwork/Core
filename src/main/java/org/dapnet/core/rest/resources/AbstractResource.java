@@ -26,14 +26,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.dapnet.core.cluster.RemoteMethods;
 import org.dapnet.core.model.CoreRepository;
-import org.dapnet.core.model.NamedObject;
 import org.dapnet.core.rest.JsonConverter;
 import org.dapnet.core.rest.RestAuthorizable;
-import org.dapnet.core.rest.RestListener;
 import org.dapnet.core.rest.RestSecurity;
-import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
-import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -49,7 +46,7 @@ public abstract class AbstractResource {
 	@Inject
 	private RestSecurity restSecurity;
 	@Inject
-	private RestListener restListener;
+	private RemoteMethods rpcMethods;
 	@Inject
 	private JsonConverter jsonConverter;
 
@@ -57,8 +54,8 @@ public abstract class AbstractResource {
 		return repository;
 	}
 
-	protected RestListener getRestListener() {
-		return restListener;
+	protected RemoteMethods getRpcMethods() {
+		return rpcMethods;
 	}
 
 	protected JsonConverter getJsonConverter() {
@@ -102,52 +99,4 @@ public abstract class AbstractResource {
 		return Response.ok(jsonConverter.toJson(object, status)).build();
 	}
 
-	public Response handleObject(Object object, String methodName, boolean creation, boolean quorumNeeded)
-			throws Exception {
-		// Check Quorum
-		if (quorumNeeded && !restListener.isQuorum()) {
-			throw new NoQuorumException();
-		}
-
-		// Validation
-		if (object == null) {
-			throw new EmptyBodyException();
-		}
-
-		validateObject(object);
-
-		// Send to Cluster
-		if (restListener.handleStateOperation(null, methodName, new Object[] { object },
-				new Class[] { object.getClass() })) {
-			final String json = jsonConverter.toJson(object);
-			if (creation) {
-				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
-			} else {
-				return Response.ok(json).build();
-			}
-		} else {
-			throw new InternalServerErrorException();
-		}
-	}
-
-	protected Response deleteObject(NamedObject object, String methodName, boolean quorumNeeded) throws Exception {
-		// Check Quorum
-		if (quorumNeeded && !restListener.isQuorum()) {
-			throw new NoQuorumException();
-		}
-
-		// Validation
-		if (object == null) {
-			throw new NotFoundException();
-		}
-
-		// Send to Cluster
-		if (restListener.handleStateOperation(null, methodName, new Object[] { object.getName() },
-				new Class[] { String.class })) {
-			// TODO Why do we return the deleted object here?
-			return Response.ok(jsonConverter.toJson(object)).build();
-		} else {
-			throw new InternalServerErrorException();
-		}
-	}
 }

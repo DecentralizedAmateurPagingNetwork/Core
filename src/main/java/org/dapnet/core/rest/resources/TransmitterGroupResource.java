@@ -19,6 +19,7 @@ import java.util.concurrent.locks.Lock;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -99,7 +100,16 @@ public class TransmitterGroupResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(transmitterGroup, "putTransmitterGroup", oldGroup == null, true);
+		if (getRpcMethods().putTransmitterGroup(transmitterGroup)) {
+			final String json = getJsonConverter().toJson(transmitterGroup);
+			if (oldGroup == null) {
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+			} else {
+				return Response.ok(json).build();
+			}
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@DELETE
@@ -117,12 +127,20 @@ public class TransmitterGroupResource extends AbstractResource {
 				checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY, oldTransmitterGroup);
 			} else {
 				checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
-				throw new NotFoundException();
 			}
 		} finally {
 			lock.unlock();
 		}
 
-		return deleteObject(oldTransmitterGroup, "deleteTransmitterGroup", true);
+		if (oldTransmitterGroup == null) {
+			throw new NotFoundException();
+		}
+
+		if (getRpcMethods().deleteTransmitterGroup(oldTransmitterGroup)) {
+			final String json = getJsonConverter().toJson(oldTransmitterGroup);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 }

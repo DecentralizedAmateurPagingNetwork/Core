@@ -18,20 +18,28 @@ import java.io.FileNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.Program;
+import org.dapnet.core.model.Activation;
+import org.dapnet.core.model.Call;
+import org.dapnet.core.model.CallSign;
 import org.dapnet.core.model.ModelRepository;
+import org.dapnet.core.model.News;
 import org.dapnet.core.model.NewsList;
 import org.dapnet.core.model.Node;
 import org.dapnet.core.model.Node.Status;
 import org.dapnet.core.model.Rubric;
 import org.dapnet.core.model.StateManager;
 import org.dapnet.core.model.Transmitter;
-import org.dapnet.core.rest.RestListener;
+import org.dapnet.core.model.TransmitterGroup;
+import org.dapnet.core.model.User;
+import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
+import org.dapnet.core.rest.exceptionHandling.NoQuorumException;
 import org.dapnet.core.transmission.TransmissionManager;
 import org.dapnet.core.transmission.TransmitterManager;
 import org.dapnet.core.transmission.TransmitterManagerListener;
@@ -41,14 +49,18 @@ import org.jgroups.blocks.RequestOptions;
 import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.util.ExtendedUUID;
+import org.jgroups.util.Rsp;
 import org.jgroups.util.RspList;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 /**
  * The cluster manager is responsible for the DAPNET cluster connection.
  * 
  * @author Philipp Thiel
  */
-public final class ClusterManager implements TransmitterManagerListener, RestListener {
+public final class ClusterManager implements TransmitterManagerListener, RemoteMethods {
 	private static final Logger logger = LogManager.getLogger();
 
 	private final StateManager stateManager;
@@ -232,7 +244,6 @@ public final class ClusterManager implements TransmitterManagerListener, RestLis
 		}
 	}
 
-	@Override
 	public boolean isQuorum() {
 		checkQuorum();// Should be unnecessary, but added ensure QuorumCheck
 		return quorum;
@@ -240,53 +251,266 @@ public final class ClusterManager implements TransmitterManagerListener, RestLis
 
 	// ### Remote Procedure Call
 	// ########################################################################################
-	@Override
-	@SuppressWarnings("rawtypes")
-	public boolean handleStateOperation(Collection<Address> destination, String methodName, Object[] args,
-			Class[] types) {
+
+	private boolean callRemoteMethods(Collection<Address> destination, String methodName, Object[] args,
+			Class<?>[] types) {
 		if (!channel.isConnected()) {
+			logger.warn("Cannot call remote method '{}', channel is not connected.", methodName);
 			return false;
 		}
 
+		boolean success = true;
+
 		try {
-			RspList rspList = dispatcher.callRemoteMethods(destination, methodName, args, types, requestOptions);
-			if (isSuccessful(rspList)) {
-				return true;
-			} else {
+			RspList<RpcResponse> rspList = dispatcher.callRemoteMethods(destination, methodName, args, types,
+					requestOptions);
+			for (Rsp<RpcResponse> response : rspList) {
+				if (response.getValue() != RpcResponse.OK) {
+					success = false;
+					break;
+				}
+			}
+
+			if (!success) {
 				logger.error("Response: {}", rspList);
 			}
 		} catch (Exception e) {
 			logger.catching(e);
+
+			success = false;
 		}
 
-		logger.fatal("Insecure Cluster State");
+		return success;
+	}
 
-		return false;
+	private <T> void validateObject(T object) {
+		Set<ConstraintViolation<T>> constraintViolations = stateManager.validate(object);
+		if (!constraintViolations.isEmpty()) {
+			throw new ConstraintViolationException(constraintViolations);
+		}
 	}
 
 	public boolean updateNodeStatus(Node.Status status) {
-		return handleStateOperation(null, "updateNodeStatus", new Object[] { channel.getName(), status },
+		return callRemoteMethods(null, "updateNodeStatus", new Object[] { channel.getName(), status },
 				new Class[] { String.class, Node.Status.class });
 	}
 
-	@SuppressWarnings("rawtypes")
-	private boolean isSuccessful(RspList list) {
-		if (list == null || list.getResults() == null || list.getResults().isEmpty()) {
-			return false;
+	@Override
+	public boolean postActivation(Activation activation) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
 		}
 
-		for (Object result : list.getResults()) {
-			try {
-				if (result != RpcResponse.OK) {
-					return false;
-				}
-			} catch (Exception e) {
-				logger.catching(e);
-				return false;
-			}
+		if (activation == null) {
+			throw new EmptyBodyException();
 		}
 
-		return true;
+		validateObject(activation);
+
+		return callRemoteMethods(null, "postActivation", new Object[] { activation },
+				new Class<?>[] { activation.getClass() });
+	}
+
+	@Override
+	public boolean postCall(Call call) throws Exception {
+		if (call == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(call);
+
+		return callRemoteMethods(null, "postCall", new Object[] { call }, new Class<?>[] { call.getClass() });
+	}
+
+	@Override
+	public boolean putCallSign(CallSign callSign) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (callSign == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(callSign);
+
+		return callRemoteMethods(null, "putCallSign", new Object[] { callSign },
+				new Class<?>[] { callSign.getClass() });
+	}
+
+	@Override
+	public boolean deleteCallSign(CallSign callSign) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (callSign == null) {
+			throw new EmptyBodyException();
+		}
+
+		return callRemoteMethods(null, "deleteCallSign", new Object[] { callSign },
+				new Class<?>[] { callSign.getClass() });
+	}
+
+	@Override
+	public boolean postNews(News news) throws Exception {
+		if (news == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(news);
+
+		return callRemoteMethods(null, "postNews", new Object[] { news }, new Class<?>[] { news.getClass() });
+	}
+
+	@Override
+	public boolean putNode(Node node) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (node == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(node);
+
+		return callRemoteMethods(null, "putNode", new Object[] { node }, new Class<?>[] { node.getClass() });
+	}
+
+	@Override
+	public boolean deleteNode(Node node) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (node == null) {
+			throw new EmptyBodyException();
+		}
+
+		return callRemoteMethods(null, "deleteNode", new Object[] { node }, new Class<?>[] { node.getClass() });
+	}
+
+	@Override
+	public boolean putRubric(Rubric rubric) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (rubric == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(rubric);
+
+		return callRemoteMethods(null, "putRubric", new Object[] { rubric }, new Class<?>[] { rubric.getClass() });
+	}
+
+	@Override
+	public boolean deleteRubric(Rubric rubric) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (rubric == null) {
+			throw new EmptyBodyException();
+		}
+
+		return callRemoteMethods(null, "deleteRubric", new Object[] { rubric }, new Class<?>[] { rubric.getClass() });
+	}
+
+	@Override
+	public boolean putTransmitter(Transmitter transmitter) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (transmitter == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(transmitter);
+
+		return callRemoteMethods(null, "putTransmitter", new Object[] { transmitter },
+				new Class<?>[] { transmitter.getClass() });
+	}
+
+	@Override
+	public boolean deleteTransmitter(Transmitter transmitter) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (transmitter == null) {
+			throw new EmptyBodyException();
+		}
+
+		return callRemoteMethods(null, "deleteTransmitter", new Object[] { transmitter },
+				new Class<?>[] { transmitter.getClass() });
+	}
+
+	@Override
+	public boolean putTransmitterGroup(TransmitterGroup group) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (group == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(group);
+
+		return callRemoteMethods(null, "putTransmitterGroup", new Object[] { group },
+				new Class<?>[] { group.getClass() });
+	}
+
+	@Override
+	public boolean deleteTransmitterGroup(TransmitterGroup group) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (group == null) {
+			throw new EmptyBodyException();
+		}
+
+		return callRemoteMethods(null, "deleteTransmitterGroup", new Object[] { group },
+				new Class<?>[] { group.getClass() });
+	}
+
+	@Override
+	public boolean putUser(User user) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (user == null) {
+			throw new EmptyBodyException();
+		}
+
+		validateObject(user);
+
+		return callRemoteMethods(null, "putUser", new Object[] { user }, new Class<?>[] { user.getClass() });
+	}
+
+	@Override
+	public boolean deleteUser(User user) throws Exception {
+		if (!isQuorum()) {
+			throw new NoQuorumException();
+		}
+
+		if (user == null) {
+			throw new EmptyBodyException();
+		}
+
+		return callRemoteMethods(null, "deleteUser", new Object[] { user }, new Class<?>[] { user.getClass() });
+	}
+
+	@Override
+	public boolean sendRubricNames(String transmitterName) throws Exception {
+		return callRemoteMethods(null, "sendRubricNames", new Object[] { transmitterName },
+				new Class[] { String.class });
 	}
 
 	// ### TransmitterDeviceManagerListener
@@ -317,7 +541,7 @@ public final class ClusterManager implements TransmitterManagerListener, RestLis
 		}
 
 		if (exists) {
-			handleStateOperation(null, "updateTransmitterStatus", new Object[] { transmitter },
+			callRemoteMethods(null, "updateTransmitterStatus", new Object[] { transmitter },
 					new Class[] { Transmitter.class });
 		}
 	}
@@ -359,4 +583,5 @@ public final class ClusterManager implements TransmitterManagerListener, RestLis
 	public JChannel getChannel() {
 		return channel;
 	}
+
 }

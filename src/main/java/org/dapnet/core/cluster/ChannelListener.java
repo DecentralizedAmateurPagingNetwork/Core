@@ -101,16 +101,25 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 	private void createFirstNode() {
 		logger.info("Creating first node");
 
-		// Get own IP address
-		IpAddress address = (IpAddress) clusterManager.getChannel()
-				.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
-		// Create new node
-		Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE);
-		node.setOwnerNames(Set.of("admin"));
-		if (clusterManager.handleStateOperation(null, "putNode", new Object[] { node }, new Class[] { Node.class })) {
+		boolean created = false;
+
+		try {
+			// Get own IP address
+			IpAddress address = (IpAddress) clusterManager.getChannel()
+					.down(new Event(Event.GET_PHYSICAL_ADDRESS, clusterManager.getChannel().getAddress()));
+			// Create new node
+			Node node = new Node(clusterManager.getChannel().getName(), address, "0", "0", Node.Status.ONLINE);
+			node.setOwnerNames(Set.of("admin"));
+			created = clusterManager.putNode(node);
+		} catch (Exception e) {
+			logger.catching(e);
+			created = false;
+		}
+
+		if (created) {
 			logger.info("First node successfully created");
 		} else {
-			logger.fatal("First node could not been created");
+			logger.fatal("First node could not be created");
 			Program.shutdown();
 		}
 	}
@@ -145,15 +154,17 @@ public class ChannelListener implements org.jgroups.ChannelListener {
 		logger.info("Creating first user");
 		User user = new User("admin", "admin", "admin@example.com", true);
 
+		boolean created = false;
 		try {
 			user.setHash(HashUtil.createHash(user.getHash()));
+
+			created = clusterManager.putUser(user);
 		} catch (Exception e) {
 			logger.catching(e);
-			logger.fatal("First user could not been created");
-			Program.shutdown();
+			created = false;
 		}
 
-		if (clusterManager.handleStateOperation(null, "putUser", new Object[] { user }, new Class[] { User.class })) {
+		if (created) {
 			logger.info("First user successfully updated");
 		} else {
 			logger.fatal("First user could not be created");

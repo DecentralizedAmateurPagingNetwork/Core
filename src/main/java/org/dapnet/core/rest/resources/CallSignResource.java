@@ -19,6 +19,8 @@ import java.util.concurrent.locks.Lock;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -96,7 +98,16 @@ public class CallSignResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(callSign, "putCallSign", oldCallSign == null, true);
+		if (getRpcMethods().putCallSign(callSign)) {
+			final String json = getJsonConverter().toJson(callSign);
+			if (oldCallSign == null) {
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+			} else {
+				return Response.ok(json).build();
+			}
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@DELETE
@@ -121,6 +132,15 @@ public class CallSignResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return deleteObject(oldCallSign, "deleteCallSign", true);
+		if (oldCallSign == null) {
+			throw new NotFoundException();
+		}
+
+		if (getRpcMethods().deleteCallSign(oldCallSign)) {
+			final String json = getJsonConverter().toJson(oldCallSign);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 }

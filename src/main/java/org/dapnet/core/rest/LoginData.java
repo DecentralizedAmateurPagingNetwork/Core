@@ -46,10 +46,20 @@ public class LoginData {
 		this.password = Objects.requireNonNull(password, "Password must not be null.");
 	}
 
+	/**
+	 * Gets the username.
+	 * 
+	 * @return Username
+	 */
 	public String getUsername() {
 		return username;
 	}
 
+	/**
+	 * Sets the username.
+	 * 
+	 * @param username Username
+	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}

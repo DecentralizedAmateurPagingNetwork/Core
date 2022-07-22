@@ -19,6 +19,7 @@ import java.util.concurrent.locks.Lock;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -97,7 +98,16 @@ public class NodeResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return handleObject(node, "putNode", oldNode == null, true);
+		if (getRpcMethods().putNode(node)) {
+			final String json = getJsonConverter().toJson(node);
+			if (oldNode == null) {
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+			} else {
+				return Response.ok(json).build();
+			}
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@DELETE
@@ -120,6 +130,11 @@ public class NodeResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return deleteObject(oldNode, "deleteNode", true);
+		if (getRpcMethods().deleteNode(oldNode)) {
+			final String json = getJsonConverter().toJson(oldNode);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 }

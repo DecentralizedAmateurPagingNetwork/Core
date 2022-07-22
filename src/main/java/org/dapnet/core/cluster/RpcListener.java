@@ -44,7 +44,7 @@ import org.dapnet.core.transmission.TransmissionManager;
  * This class implements the RPC listener and is responsible for handling RPCs
  * over jgroups.
  */
-public class RpcListener {
+class RpcListener {
 	private static final Logger logger = LogManager.getLogger();
 	private final ClusterManager clusterManager;
 	private final StateManager stateManager;

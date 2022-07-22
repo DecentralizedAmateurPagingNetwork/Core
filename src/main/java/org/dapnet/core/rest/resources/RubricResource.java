@@ -19,6 +19,8 @@ import java.util.concurrent.locks.Lock;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -95,7 +97,16 @@ public class RubricResource extends AbstractResource {
 			throw new EmptyBodyException();
 		}
 
-		return handleObject(rubric, "putRubric", oldRubric == null, true);
+		if (getRpcMethods().putRubric(rubric)) {
+			final String json = getJsonConverter().toJson(rubric);
+			if (oldRubric == null) {
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+			} else {
+				return Response.ok(json).build();
+			}
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@DELETE
@@ -120,6 +131,15 @@ public class RubricResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return deleteObject(oldRubric, "deleteRubric", true);
+		if (oldRubric == null) {
+			throw new NotFoundException();
+		}
+
+		if (getRpcMethods().deleteRubric(oldRubric)) {
+			final String json = getJsonConverter().toJson(oldRubric);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 }

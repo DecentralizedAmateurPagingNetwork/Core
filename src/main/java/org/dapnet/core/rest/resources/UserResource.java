@@ -19,6 +19,8 @@ import java.util.concurrent.locks.Lock;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -111,7 +113,16 @@ public class UserResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return handleObject(user, "putUser", oldUser == null, true);
+		if (getRpcMethods().putUser(user)) {
+			final String json = getJsonConverter().toJson(user);
+			if (oldUser == null) {
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+			} else {
+				return Response.ok(json).build();
+			}
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@DELETE
@@ -136,6 +147,15 @@ public class UserResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return deleteObject(oldUser, "deleteUser", true);
+		if (oldUser == null) {
+			throw new NotFoundException();
+		}
+
+		if (getRpcMethods().deleteUser(oldUser)) {
+			final String json = getJsonConverter().toJson(oldUser);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 }

@@ -24,7 +24,9 @@ import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAcceptableException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -139,7 +141,16 @@ public class TransmitterResource extends AbstractResource {
 			throw new NotAcceptableException("Auth key contains invalid characters.");
 		}
 
-		return handleObject(transmitter, "putTransmitter", oldTransmitter == null, true);
+		if (getRpcMethods().putTransmitter(transmitter)) {
+			final String json = getJsonConverter().toJson(transmitter);
+			if (oldTransmitter == null) {
+				return Response.created(uriInfo.getAbsolutePath()).entity(json).build();
+			} else {
+				return Response.ok(json).build();
+			}
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@DELETE
@@ -162,7 +173,16 @@ public class TransmitterResource extends AbstractResource {
 			lock.unlock();
 		}
 
-		return deleteObject(oldTransmitter, "deleteTransmitter", true);
+		if (oldTransmitter == null) {
+			throw new NotFoundException();
+		}
+
+		if (getRpcMethods().deleteTransmitter(oldTransmitter)) {
+			final String json = getJsonConverter().toJson(oldTransmitter);
+			return Response.ok(json).build();
+		} else {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@SuppressWarnings("unused")

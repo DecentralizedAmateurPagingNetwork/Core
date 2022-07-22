@@ -36,8 +36,7 @@ public class TransmitterControl extends AbstractResource {
 			lock.unlock();
 		}
 
-		if (getRestListener().handleStateOperation(null, "sendRubricNames", new Object[] { transmitterName },
-				new Class[] { String.class })) {
+		if (getRpcMethods().sendRubricNames(transmitterName)) {
 			return Response.ok().build();
 		} else {
 			throw new InternalServerErrorException();

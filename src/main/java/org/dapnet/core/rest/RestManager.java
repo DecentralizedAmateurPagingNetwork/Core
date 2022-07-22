@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dapnet.core.CoreStartupException;
 import org.dapnet.core.Settings;
+import org.dapnet.core.cluster.RemoteMethods;
 import org.dapnet.core.model.CoreRepository;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -37,19 +38,19 @@ public final class RestManager {
 	private static final Logger logger = LogManager.getLogger();
 	private final Settings settings;
 	private final CoreRepository repository;
-	private final RestListener restListener;
+	private final RemoteMethods clusterMethods;
 	private HttpServer server;
 
 	/**
 	 * Constructs a new REST manager instance.
 	 * 
-	 * @param repository   Repository to use
-	 * @param restListener REST listener to use
+	 * @param repository Repository to use
+	 * @param clusterMethods Cluster methods to use
 	 */
-	public RestManager(Settings settings, CoreRepository repository, RestListener restListener) {
+	public RestManager(Settings settings, CoreRepository repository, RemoteMethods clusterMethods) {
 		this.settings = Objects.requireNonNull(settings, "Settings must not be null.");
 		this.repository = Objects.requireNonNull(repository, "State manager must not be null.");
-		this.restListener = Objects.requireNonNull(restListener, "REST listener must not be null.");
+		this.clusterMethods = Objects.requireNonNull(clusterMethods, "Cluster methods must not be null.");
 	}
 
 	/**
@@ -59,7 +60,7 @@ public final class RestManager {
 		try {
 			URI endpoint = new URI("http", null, settings.getRestSettings().getHostname(),
 					settings.getRestSettings().getPort(), settings.getRestSettings().getPath(), null, null);
-			ResourceConfig rc = new ApplicationConfig(settings, repository, restListener);
+			ResourceConfig rc = new ApplicationConfig(settings, repository, clusterMethods);
 			server = GrizzlyHttpServerFactory.createHttpServer(endpoint, rc);
 
 			logger.info("RestApi successfully started.");
