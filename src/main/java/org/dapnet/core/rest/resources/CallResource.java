@@ -37,14 +37,12 @@ import org.dapnet.core.rest.exceptionHandling.EmptyBodyException;
 public class CallResource extends AbstractResource {
 	@GET
 	public Response getCalls(@QueryParam("ownerName") String ownerName) throws Exception {
+		checkAuthorization(RestSecurity.SecurityLevel.USER_ONLY);
+		
 		if (ownerName == null || ownerName.isEmpty()) {
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.ADMIN_ONLY);
 			return getObject(restListener.getState().getCalls(), status);
 		} else {
 			ownerName = ownerName.toLowerCase();
-
-			RestSecurity.SecurityStatus status = checkAuthorization(RestSecurity.SecurityLevel.OWNER_ONLY,
-					restListener.getState().getUsers().get(ownerName));
 
 			List<Call> calls = new ArrayList<>();
 			for (Call call : restListener.getState().getCalls()) {
