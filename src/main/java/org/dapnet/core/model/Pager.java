@@ -33,6 +33,18 @@ public class Pager implements Serializable {
 	@Size(min = 3, max = 20)
 	private String name;
 
+	@Min(value = 0, message = "subric must be in range 0-3")
+	@Max(value = 3, message = "subric must be in range 0-3")
+	private Integer subric;
+
+	public Integer getSubric() {
+		return subric;
+	}
+
+	public void setSubric(Integer subric) {
+		this.subric = subric;
+	}
+
 	public int getNumber() {
 		return number;
 	}
