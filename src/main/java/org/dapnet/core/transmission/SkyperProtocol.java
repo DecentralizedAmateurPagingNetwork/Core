@@ -167,7 +167,8 @@ public class SkyperProtocol implements PagerProtocol {
 	@Override
 	public PagerMessage createMessageFromNewsAsCall(News news) {
 		try {
-			return new PagerMessage(news.getText(), news.getRubric().getAddress(), PagerMessage.MessagePriority.CALL,
+			String text = encodeString(news.getText());
+			return new PagerMessage(text, news.getRubric().getAddress(), PagerMessage.MessagePriority.CALL,
 					PagerMessage.FunctionalBits.ALPHANUM);
 		} catch (Exception ex) {
 			return null;
