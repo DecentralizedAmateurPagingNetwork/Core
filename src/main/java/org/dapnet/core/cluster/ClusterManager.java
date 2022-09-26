@@ -165,7 +165,7 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// ### Helper for reading Cluster Config
 	// ############################################################################
 	private String readChannelName() {
-		String channelName = Settings.getClusterSettings().getChannelName();
+		String channelName = Settings.getClusterSettings().getChannelName() + DAPNETCore.getCoreVersion();
 		logger.info("readChannelName from Settings: " + channelName);
 		return channelName;
 	}
