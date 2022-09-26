@@ -25,7 +25,9 @@
   },
   "clusterSettings": {
     "responseTimeout": 10000,
-    "clusterConfigurationFile": "../local/config/ClusterConfig.xml"
+    "clusterConfigurationFile": "../local/config/ClusterConfig.xml",
+    "nodeName": "THIS_IS_YOUR_CALLSIGN_AS_ITS_IN_SETUP_IN_THE_CLUSTER",
+    "channelName": "DAPNET"
   },
   "schedulerSettings": {
     "timeTransmissionCron": "0 0/2 * * * ?",

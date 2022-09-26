@@ -21,6 +21,10 @@ public class ClusterSettings implements Serializable {
 	private int responseTimeout = 10000;
 	private String clusterConfigurationFile = "config/ClusterConfig.xml";
 
+	private String nodeName;
+
+	private String channelName;
+
 	public int getResponseTimeout() {
 		return responseTimeout;
 	}
@@ -28,4 +32,8 @@ public class ClusterSettings implements Serializable {
 	public String getClusterConfigurationFile() {
 		return clusterConfigurationFile;
 	}
+
+	public String getNodeName() { return nodeName; }
+
+	public String getChannelName() { return channelName; }
 }
