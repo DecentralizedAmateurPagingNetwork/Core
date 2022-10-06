@@ -165,23 +165,15 @@ public class ClusterManager implements TransmitterManagerListener, RestListener 
 	// ### Helper for reading Cluster Config
 	// ############################################################################
 	private String readChannelName() {
-		// Ugly solution but prevents the use of a second configuration file
-		String properties = channel.getProperties();
-		int gmsPosition = properties.indexOf("pbcast.GMS");
-		int namePosition = properties.indexOf("name=", gmsPosition);
-		int startPosition = properties.indexOf('@', namePosition) + 1;
-		int endPosition = properties.indexOf(';', startPosition);
-		return properties.substring(startPosition, endPosition) + DAPNETCore.getCoreVersion();
+		String channelName = Settings.getClusterSettings().getChannelName() + DAPNETCore.getCoreVersion();
+		logger.info("readChannelName from Settings: " + channelName);
+		return channelName;
 	}
 
 	private String readNodeName() {
-		// Ugly solution but prevents the use of a second configuration file
-		String properties = channel.getProperties();
-		int gmsPosition = properties.indexOf("pbcast.GMS");
-		int namePosition = properties.indexOf("name=", gmsPosition);
-		int startPosition = namePosition + 5;
-		int endPosition = properties.indexOf('@', startPosition);
-		return properties.substring(startPosition, endPosition);
+		String nodeName = Settings.getClusterSettings().getNodeName();
+		logger.info("readNodeName from Settings: " + nodeName);
+		return nodeName;
 	}
 
 	// ### Quorum
