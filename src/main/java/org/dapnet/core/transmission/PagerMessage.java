@@ -15,6 +15,7 @@
 package org.dapnet.core.transmission;
 
 import java.time.Instant;
+import java.util.stream.Stream;
 
 public class PagerMessage implements Comparable<PagerMessage> {
 	private final String text;
@@ -38,6 +39,10 @@ public class PagerMessage implements Comparable<PagerMessage> {
 
 		public int getValue() {
 			return value;
+		}
+
+		public static FunctionalBits fromSubric(int subric, FunctionalBits fallback) {
+			return Stream.of(values()).filter(fb -> fb.value == subric).findFirst().orElse(fallback);
 		}
 	}
 

@@ -82,6 +82,9 @@ public class SkyperProtocol implements PagerProtocol {
 				}
 
 				for (Pager pager : callsign.getPagers()) {
+					if (pager.getSubric() != null) {
+						mode = FunctionalBits.fromSubric(pager.getSubric(), mode);
+					}
 					messages.add(new PagerMessage(now, text, pager.getNumber(), priority, mode));
 				}
 			}
